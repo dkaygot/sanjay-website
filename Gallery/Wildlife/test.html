@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pinterest Masonry Gallery</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #f7f7f7;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 24px;
+    }
+
+    .gallery-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* CSS Multi-column Masonry */
+    .masonry-gallery {
+      column-count: 4;
+      column-gap: 16px;
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: #e5e5e5;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .masonry-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    .masonry-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      vertical-align: middle;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1200px) {
+      .masonry-gallery {
+        column-count: 3;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .masonry-gallery {
+        column-count: 2;
+        column-gap: 12px;
+      }
+      .masonry-item {
+        margin-bottom: 12px;
+        border-radius: 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .masonry-gallery {
+        column-count: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="gallery-container">
+    <div class="masonry-gallery">
+      <div class="masonry-item"><img src="1.jpg" width="1200" height="797" alt="Photo 1" loading="lazy" /></div>
+      <div class="masonry-item"><img src="2.jpg" width="1200" height="800" alt="Photo 2" loading="lazy" /></div>
+      <div class="masonry-item"><img src="3.jpg" width="1200" height="800" alt="Photo 3" loading="lazy" /></div>
+      <div class="masonry-item"><img src="4.jpg" width="1200" height="800" alt="Photo 4" loading="lazy" /></div>
+      <div class="masonry-item"><img src="5.jpg" width="1200" height="800" alt="Photo 5" loading="lazy" /></div>
+      <div class="masonry-item"><img src="6.jpg" width="1200" height="800" alt="Photo 6" loading="lazy" /></div>
+      <div class="masonry-item"><img src="7.jpg" width="1200" height="800" alt="Photo 7" loading="lazy" /></div>
+      <div class="masonry-item"><img src="8.jpg" width="1200" height="800" alt="Photo 8" loading="lazy" /></div>
+      <div class="masonry-item"><img src="9.jpg" width="1200" height="800" alt="Photo 9" loading="lazy" /></div>
+      <div class="masonry-item"><img src="10.jpg" width="1200" height="801" alt="Photo 10" loading="lazy" /></div>
+      <div class="masonry-item"><img src="11.jpg" width="1200" height="800" alt="Photo 11" loading="lazy" /></div>
+      <div class="masonry-item"><img src="12.jpg" width="1200" height="800" alt="Photo 12" loading="lazy" /></div>
+      <div class="masonry-item"><img src="13.jpg" width="1200" height="800" alt="Photo 13" loading="lazy" /></div>
+      <div class="masonry-item"><img src="14.jpg" width="960" height="1200" alt="Photo 14" loading="lazy" /></div>
+      <div class="masonry-item"><img src="15.jpg" width="800" height="1200" alt="Photo 15" loading="lazy" /></div>
+      <div class="masonry-item"><img src="16.jpg" width="1200" height="800" alt="Photo 16" loading="lazy" /></div>
+      <div class="masonry-item"><img src="17.jpg" width="922" height="1200" alt="Photo 17" loading="lazy" /></div>
+      <div class="masonry-item"><img src="18.jpg" width="1200" height="791" alt="Photo 18" loading="lazy" /></div>
+      <div class="masonry-item"><img src="19.jpg" width="1200" height="800" alt="Photo 19" loading="lazy" /></div>
+      <div class="masonry-item"><img src="20.jpg" width="1200" height="801" alt="Photo 20" loading="lazy" /></div>
+      <div class="masonry-item"><img src="21.jpg" width="1200" height="800" alt="Photo 21" loading="lazy" /></div>
+      <div class="masonry-item"><img src="22.jpg" width="1200" height="800" alt="Photo 22" loading="lazy" /></div>
+      <div class="masonry-item"><img src="23.jpg" width="1200" height="800" alt="Photo 23" loading="lazy" /></div>
+      <div class="masonry-item"><img src="24.jpg" width="1200" height="800" alt="Photo 24" loading="lazy" /></div>
+      <div class="masonry-item"><img src="25.jpg" width="1200" height="659" alt="Photo 25" loading="lazy" /></div>
+      <div class="masonry-item"><img src="26.jpg" width="857" height="1200" alt="Photo 26" loading="lazy" /></div>
+      <div class="masonry-item"><img src="27.jpg" width="960" height="1200" alt="Photo 27" loading="lazy" /></div>
+      <div class="masonry-item"><img src="28.jpg" width="798" height="1200" alt="Photo 28" loading="lazy" /></div>
+      <div class="masonry-item"><img src="29.jpg" width="960" height="1200" alt="Photo 29" loading="lazy" /></div>
+      <div class="masonry-item"><img src="30.jpg" width="960" height="1200" alt="Photo 30" loading="lazy" /></div>
+      <div class="masonry-item"><img src="31.jpg" width="1200" height="1200" alt="Photo 31" loading="lazy" /></div>
+      <div class="masonry-item"><img src="32.jpg" width="800" height="1200" alt="Photo 32" loading="lazy" /></div>
+      <div class="masonry-item"><img src="33.jpg" width="1200" height="800" alt="Photo 33" loading="lazy" /></div>
+      <div class="masonry-item"><img src="34.jpg" width="1200" height="800" alt="Photo 34" loading="lazy" /></div>
+      <div class="masonry-item"><img src="35.jpg" width="1200" height="798" alt="Photo 35" loading="lazy" /></div>
+      <div class="masonry-item"><img src="36.jpg" width="1200" height="800" alt="Photo 36" loading="lazy" /></div>
+      <div class="masonry-item"><img src="37.jpg" width="1200" height="800" alt="Photo 37" loading="lazy" /></div>
+      <div class="masonry-item"><img src="38.jpg" width="1200" height="800" alt="Photo 38" loading="lazy" /></div>
+      <div class="masonry-item"><img src="39.jpg" width="1200" height="800" alt="Photo 39" loading="lazy" /></div>
+      <div class="masonry-item"><img src="40.jpg" width="1200" height="800" alt="Photo 40" loading="lazy" /></div>
+      <div class="masonry-item"><img src="41.jpg" width="1200" height="800" alt="Photo 41" loading="lazy" /></div>
+      <div class="masonry-item"><img src="42.jpg" width="1200" height="800" alt="Photo 42" loading="lazy" /></div>
+      <div class="masonry-item"><img src="43.jpg" width="857" height="1200" alt="Photo 43" loading="lazy" /></div>
+      <div class="masonry-item"><img src="44.jpg" width="1200" height="798" alt="Photo 44" loading="lazy" /></div>
+      <div class="masonry-item"><img src="45.jpg" width="1200" height="797" alt="Photo 45" loading="lazy" /></div>
+    </div>
+  </main>
+
+</body>
+</html>

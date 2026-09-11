@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Website</title>
+    
+    <!-- 1. Link the CSS file in your head tag -->
+    <link rel="stylesheet" href="sidebar.css">
+    
+</head>
+<body>
+
+    <!-- 2. Paste the HTML elements right below the opening body tag -->
+    <svg id="sidebar-svg">
+        <defs>
+            <linearGradient id="black-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#000000" stop-opacity="0.30"/>
+                <stop offset="100%" stop-color="#000000" stop-opacity="0.20"/>
+            </linearGradient>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="5" dy="0" stdDeviation="15" flood-opacity="0.2"/>
+            </filter>
+        </defs>
+        <path id="sidebar-path" fill="url(#black-gradient)" filter="url(#shadow)"/>
+    </svg>
+
+    <div id="hover-trigger"></div>
+
+    <div id="sidebar-content">
+        <div class="menu-item">Home</div>
+        <div class="menu-item">Gallery</div>
+        <div class="menu-item">Contact</div>
+        <div class="menu-item">Know me</div>
+    </div>
+    <!-- End of Sidebar Elements -->
+
+
+    <!-- The rest of your normal website content goes here! -->
+    <div style="padding: 50px 50px 50px 100px;">
+        <h1>Welcome to my site</h1>
+        <p>Hover over the left edge to see the menu.</p>
+    </div>
+
+
+    <!-- 3. Link the JS file right before the closing body tag -->
+    <script src="sidebar.js"></script>
+</body>
+</html>
