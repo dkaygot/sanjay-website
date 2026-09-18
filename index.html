@@ -1,27 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home</title>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
 
-    html, body {
-        height: 100%;
-        background: #0f0f14;
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
-</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Slide Pages</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        *::-webkit-scrollbar {
+            display: none;
+        }
+        
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            background: #0e0e0e;
+            overflow: hidden;
+        }
+        
+        #stage {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+        
+        .page {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 600ms ease;
+            z-index: 1;
+        }
+        
+        .page.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            z-index: 2;
+        }
+        
+        .page iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .page {
+                transition: none;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <h1>Home page is yet to be build</h1>
+    <div id="stage"></div>
 
-    <script src="Sidebar/sidebar-widget.js"></script>
+    <script>
+        /* ======================================================================
+                                   ADD YOUR PAGE FILES HERE — each entry is a path to a local .html file,
+                                   relative to THIS file's location. Use forward slashes, e.g.
+                                   "media-home/chapter-two.html".
+
+                                   IMPORTANT: for auto-advance-on-scroll to work, each of these files
+                                   must include the small bridge script — see oni-bridge.js and the
+                                   one-line <script> tag you add to each page.
+                                   Without the bridge script a page still displays and you can still
+                                   navigate it with the arrow keys, just not by scrolling past its end.
+                                   ====================================================================== */
+        const pages = [
+            "lens.html",
+            "media-home/chapter-two.html",
+            "Artist/Artist.html"
+        ];
+        /* ====================================================================== */
+
+        const stage = document.getElementById('stage');
+
+        stage.innerHTML = pages.map(path =>
+            `<section class="page"><iframe src="${path}"></iframe></section>`
+        ).join('');
+
+        const pageEls = Array.from(stage.children);
+        let current = 0;
+        let busy = false;
+        const DUR = 600;
+
+        function setActive(i) {
+            pageEls.forEach((p, idx) => p.classList.toggle('active', idx === i));
+        }
+
+        function goTo(i) {
+            if (i < 0 || i >= pageEls.length || i === current || busy) return;
+            busy = true;
+            const direction = i > current ? 'forward' : 'backward';
+            current = i;
+            setActive(i);
+
+            // tell the page we just landed on which end to scroll to, so
+            // moving backward lands at its bottom and moving forward lands
+            // at its top (mirrors how the user is scrolling)
+            const iframe = pageEls[i].querySelector('iframe');
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage({
+                    source: 'oni-parent',
+                    type: 'scrollTo',
+                    position: direction === 'backward' ? 'bottom' : 'top'
+                }, '*');
+            }
+
+            setTimeout(() => busy = false, DUR + 50);
+        }
+
+        // ---- receive edge-of-scroll signals from the child pages ----
+        window.addEventListener('message', (e) => {
+            const data = e.data;
+            if (!data || data.source !== 'oni-bridge') return;
+            console.log('[parent] received', data, 'from a child; current page index =', current);
+
+            // only react to messages coming from the currently active page's iframe
+            const activeFrame = pageEls[current].querySelector('iframe');
+            if (e.source !== activeFrame.contentWindow) {
+                console.log('[parent] ignored — message did not come from the active iframe');
+                return;
+            }
+
+            if (data.type === 'navigate') {
+                if (data.direction === 'next') goTo(current + 1);
+                if (data.direction === 'prev') goTo(current - 1);
+            }
+        }, false);
+
+        // arrow keys always work, regardless of whether a page has the bridge script
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                e.preventDefault();
+                goTo(current + 1);
+            }
+            if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                goTo(current - 1);
+            }
+        });
+
+        setActive(0);
+    </script>
+
 </body>
+
 </html>

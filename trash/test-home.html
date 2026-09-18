@@ -1,0 +1,1118 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sanjay Patil — Photography</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,440;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --ink: #060606;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--ink);
+            color: #f2f2f0;
+            font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE/Edge */
+            overscroll-behavior: none;
+            /* stop rubber-band bounce revealing background past page end */
+        }
+        
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+            /* Chrome/Safari/Edge */
+            width: 0;
+            height: 0;
+        }
+        
+        @media (pointer:fine) {
+            body.cursor-ready {
+                cursor: none;
+            }
+        }
+        /* ---------- custom cursor ---------- */
+        
+        .cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 84px;
+            height: 84px;
+            margin-left: -42px;
+            margin-top: -42px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            color: #fff;
+            pointer-events: none;
+            z-index: 999;
+            mix-blend-mode: difference;
+            transition: width .35s ease, height .35s ease, margin .35s ease, opacity .35s ease;
+            opacity: 0;
+        }
+        
+        .cursor.visible {
+            opacity: 1;
+        }
+        
+        .cursor .cursor-label {
+            transition: opacity .3s ease;
+        }
+        
+        .cursor.scrolled {
+            width: 14px;
+            height: 14px;
+            margin-left: -7px;
+            margin-top: -7px;
+        }
+        
+        .cursor.scrolled .cursor-label {
+            opacity: 0;
+        }
+        /* ---------- fixed image, never translates ---------- */
+        
+        .photo-stage {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: var(--ink);
+        }
+        
+        .photo-layer {
+            position: absolute;
+            inset: 0;
+            background-image: url('media-home/lens.jpg');
+            background-size: cover;
+            background-position: center;
+            transform-origin: 50% 50%;
+            /* aperture sits centre-frame in this image */
+            transform: scale(1) rotate(0deg);
+            will-change: transform, filter;
+        }
+        
+        .photo-fade {
+            position: absolute;
+            inset: 0;
+            background: #000000;
+            opacity: 0;
+            pointer-events: none;
+            will-change: opacity;
+        }
+        
+        .frame-index {
+            position: absolute;
+            top: 40px;
+            left: 44px;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.55);
+            z-index: 2;
+        }
+        
+        .frame-index span {
+            color: rgba(255, 255, 255, 0.22);
+        }
+        
+        .wordmark {
+            position: absolute;
+            left: 50%;
+            bottom: 56px;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 2;
+            will-change: opacity;
+        }
+        
+        .wordmark .name {
+            font-size: 14px;
+            letter-spacing: 0.22em;
+            color: rgba(255, 255, 255, 0.82);
+        }
+        
+        .wordmark .role {
+            margin-top: 6px;
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            color: rgba(255, 255, 255, 0.42);
+            font-family: Georgia, 'Times New Roman', serif;
+            font-style: italic;
+        }
+        
+        .aperture-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .aperture-text .line {
+            font-size: clamp(36px, 7vw, 86px);
+            line-height: 1.12;
+            letter-spacing: -0.01em;
+            color: #f5f4ef;
+            white-space: nowrap;
+            will-change: transform, opacity;
+        }
+        
+        .aperture-text .line-2 {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: 400;
+            color: rgba(245, 244, 239, 0.88);
+        }
+        /* ---------- scroll track: purely reserves scroll distance for the zoom ---------- */
+        
+        .scroll-track {
+            position: relative;
+            height: 460vh;
+            z-index: 0;
+        }
+        /* ---------- scene 1 : chapter interstitial (kept from original file, unused/unreferenced) ---------- */
+        
+        .scene1 {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            background: #fcfcfc;
+            color: #111;
+            display: flex;
+            align-items: center;
+            padding: 0 8vw;
+        }
+        
+        .scene1-inner {
+            max-width: 760px;
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 1s cubic-bezier(.2, .7, .2, 1), transform 1s cubic-bezier(.2, .7, .2, 1);
+        }
+        
+        .scene1.in-view .scene1-inner {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .scene1-index {
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            color: #b3ada0;
+            margin-bottom: 22px;
+        }
+        
+        .scene1-index span {
+            color: #dcd7cc;
+        }
+        
+        .scene1-heading {
+            font-size: clamp(34px, 5vw, 58px);
+            line-height: 1.14;
+            margin: 0 0 26px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+        
+        .scene1-heading em {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: 400;
+            color: #8a8577;
+        }
+        
+        .scene1-sub {
+            font-size: 17px;
+            line-height: 1.7;
+            max-width: 480px;
+            color: #5c574c;
+            margin: 0;
+        }
+        
+        .scene1-rule {
+            width: 44px;
+            height: 1px;
+            background: #111;
+            margin: 34px 0 0;
+        }
+        /* ---------- chapter one : image sequence (kept from original file, unused/unreferenced) ---------- */
+        
+        .chapter-track {
+            position: relative;
+            height: 360vh;
+            z-index: 1;
+            background: #fcfcfc;
+        }
+        
+        .chapter-stage {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            background: #0c0c0c;
+        }
+        
+        .chapter-img {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            will-change: opacity, transform;
+        }
+        
+        .chapter-img.img-1 {
+            background-image: url('media-home/_DSC7809.jpg');
+        }
+        
+        .chapter-img.img-2 {
+            background-image: url('media-home/_DSC5849.jpg');
+        }
+        
+        .chapter-img.img-3 {
+            background-image: url('media-home/DSC_0583.jpg');
+        }
+        
+        .chapter-scrim {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 34%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .chapter-caption {
+            position: absolute;
+            left: 44px;
+            bottom: 40px;
+            z-index: 3;
+            color: #f5f4ef;
+            opacity: 0;
+            transition: opacity .5s ease;
+            will-change: opacity;
+        }
+        
+        .chapter-caption.active {
+            opacity: 1;
+        }
+        
+        .chapter-caption .cap-index {
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            color: rgba(245, 244, 239, 0.6);
+            margin-bottom: 8px;
+        }
+        
+        .chapter-caption .cap-title {
+            font-size: clamp(22px, 3vw, 32px);
+            font-family: Georgia, 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: 400;
+        }
+        
+        .chapter-progress {
+            position: absolute;
+            right: 44px;
+            bottom: 40px;
+            z-index: 3;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chapter-progress .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(245, 244, 239, 0.32);
+            transition: background .4s ease, transform .4s ease;
+        }
+        
+        .chapter-progress .dot.active {
+            background: #f5f4ef;
+            transform: scale(1.3);
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .photo-layer,
+            .photo-fade,
+            .cursor {
+                transition: none !important;
+            }
+        }
+        /* =========================================================
+           CHAPTER TWO — "Eleven Frames"
+           Scoped to #chapterTwoRoot instead of html/body so it can
+           sit directly after the aperture intro in the same document
+           without touching the first section's global page styles.
+           It is stacked above the fixed photo-stage (z-index 2) and
+           fixed full-screen; its opacity is driven continuously by
+           scroll position in the script below (fading in as the
+           intro's zoom/fade finishes, fading back out if you scroll
+           back up) — no positional slide, no hard pop.
+           ========================================================= */
+        
+        #chapterTwoRoot {
+            --bg: #0d0c0a;
+            --paper: #ece6d8;
+            --paper-dim: #a49c8b;
+            --rust: #9a4526;
+            --line: rgba(236, 230, 216, 0.14);
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--paper);
+            font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+            -webkit-font-smoothing: antialiased;
+            /* Default hidden state; opacity/visibility/pointer-events are
+               set on every scroll tick by the script, in proportion to
+               scroll progress, so this fades rather than pops. */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        /* -------- horizontal scroller -------- */
+        
+        #scroller {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            height: 100svh;
+            width: 100vw;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            touch-action: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        #scroller::-webkit-scrollbar {
+            height: 0;
+        }
+        
+        #frames {
+            display: contents;
+        }
+        /* -------- progress rail (bottom, horizontal) -------- */
+        
+        .rail {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .rail button {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            border: 1px solid var(--paper-dim);
+            background: transparent;
+            padding: 0;
+            cursor: pointer;
+            transition: background .35s ease, border-color .35s ease, transform .35s ease;
+        }
+        
+        .rail button.active {
+            background: var(--rust);
+            border-color: var(--rust);
+            transform: scale(1.6);
+        }
+        
+        @media (max-width: 560px) {
+            .rail {
+                gap: 9px;
+                bottom: 14px;
+            }
+        }
+        /* -------- intro -------- */
+        
+        .hero-intro {
+            flex: 0 0 100vw;
+            width: 100vw;
+            height: 100vh;
+            height: 100svh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 8vw;
+            background: radial-gradient(circle at 50% 42%, #1a1712 0%, var(--bg) 72%);
+        }
+        
+        .hero-intro h1 {
+            opacity: 0;
+            filter: blur(9px) brightness(2.6);
+            transform: scale(1.03);
+            font-weight: 300;
+            font-style: italic;
+            font-size: clamp(2rem, 5.5vw, 4rem);
+            margin: 0;
+            line-height: 1.08;
+            max-width: 15ch;
+        }
+        
+        .hero-intro.revealed h1 {
+            animation: emerge 1.8s cubic-bezier(.19, 1, .22, 1) forwards;
+        }
+        
+        .hero-intro .scroll-cue {
+            opacity: 0;
+            filter: blur(9px) brightness(2.6);
+            transform: scale(1.03);
+            animation: emerge 2s cubic-bezier(.19, 1, .22, 1) .4s forwards;
+            margin-top: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .hero-intro .scroll-cue .track {
+            width: 46px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--line) 40%, var(--line));
+            position: relative;
+            overflow: visible;
+        }
+        
+        .hero-intro .scroll-cue .track::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--rust);
+            animation: slide 2.2s ease-in-out 2.4s infinite;
+        }
+        
+        .hero-intro .scroll-cue span {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.06em;
+            color: var(--paper-dim);
+        }
+        
+        @keyframes emerge {
+            0% {
+                opacity: 0;
+                filter: blur(9px) brightness(2.6);
+                transform: scale(1.03);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0) brightness(1);
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes slide {
+            0% {
+                left: 0;
+                opacity: 0;
+            }
+            15% {
+                opacity: 1;
+            }
+            85% {
+                opacity: 1;
+            }
+            100% {
+                left: 41px;
+                opacity: 0;
+            }
+        }
+        /* -------- click / frame sections -------- */
+        
+        .frame {
+            flex: 0 0 100vw;
+            width: 100vw;
+            height: 100vh;
+            height: 100svh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4vh 6vw;
+            gap: 26px;
+        }
+        
+        .frame-figure {
+            display: flex;
+            justify-content: center;
+            min-height: 0;
+        }
+        
+        .frame-figure img {
+            max-width: 88vw;
+            max-height: 62vh;
+            width: auto;
+            height: auto;
+            display: block;
+            opacity: 0;
+            filter: brightness(0.55) saturate(0.8);
+            transform: scale(1.035);
+            transition: opacity 1.5s cubic-bezier(.2, .6, .2, 1), filter 1.7s cubic-bezier(.2, .6, .2, 1), transform 1.9s cubic-bezier(.2, .6, .2, 1);
+        }
+        
+        .frame.is-visible .frame-figure img {
+            opacity: 1;
+            filter: brightness(1) saturate(1);
+            transform: scale(1);
+        }
+        
+        .frame-text {
+            display: flex;
+            gap: 22px;
+            align-items: baseline;
+            max-width: 90vw;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 1s ease .35s, transform 1s ease .35s;
+        }
+        
+        .frame.is-visible .frame-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .frame-number {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--rust);
+            padding-top: 3px;
+            flex-shrink: 0;
+        }
+        
+        .frame-caption-group {
+            max-width: 38ch;
+        }
+        
+        .frame-caption {
+            font-size: clamp(1.05rem, 2vw, 1.4rem);
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.4;
+            margin: 0 0 8px;
+            color: var(--paper);
+        }
+        
+        .frame-exif {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.03em;
+            color: var(--paper-dim);
+        }
+        /* -------- close -------- */
+        
+        .closing {
+            flex: 0 0 100vw;
+            width: 100vw;
+            height: 100vh;
+            height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 8vw;
+        }
+        
+        .closing p {
+            font-style: italic;
+            font-weight: 300;
+            font-size: clamp(1.3rem, 2.8vw, 1.9rem);
+            max-width: 20ch;
+            margin: 0;
+            color: var(--paper);
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            #scroller {
+                scroll-behavior: auto;
+            }
+            .hero-intro h1,
+            .hero-intro .scroll-cue {
+                animation: none !important;
+                opacity: 1 !important;
+                filter: none !important;
+                transform: none !important;
+            }
+            .frame-figure img,
+            .frame-text {
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+         FILE 1 — aperture intro (index.html), unchanged
+         ============================================================ -->
+
+    <div class="cursor" id="cursor"><span class="cursor-label">scroll</span></div>
+
+    <div class="photo-stage">
+        <div class="photo-layer" id="photoLayer"></div>
+        <div class="photo-fade" id="photoFade"></div>
+        <div class="aperture-text" id="apertureText">
+            <div class="line line-1" id="line1">See the world</div>
+            <div class="line line-2" id="line2">differently.</div>
+        </div>
+        <div class="wordmark" id="wordmark">
+            <div class="name">Sanjay Patil</div>
+            <div class="role">photography, field &amp; frame</div>
+        </div>
+    </div>
+
+    <div class="scroll-track" id="scrollTrack"></div>
+
+    <!-- ============================================================
+         FILE 2 — "Eleven Frames" (chapter-two.html), scoped wrapper.
+         Follows immediately in document order: as soon as the
+         scroll-track above finishes, this slides straight over the
+         fixed photo-stage. No interstitial section in between.
+         ============================================================ -->
+
+    <div id="chapterTwoRoot">
+        <div id="scroller">
+
+            <header class="hero-intro">
+                <h1>This is what I see.</h1>
+                <div class="scroll-cue">
+                    <span>SCROLL</span>
+                    <div class="track"></div>
+                </div>
+            </header>
+
+            <div id="frames"></div>
+
+            <footer class="closing">
+                <p>Eleven clicks. One roll of light.</p>
+            </footer>
+
+        </div>
+
+        <nav class="rail" id="rail" aria-label="Frame progress"></nav>
+    </div>
+
+    <script>
+        (function() {
+            var isFinePointer = window.matchMedia('(pointer:fine)').matches;
+
+            var cursor = document.getElementById('cursor');
+            if (isFinePointer) {
+                document.body.classList.add('cursor-ready');
+                cursor.classList.add('visible');
+                var mx = 0,
+                    my = 0,
+                    cx = 0,
+                    cy = 0;
+                window.addEventListener('mousemove', function(e) {
+                    mx = e.clientX;
+                    my = e.clientY;
+                });
+                (function raf() {
+                    cx += (mx - cx) * 0.22;
+                    cy += (my - cy) * 0.22;
+                    cursor.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
+                    requestAnimationFrame(raf);
+                })();
+                var scrolledOnce = false;
+                window.addEventListener('scroll', function() {
+                    if (!scrolledOnce) {
+                        scrolledOnce = true;
+                        cursor.classList.add('scrolled');
+                    }
+                }, {
+                    passive: true
+                });
+            }
+
+            var track = document.getElementById('scrollTrack');
+            var photoLayer = document.getElementById('photoLayer');
+            var photoFade = document.getElementById('photoFade');
+            var wordmark = document.getElementById('wordmark');
+            var line1 = document.getElementById('line1');
+            var line2 = document.getElementById('line2');
+            var chapterTwoRoot = document.getElementById('chapterTwoRoot');
+            var CH2_FADE_START = 0.75; // chapter two starts fading in here...
+            var CH2_FADE_END = 1.0; // ...and is fully visible by here
+
+            function clamp(v, min, max) {
+                return Math.max(min, Math.min(max, v));
+            }
+
+            function easeInOutCubic(t) {
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            }
+
+            function update() {
+                var rect = track.getBoundingClientRect();
+                var total = track.offsetHeight - window.innerHeight;
+                var scrolled = clamp(-rect.top, 0, total);
+                var p = total > 0 ? scrolled / total : 0; // 0 -> 1
+
+                var scale = 1 + easeInOutCubic(p) * 3.5; // gentler zoom, stretched over more scroll
+                var rotate = easeInOutCubic(p) * 32; // rotation grows in step with the zoom
+                var brightness = 1 - p * 1; // darkens toward black instead of brightening
+
+                photoLayer.style.transform = 'scale(' + scale + ') rotate(' + rotate + 'deg)';
+                photoLayer.style.filter = 'brightness(' + brightness + ')';
+
+                var fadeStart = 0.5;
+                var fadeP = clamp((p - fadeStart) / (1 - fadeStart), 0, 1);
+                photoFade.style.opacity = String(easeInOutCubic(fadeP));
+
+                wordmark.style.opacity = String(1 - clamp(p / 0.18, 0, 1));
+
+                var textP = easeInOutCubic(clamp(p / 0.22, 0, 1));
+                line1.style.transform = 'translateX(-' + (textP * 140) + 'vw)';
+                line2.style.transform = 'translateX(' + (textP * 140) + 'vw)';
+                line1.style.opacity = String(1 - textP);
+                line2.style.opacity = String(1 - textP);
+
+                // Chapter two fades in continuously with scroll — no pop,
+                // no positional slide — overlapping the tail end of the
+                // photo's own fade-to-black above for a clean crossfade.
+                // It reverses smoothly too if you scroll back up.
+                var ch2FadeP = clamp((p - CH2_FADE_START) / (CH2_FADE_END - CH2_FADE_START), 0, 1);
+                var ch2Opacity = easeInOutCubic(ch2FadeP);
+                chapterTwoRoot.style.opacity = String(ch2Opacity);
+                chapterTwoRoot.style.visibility = ch2Opacity > 0.01 ? 'visible' : 'hidden';
+                // Only start capturing interaction once nearly fully visible,
+                // so the fade-in itself never traps the scroll.
+                chapterTwoRoot.style.pointerEvents = ch2Opacity > 0.98 ? 'auto' : 'none';
+            }
+
+            var ticking = false;
+
+            function onScroll() {
+                if (!ticking) {
+                    requestAnimationFrame(function() {
+                        update();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }
+            window.addEventListener('scroll', onScroll, {
+                passive: true
+            });
+            window.addEventListener('resize', onScroll);
+            update();
+        })();
+    </script>
+
+    <script>
+        /* ============================================================
+                                   IMAGE FILES
+                                   Each "src" below is the filename you gave me. Place the actual
+                                   files in the same folder as this HTML page (or update src to
+                                   the correct relative path, e.g. "images/_DSC1683.jpg"). Until
+                                   a file is found, that frame falls back to a placeholder swatch
+                                   automatically (see the onerror handler below) — nothing breaks
+                                   in the meantime.
+                                   ============================================================ */
+        const CLICKS = [{
+            src: "media-home/_DSC1683.jpg",
+            caption: "Morning finds the forest floor first.",
+            exif: "24mm · f/8 · 1/60s",
+            hue: 40,
+            orient: "landscape"
+        }, {
+            src: "media-home/_DSC3537.jpg",
+            caption: "Nine hundred years dead, and still standing.",
+            exif: "35mm · f/11 · 1/250s · Deadvlei, Namibia",
+            hue: 26,
+            orient: "portrait"
+        }, {
+            src: "media-home/DSC_0011.jpg",
+            caption: "A glimpse, framed before it's gone.",
+            exif: "85mm · f/2.0 · 1/320s",
+            hue: 186,
+            orient: "portrait"
+        }, {
+            src: "media-home/_DSC7809.jpg",
+            caption: "He wears his colour like an argument.",
+            exif: "300mm · f/5.6 · 1/1000s",
+            hue: 195,
+            orient: "landscape"
+        }, {
+            src: "media-home/_DSC5158.jpg",
+            caption: "Fire behind glass, and then it's gone.",
+            exif: "50mm · f/4.0 · 1/500s",
+            hue: 30,
+            orient: "landscape"
+        }, {
+            src: "media-home/_DSC5849.jpg",
+            caption: "He carries the mountain in his stride.",
+            exif: "400mm · f/5.6 · 1/640s · Amboseli",
+            hue: 0,
+            orient: "landscape",
+            bw: true
+        }, {
+            src: "media-home/DSC_0583.jpg",
+            caption: "Not a fight — just two old friends talking.",
+            exif: "200mm · f/5.6 · 1/1600s",
+            hue: 28,
+            orient: "landscape"
+        }, {
+            src: "media-home/Malshej ghat-0153.jpg",
+            caption: "Three women, one rhythm, the fields between them.",
+            exif: "70mm · f/5.6 · 1/500s · Malshej Ghat",
+            hue: 108,
+            orient: "landscape"
+        }, {
+            src: "media-home/_DSC8044.jpg",
+            caption: "Even shadow lets some gold through.",
+            exif: "35mm · f/2.8 · 1/125s",
+            hue: 36,
+            orient: "portrait"
+        }, {
+            src: "media-home/_DSC8319-Edit.jpg",
+            caption: "She carries the last of the day's light downstream.",
+            exif: "50mm · f/2.2 · 1/200s",
+            hue: 228,
+            orient: "portrait"
+        }, {
+            src: "media-home/DSC_0565.jpg",
+            caption: "One face, found through all that colour.",
+            exif: "50mm · f/2.5 · 1/1000s · Holi",
+            hue: 330,
+            orient: "portrait"
+        }, ];
+
+        function placeholderSVG(n, hue, orient, bw) {
+            const w = orient === "portrait" ? 900 : 1400;
+            const h = orient === "portrait" ? 1160 : 940;
+            const sat = bw ? 0 : 34;
+            const c1 = `hsl(${hue},${sat}%,${bw ? 22 : 16}%)`;
+            const c2 = `hsl(${hue+18},${bw ? 0 : 28}%,${bw ? 6 : 8}%)`;
+            const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <defs>
+      <radialGradient id="g" cx="38%" cy="34%" r="80%">
+        <stop offset="0%" stop-color="${c1}"/>
+        <stop offset="100%" stop-color="${c2}"/>
+      </radialGradient>
+      <filter id="grain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0"/>
+      </filter>
+    </defs>
+    <rect width="${w}" height="${h}" fill="url(#g)"/>
+    <rect width="${w}" height="${h}" filter="url(#grain)"/>
+    <circle cx="${w*0.62}" cy="${h*0.5}" r="${Math.min(w,h)*0.16}" fill="none" stroke="hsla(${hue},40%,70%,0.18)" stroke-width="1.5"/>
+    <text x="${w-30}" y="${h-26}" text-anchor="end" font-family="monospace" font-size="20" fill="hsla(${hue},20%,80%,0.28)">0${n} / placeholder</text>
+  </svg>`;
+            return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+        }
+
+        const frames = document.getElementById("frames");
+        const rail = document.getElementById("rail");
+        const scroller = document.getElementById("scroller");
+
+        CLICKS.forEach((c, i) => {
+            const n = i + 1;
+            const id = "frame-" + n;
+
+            const section = document.createElement("section");
+            section.className = "frame";
+            section.id = id;
+            const fallback = placeholderSVG(n, c.hue, c.orient, c.bw);
+            section.innerHTML = `
+    <div class="frame-figure">
+      <img src="${c.src || fallback}" data-fallback="${fallback}" alt="${c.caption}"
+           onerror="this.onerror=null; this.src=this.dataset.fallback;">
+    </div>
+    <div class="frame-text">
+      <span class="frame-number">${String(n).padStart(2,"0")}</span>
+      <div class="frame-caption-group">
+        <p class="frame-caption">${c.caption}</p>
+        <p class="frame-exif">${c.exif}</p>
+      </div>
+    </div>
+  `;
+            frames.appendChild(section);
+
+            const dot = document.createElement("button");
+            dot.setAttribute("aria-label", "Jump to frame " + n);
+            dot.dataset.index = n;
+            rail.appendChild(dot);
+        });
+
+        const dots = Array.from(rail.children);
+        const sections = Array.from(document.querySelectorAll(".frame"));
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add("is-visible");
+            });
+        }, {
+            root: scroller,
+            threshold: 0.5
+        });
+        sections.forEach(s => revealObserver.observe(s));
+
+        /* ============================================================
+           PAGED NAVIGATION
+           One scroll gesture, swipe, arrow key, or dot click moves
+           exactly one frame and centers it — no free scrolling.
+           ============================================================ */
+        const heroEl = document.querySelector(".hero-intro");
+        const closingEl = document.querySelector(".closing");
+        const allSections = [heroEl, ...sections, closingEl];
+
+        let currentIndex = 0;
+        let locked = false;
+        let heroRevealed = false;
+
+        function revealHero() {
+            heroRevealed = true;
+            heroEl.classList.add("revealed");
+            locked = true;
+            setTimeout(() => {
+                locked = false;
+            }, 1900);
+        }
+
+        function setActiveDot(index) {
+            dots.forEach(d => d.classList.toggle("active", Number(d.dataset.index) === index));
+        }
+
+        function goTo(index) {
+            const target = Math.max(0, Math.min(allSections.length - 1, index));
+            if (target === currentIndex && !locked) return;
+            currentIndex = target;
+            locked = true;
+            scroller.scrollTo({
+                left: currentIndex * scroller.clientWidth,
+                behavior: "smooth"
+            });
+            setActiveDot(currentIndex);
+            if ("onscrollend" in window) {
+                scroller.addEventListener("scrollend", () => {
+                    locked = false;
+                }, {
+                    once: true
+                });
+            } else {
+                setTimeout(() => {
+                    locked = false;
+                }, 700);
+            }
+        }
+
+        dots.forEach(d => d.addEventListener("click", () => goTo(Number(d.dataset.index))));
+
+        scroller.addEventListener("wheel", (e) => {
+            const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+
+            // At the very first frame, scrolling further up hands control
+            // back to the page instead of being trapped here — this lets
+            // the aperture intro scroll back into view as one continuous
+            // flow, with no dead end.
+            if (currentIndex === 0 && heroRevealed && delta < 0) {
+                return; // don't preventDefault — let the browser scroll the document
+            }
+
+            e.preventDefault();
+            if (locked) return;
+            if (!heroRevealed && currentIndex === 0) {
+                revealHero();
+                return;
+            }
+            if (Math.abs(delta) < 4) return;
+            goTo(currentIndex + (delta > 0 ? 1 : -1));
+        }, {
+            passive: false
+        });
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+        scroller.addEventListener("touchstart", (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, {
+            passive: true
+        });
+        scroller.addEventListener("touchend", (e) => {
+            if (locked) return;
+            if (!heroRevealed && currentIndex === 0) {
+                revealHero();
+                return;
+            }
+            const dx = touchStartX - e.changedTouches[0].clientX;
+            const dy = touchStartY - e.changedTouches[0].clientY;
+
+            // A downward swipe on the first frame = same "scroll back up"
+            // gesture as the wheel case above.
+            if (currentIndex === 0 && dy < -40 && Math.abs(dy) > Math.abs(dx)) {
+                window.scrollBy({
+                    top: dy * 2,
+                    behavior: "auto"
+                });
+                return;
+            }
+
+            if (Math.abs(dx) < 40) return;
+            goTo(currentIndex + (dx > 0 ? 1 : -1));
+        }, {
+            passive: true
+        });
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+            if (locked) return;
+            if (!heroRevealed && currentIndex === 0) {
+                revealHero();
+                return;
+            }
+            if (e.key === "ArrowRight") goTo(currentIndex + 1);
+            if (e.key === "ArrowLeft") goTo(currentIndex - 1);
+        });
+
+        window.addEventListener("resize", () => {
+            scroller.scrollLeft = currentIndex * scroller.clientWidth;
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+<svg id="sidebar-svg">
+    <defs>
+        <!-- Transparent Black Gradient (30% to 20% opacity) -->
+        <linearGradient id="black-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#000000" stop-opacity="0.30" />
+            <stop offset="100%" stop-color="#000000" stop-opacity="0.20" />
+        </linearGradient>
+
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="5" dy="0" stdDeviation="15" flood-opacity="0.2" />
+        </filter>
+    </defs>
+
+    <path id="sidebar-path" fill="url(#black-gradient)" filter="url(#shadow)" />
+</svg>
+
+<div id="hover-trigger"></div>
+
+<div id="sidebar-content">
+    <div class="menu-item">Home</div>
+    <div class="menu-item">Gallery</div>
+    <div class="menu-item">Contact</div>
+    <div class="menu-item">Know me</div>
+</div>
