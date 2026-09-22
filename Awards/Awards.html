@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Awards &amp; Recognition — Sanjay Patil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+     THEME — change --accent to re-color the whole page.
+     Copper: #b87a4b   Silver: #b8bcc4   Muted red: #c0574a
+     ============================================================ */
+        
+         :root {
+            --bg: #0e0e0f;
+            --bg-alt: #151516;
+            --card: #1b1b1d;
+            --line: #2d2d30;
+            --text: #d9d6d0;
+            --muted: #9a978f;
+            --heading: #f4f1ea;
+            --accent: #c9a96a;
+            --glow: #222224;
+            --font-head: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+            --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            color-scheme: dark;
+        }
+        
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px);
+        }
+        
+        *,
+        *::before,
+        *::after {
+            box-sizing: inherit;
+        }
+        
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        img,
+        svg {
+            max-width: 100%;
+            display: block;
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            color: var(--accent);
+        }
+        
+         :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-head);
+            color: var(--heading);
+            font-weight: 500;
+            line-height: 1.1;
+            margin: 0;
+        }
+        
+        p {
+            margin: 0;
+        }
+        
+        .wrap {
+            width: min(1200px, 100% - 2rem);
+            margin-inline: auto;
+        }
+        
+        .eyebrow {
+            color: var(--accent);
+            font-size: .8rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        /* ---------- Header ---------- */
+        
+        .site-header {
+            border-bottom: 1px solid var(--line);
+        }
+        
+        .site-header .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-block: 1.4rem;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .brand {
+            font-family: var(--font-head);
+            font-size: 1.6rem;
+            color: var(--heading);
+            letter-spacing: .01em;
+        }
+        
+        .brand:hover {
+            color: var(--heading);
+        }
+        /* ---------- Hero ---------- */
+        
+        .hero {
+            background: radial-gradient(ellipse 80% 70% at 50% 0%, var(--glow) 0%, var(--bg) 70%);
+            padding: clamp(3.5rem, 8vw, 6.5rem) 0;
+            border-bottom: 1px solid var(--line);
+        }
+        
+        .hero .wrap {
+            display: grid;
+            gap: clamp(2rem, 5vw, 4.5rem);
+            grid-template-columns: 1.05fr .95fr;
+            align-items: center;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.8rem, 6vw, 4.8rem);
+            margin-bottom: 1.4rem;
+        }
+        
+        .hero p.lead {
+            color: var(--muted);
+            font-size: 1.08rem;
+            max-width: 46ch;
+        }
+        
+        .hero .actions {
+            margin-top: 2.2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: .85rem 1.7rem;
+            border: 1px solid var(--accent);
+            font-size: .92rem;
+            font-weight: 500;
+            transition: background .2s, color .2s;
+        }
+        
+        .btn-solid {
+            background: var(--accent);
+            color: var(--bg);
+        }
+        
+        .btn-solid:hover {
+            background: transparent;
+            color: var(--accent);
+        }
+        
+        .btn-ghost {
+            color: var(--accent);
+        }
+        
+        .btn-ghost:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+        /* Featured award frame */
+        
+        .feature {
+            background: var(--card);
+            border: 1px solid var(--line);
+            padding: .9rem;
+        }
+        
+        .ph {
+            position: relative;
+            aspect-ratio: 4 / 5;
+            width: 100%;
+            background: radial-gradient(ellipse at 50% 30%, #2a2a2d 0%, #1b1b1d 60%, #151516 100%);
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+        
+        .ph.wide {
+            aspect-ratio: 3 / 2;
+        }
+        
+        .ph svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .55;
+        }
+        
+        .ph span {
+            position: relative;
+            font-size: .78rem;
+            color: var(--muted);
+            border: 1px dashed var(--line);
+            padding: .35rem .8rem;
+            background: rgba(14, 14, 15, .6);
+        }
+        
+        .feature figcaption {
+            padding: 1.1rem .4rem .4rem;
+        }
+        
+        .feature figcaption h3 {
+            font-size: 1.55rem;
+            margin: .35rem 0 .3rem;
+        }
+        
+        .feature figcaption p {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+        
+        .feature {
+            margin: 0;
+        }
+        /* ---------- Ledger ---------- */
+        
+        section {
+            padding: clamp(3.5rem, 7vw, 5.5rem) 0;
+        }
+        
+        .section-head {
+            max-width: 60ch;
+            margin-bottom: 2.4rem;
+        }
+        
+        .section-head h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-top: .7rem;
+        }
+        
+        .section-head p {
+            color: var(--muted);
+            margin-top: 1rem;
+        }
+        
+        .filters {
+            display: flex;
+            gap: .6rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+        
+        .filters button {
+            font: inherit;
+            font-size: .88rem;
+            cursor: pointer;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--line);
+            padding: .5rem 1.1rem;
+            transition: color .2s, border-color .2s, background .2s;
+        }
+        
+        .filters button:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .filters button[aria-pressed="true"] {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg);
+        }
+        
+        .year-group {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 2rem;
+            padding-block: 2.2rem;
+            border-top: 1px solid var(--line);
+        }
+        
+        .year-group:last-child {
+            border-bottom: 1px solid var(--line);
+        }
+        
+        .year-group[hidden] {
+            display: none;
+        }
+        
+        .year {
+            font-family: var(--font-head);
+            font-size: 3.4rem;
+            line-height: 1;
+            color: var(--heading);
+            position: sticky;
+            top: 1.5rem;
+            align-self: start;
+        }
+        
+        .entries {
+            display: grid;
+            gap: 0;
+        }
+        
+        .entry {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: .4rem 2rem;
+            padding-block: 1.3rem;
+            border-bottom: 1px solid var(--line);
+        }
+        
+        .entry:first-child {
+            padding-top: 0;
+        }
+        
+        .entry:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .entry[hidden] {
+            display: none;
+        }
+        
+        .entry h3 {
+            font-size: 1.55rem;
+        }
+        
+        .entry .org {
+            color: var(--muted);
+            font-size: .92rem;
+        }
+        
+        .entry .work {
+            grid-column: 1;
+            font-size: .95rem;
+        }
+        
+        .entry .work em {
+            font-family: var(--font-head);
+            font-size: 1.1rem;
+            color: var(--heading);
+        }
+        
+        .result {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            align-self: start;
+            font-size: .8rem;
+            font-weight: 500;
+            padding: .3rem .8rem;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            white-space: nowrap;
+        }
+        
+        .result.top {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .empty {
+            display: none;
+            color: var(--muted);
+            padding: 2rem 0;
+        }
+        
+        .empty.show {
+            display: block;
+        }
+        /* ---------- Alt sections ---------- */
+        
+        .alt {
+            background: var(--bg-alt);
+            border-block: 1px solid var(--line);
+        }
+        
+        .press-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: .8rem;
+        }
+        
+        .card h3 {
+            font-size: 1.6rem;
+        }
+        
+        .card .meta {
+            color: var(--muted);
+            font-size: .88rem;
+        }
+        
+        .card a.more {
+            margin-top: auto;
+            color: var(--accent);
+            font-size: .92rem;
+            padding-top: .6rem;
+        }
+        
+        .card a.more:hover {
+            color: var(--heading);
+        }
+        
+        .quotes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        blockquote {
+            margin: 0;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-left: 2px solid var(--accent);
+            padding: 2rem;
+        }
+        
+        blockquote p {
+            font-family: var(--font-head);
+            font-size: 1.5rem;
+            line-height: 1.4;
+            color: var(--heading);
+        }
+        
+        blockquote footer {
+            margin-top: 1.2rem;
+            color: var(--muted);
+            font-size: .88rem;
+        }
+        /* ---------- Contact ---------- */
+        
+        .cta {
+            text-align: center;
+        }
+        
+        .cta .wrap {
+            max-width: 640px;
+        }
+        
+        .cta h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+        
+        .cta p {
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+        /* ---------- Responsive ---------- */
+        
+        @media (max-width: 860px) {
+            .hero .wrap {
+                grid-template-columns: 1fr;
+            }
+            .feature {
+                max-width: 440px;
+            }
+            .press-grid,
+            .quotes {
+                grid-template-columns: 1fr;
+            }
+            .year-group {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .year {
+                position: static;
+                font-size: 2.8rem;
+            }
+        }
+        
+        @media (max-width: 520px) {
+            .entry {
+                grid-template-columns: 1fr;
+            }
+            .result {
+                grid-column: 1;
+                grid-row: auto;
+                justify-self: start;
+                margin-top: .5rem;
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============ HEADER ============ -->
+    <header class="site-header">
+        <div class="wrap">
+            <a class="brand" href="#">Sanjay Patil</a>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ============ HERO + FEATURED HONOR ============ -->
+        <div class="hero">
+            <div class="wrap">
+                <div>
+                    <h1>Awards and recognition</h1>
+                    <p class="lead">Competition wins, gallery selections and magazine features from the past decade. Each entry lists the photograph that earned it, so you can see the work behind the title.</p>
+                    <div class="actions">
+                        <a class="btn btn-solid" href="#honors">Browse all honors</a>
+                        <a class="btn btn-ghost" href="#contact">Commission a shoot</a>
+                    </div>
+                </div>
+
+                <figure class="feature">
+                    <!-- Replace .ph with: <img src="your-photo.jpg" alt="Describe the photograph"> -->
+                    <div class="ph" role="img" aria-label="Placeholder for the featured award photograph">
+                        <svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <path d="M0 360 L90 270 L150 320 L250 200 L330 290 L400 240 L400 500 L0 500Z" fill="#0e0e0f"/>
+            <path d="M0 420 L120 350 L200 400 L300 330 L400 380 L400 500 L0 500Z" fill="#151516"/>
+            <circle cx="290" cy="120" r="28" fill="#2d2d30"/>
+          </svg>
+                        <span>Featured photo, 4:5</span>
+                    </div>
+                    <figcaption>
+                        <p class="eyebrow">Most recent top honor</p>
+                        <h3>Grand Prize, Landscape of the Year</h3>
+                        <p>International Photography Awards, 2025. Awarded for <em>Salt Flat at First Light</em>.</p>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ============ HONORS LEDGER ============ -->
+        <section id="honors">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2>Every honor, by year</h2>
+                    <p>Filter by the kind of recognition. Duplicate a row inside a year to add an award, or copy a whole year block to start a new one.</p>
+                </div>
+
+                <div class="filters" role="group" aria-label="Filter honors by type">
+                    <button type="button" data-filter="all" aria-pressed="true">All</button>
+                    <button type="button" data-filter="competition" aria-pressed="false">Competitions</button>
+                    <button type="button" data-filter="exhibition" aria-pressed="false">Exhibitions</button>
+                    <button type="button" data-filter="publication" aria-pressed="false">Publications</button>
+                </div>
+
+                <div id="ledger">
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2025</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Grand Prize, Landscape of the Year</h3>
+                                <span class="result top">Winner</span>
+                                <p class="org">International Photography Awards, New York</p>
+                                <p class="work">Photograph: <em>Salt Flat at First Light</em></p>
+                            </article>
+                            <article class="entry" data-cat="exhibition">
+                                <h3>Selected for the Emerging Voices Show</h3>
+                                <span class="result">Selected</span>
+                                <p class="org">Northlight Gallery, Copenhagen</p>
+                                <p class="work">Series: <em>Quiet Coastlines</em></p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2024</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>First Place, Fine Art Portrait</h3>
+                                <span class="result top">Winner</span>
+                                <p class="org">Monochrome Photography Awards, London</p>
+                                <p class="work">Photograph: <em>The Weaver's Hands</em></p>
+                            </article>
+                            <article class="entry" data-cat="publication">
+                                <h3>Cover Story, Autumn Issue</h3>
+                                <span class="result top">Cover</span>
+                                <p class="org">Lumen Magazine</p>
+                                <p class="work">Series: <em>Fog Season</em></p>
+                            </article>
+                            <article class="entry" data-cat="competition">
+                                <h3>Finalist, Documentary Series</h3>
+                                <span class="result">Finalist</span>
+                                <p class="org">Sony World Photography Awards</p>
+                                <p class="work">Series: <em>Last Ferry Home</em></p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2022</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="exhibition">
+                                <h3>Solo Exhibition, Still Water</h3>
+                                <span class="result top">Solo show</span>
+                                <p class="org">The Foundry Gallery, Portland</p>
+                                <p class="work">Twenty-four prints, six weeks</p>
+                            </article>
+                            <article class="entry" data-cat="competition">
+                                <h3>Honorable Mention, Nature</h3>
+                                <span class="result">Honorable mention</span>
+                                <p class="org">Nature Photographer of the Year</p>
+                                <p class="work">Photograph: <em>Heron in Reeds</em></p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2019</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="publication">
+                                <h3>Featured Photographer of the Month</h3>
+                                <span class="result">Featured</span>
+                                <p class="org">Aperture Journal Online</p>
+                                <p class="work">Interview and eight-image portfolio</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <p class="empty" id="empty">No honors in this category yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PRESS ============ -->
+        <section class="alt">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2>Featured in</h2>
+                    <p>Publications and galleries that have shown the work.</p>
+                </div>
+                <div class="press-grid">
+                    <div class="card">
+                        <h3>Lumen Magazine</h3>
+                        <p class="meta">Autumn 2024, cover and 12-page feature</p>
+                        <p>A profile of the Fog Season series and the weeks spent waiting on the coast for the right light.</p>
+                        <a class="more" href="#">Read the feature</a>
+                    </div>
+                    <div class="card">
+                        <h3>Aperture Journal</h3>
+                        <p class="meta">March 2019, online interview</p>
+                        <p>A conversation on patience, film versus digital, and how to plan a season around one photograph.</p>
+                        <a class="more" href="#">Read the interview</a>
+                    </div>
+                    <div class="card">
+                        <h3>Northlight Gallery</h3>
+                        <p class="meta">2025, group exhibition</p>
+                        <p>Four prints from Quiet Coastlines were hung in the main hall for the Emerging Voices show.</p>
+                        <a class="more" href="#">View the exhibition</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ JUROR WORDS ============ -->
+        <section>
+            <div class="wrap">
+                <div class="section-head">
+                    <h2>What the judges said</h2>
+                </div>
+                <div class="quotes">
+                    <blockquote>
+                        <p>Replace this with a short line from a juror or editor about your winning image.</p>
+                        <footer>Juror name, International Photography Awards 2025</footer>
+                    </blockquote>
+                    <blockquote>
+                        <p>Add a second quote here, or delete this block if you only have one.</p>
+                        <footer>Editor name, Lumen Magazine</footer>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ CONTACT ============ -->
+        <section class="alt cta" id="contact">
+            <div class="wrap">
+                <h2>Work with an award-winning photographer</h2>
+                <p>Available for commissions, editorial assignments and print licensing. Tell me about your project and I'll reply within two working days.</p>
+                <a class="btn btn-solid" href="mailto:hello@yourname.com">Email me</a>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Filter honors by type; hide year blocks that end up empty.
+        (function() {
+            var buttons = document.querySelectorAll('.filters button');
+            var entries = document.querySelectorAll('.entry');
+            var groups = document.querySelectorAll('.year-group');
+            var empty = document.getElementById('empty');
+
+            function apply(filter) {
+                entries.forEach(function(e) {
+                    e.hidden = !(filter === 'all' || e.dataset.cat === filter);
+                });
+                var visible = 0;
+                groups.forEach(function(g) {
+                    var has = g.querySelector('.entry:not([hidden])');
+                    g.hidden = !has;
+                    if (has) visible++;
+                });
+                empty.classList.toggle('show', visible === 0);
+            }
+
+            buttons.forEach(function(b) {
+                b.addEventListener('click', function() {
+                    buttons.forEach(function(x) {
+                        x.setAttribute('aria-pressed', 'false');
+                    });
+                    b.setAttribute('aria-pressed', 'true');
+                    apply(b.dataset.filter);
+                });
+            });
+        })();
+    </script>
+    <script src="../Sidebar/sidebar-widget.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Contact</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --bg: #0e0e0f;
+            --bg-alt: #151516;
+            --card: #1b1b1d;
+            --border: #2d2d30;
+            --text: #d9d6d0;
+            --muted: #9a978f;
+            --heading: #f4f1ea;
+            --accent: #c9a96a;
+            --glow: #222224;
+            --error: #d98a7f;
+            --font-head: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+            --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            color-scheme: dark;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px);
+        }
+        
+        *,
+        *::before,
+        *::after {
+            box-sizing: inherit;
+        }
+        
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 16px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+         :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+            border-radius: 2px;
+        }
+        
+        .wrap {
+            width: min(1120px, 100% - 48px);
+            margin-inline: auto;
+        }
+        /* ---------- Hero ---------- */
+        
+        .hero {
+            background: radial-gradient(ellipse 70% 120% at 50% 0%, var(--glow) 0%, var(--bg) 70%);
+            padding: clamp(56px, 9vw, 112px) 0 clamp(48px, 7vw, 88px);
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-family: var(--font-head);
+            font-weight: 500;
+            color: var(--heading);
+            font-size: clamp(2.6rem, 6.5vw, 4.75rem);
+            line-height: 1.05;
+            letter-spacing: -0.01em;
+            margin: 0 auto 20px;
+            max-width: 16ch;
+        }
+        
+        .hero p {
+            color: var(--muted);
+            max-width: 46ch;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+        
+        .rule {
+            width: 56px;
+            height: 1px;
+            background: var(--accent);
+            margin: 28px auto 0;
+            border: 0;
+        }
+        /* ---------- Contact section ---------- */
+        
+        .contact {
+            background: var(--bg-alt);
+            border-top: 1px solid var(--border);
+            padding: clamp(48px, 7vw, 96px) 0 clamp(64px, 9vw, 120px);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+            gap: clamp(32px, 6vw, 88px);
+            align-items: start;
+        }
+        
+        h2 {
+            font-family: var(--font-head);
+            font-weight: 500;
+            color: var(--heading);
+            font-size: clamp(1.7rem, 3vw, 2.25rem);
+            line-height: 1.15;
+            margin: 0 0 12px;
+        }
+        
+        .details {
+            margin: 28px 0 0;
+            padding: 0;
+            list-style: none;
+            border-top: 1px solid var(--border);
+        }
+        
+        .details li {
+            display: grid;
+            grid-template-columns: 96px 1fr;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .details .k {
+            color: var(--muted);
+            font-size: 0.88rem;
+            padding-top: 2px;
+        }
+        
+        .details .v {
+            color: var(--heading);
+        }
+        
+        .details a {
+            transition: color .2s;
+        }
+        
+        .details a:hover {
+            color: var(--accent);
+        }
+        
+        .details .sub {
+            display: block;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        
+        .social {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .social a {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            transition: color .2s, border-color .2s;
+        }
+        
+        .social a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        /* ---------- Form ---------- */
+        
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: clamp(24px, 4vw, 44px);
+        }
+        
+        .card p.lead {
+            color: var(--muted);
+            margin: 0 0 28px;
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .field {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        
+        label .opt {
+            color: var(--muted);
+        }
+        
+        input,
+        select,
+        textarea {
+            width: 100%;
+            font: inherit;
+            color: var(--heading);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0;
+            padding: 13px 14px;
+            transition: border-color .2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.55;
+        }
+        
+        input::placeholder,
+        textarea::placeholder {
+            color: #6d6b65;
+        }
+        
+        input:hover,
+        select:hover,
+        textarea:hover {
+            border-color: #46464a;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23c9a96a' stroke-width='1.5'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+        
+        select option {
+            background: var(--card);
+            color: var(--heading);
+        }
+        
+        .field.invalid input,
+        .field.invalid textarea {
+            border-color: var(--error);
+        }
+        
+        .err {
+            display: none;
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+        
+        .field.invalid .err {
+            display: block;
+        }
+        
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        
+        button {
+            font: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            background: var(--accent);
+            color: #0e0e0f;
+            border: 1px solid var(--accent);
+            padding: 14px 32px;
+            border-radius: 0;
+            transition: background .2s, color .2s;
+        }
+        
+        button:hover {
+            background: transparent;
+            color: var(--accent);
+        }
+        
+        .note {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        
+        .status {
+            display: none;
+            margin-top: 24px;
+            padding: 16px 18px;
+            border: 1px solid var(--accent);
+            color: var(--heading);
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status span {
+            color: var(--muted);
+            display: block;
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+        /* ---------- Responsive ---------- */
+        
+        @media (max-width: 860px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .hero {
+                text-align: left;
+            }
+            .hero h1,
+            .hero p {
+                margin-inline: 0;
+            }
+            .rule {
+                margin-inline: 0;
+            }
+        }
+        
+        @media (max-width: 520px) {
+            .row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .details li {
+                grid-template-columns: 1fr;
+                gap: 2px;
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <section class="hero">
+            <div class="wrap">
+                <h1>Get in touch</h1>
+                <p>Have a question or an idea? Send us a message and we'll get back to you within one working day.</p>
+                <hr class="rule">
+            </div>
+        </section>
+
+        <section class="contact" id="contact">
+            <div class="wrap grid">
+
+                <div>
+                    <h2>Reach us directly</h2>
+                    <p style="color:var(--muted);margin:0;">Prefer to skip the form? Any of these works.</p>
+
+                    <ul class="details">
+                        <li>
+                            <span class="k">Email</span>
+                            <span class="v"><a href="mailto:hello@yourstudio.com">hello@yourstudio.com</a></span>
+                        </li>
+                        <li>
+                            <span class="k">Phone</span>
+                            <span class="v"><a href="tel:+910000000000">+91 00000 00000</a></span>
+                        </li>
+                        <li>
+                            <span class="k">Hours</span>
+                            <span class="v">
+              Mon–Sat, 10:00 – 19:00
+              <span class="sub">Closed on Sundays</span>
+                            </span>
+                        </li>
+                    </ul>
+
+                    <div class="social">
+                        <a href="#" aria-label="Instagram" title="Instagram">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        <a href="#" aria-label="Facebook" title="Facebook">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="#" aria-label="WhatsApp" title="WhatsApp">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21l1.65-4.9A9 9 0 1 1 8 19.4L3 21z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 .8c-1-.4-2-1.4-2.4-2.4l.8-1-1-2L9 8.5z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Send a message</h2>
+                    <p class="lead">Share a few details and we'll take it from there.</p>
+
+                    <form id="contact-form" novalidate>
+                        <div class="row">
+                            <div class="field">
+                                <label for="name">Full name</label>
+                                <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
+                                <div class="err">Enter your name.</div>
+                            </div>
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+                                <div class="err">Enter a valid email address.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="field">
+                                <label for="phone">Phone <span class="opt">(optional)</span></label>
+                                <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+91 00000 00000">
+                            </div>
+                            <div class="field">
+                                <label for="topic">What do you need?</label>
+                                <select id="topic" name="topic">
+                <option>Learn Photography</option>
+                <option>Printing services</option>
+                <option>Get a quote</option>
+                <option>Ask a question</option>
+                <option>Something else</option>
+              </select>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" placeholder="Tell us about your project" required></textarea>
+                            <div class="err">Write a short message so we know how to help.</div>
+                        </div>
+
+                        <div class="actions">
+                            <button type="submit">Send message</button>
+                            <span class="note">We'll only use your details to reply to you.</span>
+                        </div>
+
+                        <div class="status" id="status" role="status" aria-live="polite">
+                            Your email app is opening with the message ready to send.
+                            <span>If nothing opens, email us at hello@yourstudio.com.</span>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        (function() {
+            var TO = "hello@yourstudio.com"; // replace with your real address
+            var form = document.getElementById("contact-form");
+            var status = document.getElementById("status");
+            var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            function setInvalid(el, bad) {
+                var field = el.closest(".field");
+                field.classList.toggle("invalid", bad);
+                el.setAttribute("aria-invalid", bad ? "true" : "false");
+            }
+
+            function check(el) {
+                var v = el.value.trim();
+                var bad = !v || (el.type === "email" && !emailRe.test(v));
+                setInvalid(el, bad);
+                return !bad;
+            }
+
+            ["name", "email", "message"].forEach(function(id) {
+                var el = document.getElementById(id);
+                el.addEventListener("blur", function() {
+                    check(el);
+                });
+                el.addEventListener("input", function() {
+                    if (el.closest(".field").classList.contains("invalid")) check(el);
+                });
+            });
+
+            form.addEventListener("submit", function(e) {
+                e.preventDefault();
+                var name = document.getElementById("name");
+                var email = document.getElementById("email");
+                var message = document.getElementById("message");
+                var results = [check(name), check(email), check(message)];
+                if (results.indexOf(false) !== -1) {
+                    var first = [name, email, message].filter(function(el) {
+                        return el.closest(".field").classList.contains("invalid");
+                    })[0];
+                    if (first) first.focus();
+                    return;
+                }
+
+                var topic = document.getElementById("topic").value;
+                var phone = document.getElementById("phone").value.trim();
+                var body =
+                    "Name: " + name.value.trim() + "\n" +
+                    "Email: " + email.value.trim() + "\n" +
+                    (phone ? "Phone: " + phone + "\n" : "") +
+                    "\n" + message.value.trim();
+
+                status.classList.add("show");
+                window.location.href =
+                    "mailto:" + TO +
+                    "?subject=" + encodeURIComponent(topic + " - " + name.value.trim()) +
+                    "&body=" + encodeURIComponent(body);
+            });
+        })();
+    </script>
+    <script src="../Sidebar/sidebar-widget.js"></script>
+</body>
+
+</html>

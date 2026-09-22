@@ -7,20 +7,30 @@
     <title>Curated Exhibition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+         :root {
+            --bg: #0e0e0f;
+            --bg-alt: #151516;
+            --card: #1b1b1d;
+            --border: #2d2d30;
+            --text: #d9d6d0;
+            --muted: #9a978f;
+            --heading: #f4f1ea;
+            --accent: #c9a96a;
+        }
+        
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #7c7c7c;
-            /* Clean white for the museum look */
-            color: #ffffff;
+            background-color: var(--bg);
+            /* Near-black main background */
+            color: var(--text);
             margin: 0;
             padding: 0;
             overflow-x: hidden;
             min-height: 100vh;
         }
-
         /* ===== Sleek animated sticky header ===== */
+        
         header {
             position: -webkit-sticky;
             position: sticky;
@@ -28,7 +38,7 @@
             z-index: 100;
             padding: 1rem 2rem;
             text-align: center;
-            background: linear-gradient(120deg, #000000, #1c1c1c, #3a3a3a, #1c1c1c, #000000);
+            background: linear-gradient(120deg, var(--bg), var(--bg-alt), var(--card), var(--bg-alt), var(--bg));
             background-size: 260% 260%;
             animation: headerGradient 10s ease infinite;
             backdrop-filter: blur(10px) saturate(160%);
@@ -36,22 +46,20 @@
             box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
             transition: padding 0.3s ease;
         }
-
+        
         @keyframes headerGradient {
             0% {
                 background-position: 0% 50%;
             }
-
             50% {
                 background-position: 100% 50%;
             }
-
             100% {
                 background-position: 0% 50%;
             }
         }
-
         /* thin animated light sweep along the header's bottom edge */
+        
         header::after {
             content: '';
             position: absolute;
@@ -59,23 +67,22 @@
             right: 0;
             bottom: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
+            background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
             background-size: 45% 100%;
             background-repeat: no-repeat;
             animation: lineSweep 4s ease-in-out infinite;
         }
-
+        
         @keyframes lineSweep {
             0% {
                 background-position: -60% 0;
             }
-
             100% {
                 background-position: 160% 0;
             }
         }
-
         /* Tab Navigation Styling */
+        
         .tabs-container {
             display: flex;
             justify-content: center;
@@ -83,7 +90,7 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-
+        
         .tab-btn {
             background: none;
             border: none;
@@ -93,11 +100,11 @@
             letter-spacing: 0.16em;
             text-transform: uppercase;
             cursor: pointer;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--muted);
             position: relative;
             transition: color 0.3s ease;
         }
-
+        
         .tab-btn::after {
             content: '';
             position: absolute;
@@ -105,34 +112,34 @@
             bottom: -6px;
             width: 0;
             height: 1px;
-            background: #ffffff;
+            background: var(--accent);
             transform: translateX(-50%);
             transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
+        
         .tab-btn:hover {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--accent);
         }
-
+        
         .tab-btn:hover::after {
             width: 55%;
         }
-
+        
         .tab-btn.active {
-            color: #ffffff;
+            color: var(--heading);
         }
-
+        
         .tab-btn.active::after {
             width: 100%;
         }
-
+        
         .gallery-container {
             max-width: 1800px;
             margin: 0 auto;
             padding: 0 2rem 4rem 2rem;
         }
-
         /* Pure CSS Masonry Grid */
+        
         .masonry-grid {
             column-count: 3;
             column-gap: 2rem;
@@ -140,11 +147,11 @@
             transition: opacity 0.4s ease;
             /* For smooth tab switching */
         }
-
+        
         .masonry-grid.fading {
             opacity: 0;
         }
-
+        
         .masonry-item {
             break-inside: avoid;
             -webkit-column-break-inside: avoid;
@@ -157,43 +164,40 @@
             z-index: 1;
             transition: z-index 0.01s;
         }
-
+        
         .masonry-item:hover {
             z-index: 50;
             /* lift above neighboring images while popped out */
         }
-
+        
         .masonry-item img {
             width: 100%;
             height: auto;
             display: block;
             object-fit: contain;
             border-radius: 4px;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             transform-origin: center center;
         }
-
         /* Pop-out effect on hover */
+        
         .masonry-item:hover img {
             transform: scale(1.07);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
         }
-
         /* Responsive Layout Adjustments */
+        
         @media (max-width: 1024px) {
             .masonry-grid {
                 column-count: 2;
                 column-gap: 1.5rem;
             }
-
             .masonry-item {
                 margin-bottom: 1.5rem;
             }
         }
-
+        
         @media (max-width: 768px) {
-
             /* Make tabs scrollable horizontally on mobile */
             .tabs-container {
                 justify-content: flex-start;
@@ -204,32 +208,28 @@
                 -ms-overflow-style: none;
                 scrollbar-width: none;
             }
-
             .tabs-container::-webkit-scrollbar {
                 display: none;
             }
-
             .tab-btn {
                 white-space: nowrap;
             }
         }
-
+        
         @media (max-width: 640px) {
             .gallery-container {
                 padding: 0 1rem 2rem 1rem;
             }
-
             .masonry-grid {
                 column-count: 1;
                 column-gap: 0;
             }
-
             .masonry-item {
                 margin-bottom: 1.5rem;
             }
         }
-
         /* ===== Lightbox / enlarge view ===== */
+        
         .lightbox-overlay {
             position: fixed;
             inset: 0;
@@ -237,19 +237,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(14, 14, 15, 0.92);
             opacity: 0;
             visibility: hidden;
             padding: 3rem 1.5rem;
             box-sizing: border-box;
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-
+        
         .lightbox-overlay.open {
             opacity: 1;
             visibility: visible;
         }
-
+        
         .lightbox-overlay img {
             max-width: 100%;
             max-height: 100%;
@@ -259,11 +259,11 @@
             transition: transform 0.3s ease;
             cursor: zoom-out;
         }
-
+        
         .lightbox-overlay.open img {
             transform: scale(1);
         }
-
+        
         .lightbox-close {
             position: absolute;
             top: 1.5rem;
@@ -271,8 +271,8 @@
             width: 2.5rem;
             height: 2.5rem;
             border: none;
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
+            background: var(--card);
+            color: var(--heading);
             font-size: 1.4rem;
             line-height: 1;
             border-radius: 50%;
@@ -282,12 +282,12 @@
             justify-content: center;
             transition: background 0.25s ease, transform 0.25s ease;
         }
-
+        
         .lightbox-close:hover {
-            background: rgba(255, 255, 255, 0.18);
+            background: var(--border);
             transform: rotate(90deg);
         }
-
+        
         .lightbox-nav {
             position: absolute;
             top: 50%;
@@ -295,8 +295,8 @@
             width: 2.75rem;
             height: 2.75rem;
             border: none;
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
+            background: var(--card);
+            color: var(--heading);
             font-size: 1.4rem;
             border-radius: 50%;
             cursor: pointer;
@@ -305,35 +305,33 @@
             justify-content: center;
             transition: background 0.25s ease;
         }
-
+        
         .lightbox-nav:hover {
-            background: rgba(255, 255, 255, 0.18);
+            background: var(--border);
         }
-
+        
         .lightbox-prev {
             left: 1.25rem;
         }
-
+        
         .lightbox-next {
             right: 1.25rem;
         }
-
+        
         @media (max-width: 640px) {
             .lightbox-nav {
                 width: 2.25rem;
                 height: 2.25rem;
                 font-size: 1.1rem;
             }
-
             .lightbox-close {
                 top: 1rem;
                 right: 1rem;
             }
         }
-
         /* ===== Custom circular inverted cursor (desktop / mouse only) ===== */
+        
         @media (hover: hover) and (pointer: fine) {
-
             body,
             a,
             button,
@@ -344,7 +342,6 @@
             .lightbox-nav {
                 cursor: none;
             }
-
             .custom-cursor {
                 position: fixed;
                 top: 0;
@@ -352,21 +349,17 @@
                 width: 26px;
                 height: 26px;
                 border-radius: 50%;
-                background: #ffffff;
+                background: var(--heading);
                 mix-blend-mode: difference;
                 pointer-events: none;
                 z-index: 9999;
                 transform: translate(-50%, -50%);
                 opacity: 0;
-                transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                    height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                    opacity 0.2s ease;
+                transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
             }
-
             .custom-cursor.active {
                 opacity: 1;
             }
-
             .custom-cursor.grow {
                 width: 48px;
                 height: 48px;
@@ -554,7 +547,10 @@
                     img.alt = filename.split('.')[0];
                     img.loading = 'lazy';
 
-                    currentImageList.push({ src: img.src, alt: img.alt });
+                    currentImageList.push({
+                        src: img.src,
+                        alt: img.alt
+                    });
 
                     img.addEventListener('click', () => openLightbox(idx));
 

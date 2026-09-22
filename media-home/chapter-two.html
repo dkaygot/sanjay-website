@@ -7,14 +7,17 @@
     <title>Eleven Frames</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,440;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
          :root {
-            --bg: #0d0c0a;
-            --paper: #ece6d8;
-            --paper-dim: #a49c8b;
-            --rust: #9a4526;
-            --line: rgba(236, 230, 216, 0.14);
+            --bg: #0e0e0f;
+            --paper: #d9d6d0;
+            --heading: #f4f1ea;
+            --paper-dim: #9a978f;
+            --rust: #c9a96a;
+            --line: #2d2d30;
+            --font-heading: 'Cormorant Garamond', 'Montserrat', Georgia, serif;
+            --font-body: 'Inter', 'Lora', -apple-system, 'Segoe UI', sans-serif;
         }
         
         * {
@@ -28,7 +31,7 @@
             overflow: hidden;
             background: var(--bg);
             color: var(--paper);
-            font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+            font-family: var(--font-body);
             -webkit-font-smoothing: antialiased;
         }
         /* -------- horizontal scroller -------- */
@@ -74,7 +77,6 @@
             border: 1px solid var(--paper-dim);
             background: transparent;
             padding: 0;
-            cursor: pointer;
             transition: background .35s ease, border-color .35s ease, transform .35s ease;
         }
         
@@ -103,10 +105,12 @@
             justify-content: center;
             text-align: center;
             padding: 40px 8vw;
-            background: radial-gradient(circle at 50% 42%, #1a1712 0%, var(--bg) 72%);
+            background: radial-gradient(circle at 50% 42%, #222224 0%, var(--bg) 72%);
         }
         
         .hero-intro h1 {
+            font-family: var(--font-heading);
+            color: var(--heading);
             opacity: 0;
             filter: blur(9px) brightness(2.6);
             transform: scale(1.03);
@@ -154,7 +158,7 @@
         }
         
         .hero-intro .scroll-cue span {
-            font-family: 'IBM Plex Mono', monospace;
+            font-family: var(--font-body);
             font-size: 10px;
             letter-spacing: 0.06em;
             color: var(--paper-dim);
@@ -197,22 +201,31 @@
             height: 100vh;
             height: 100svh;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
             justify-content: center;
-            padding: 4vh 6vw;
-            gap: 26px;
+            padding: 5vh 6vw 8vh;
+            gap: 5vw;
+        }
+        /* alternate: odd frames = image left / text right, even frames = image right / text left */
+        
+        .frame:nth-child(even) {
+            flex-direction: row-reverse;
         }
         
         .frame-figure {
             display: flex;
             justify-content: center;
+            align-items: center;
+            flex: 1 1 62%;
+            min-width: 0;
             min-height: 0;
+            height: 100%;
         }
         
         .frame-figure img {
-            max-width: 88vw;
-            max-height: 62vh;
+            max-width: 100%;
+            max-height: 100%;
             width: auto;
             height: auto;
             display: block;
@@ -232,7 +245,8 @@
             display: flex;
             gap: 22px;
             align-items: baseline;
-            max-width: 90vw;
+            flex: 0 1 30%;
+            min-width: 0;
             opacity: 0;
             transform: translateY(6px);
             transition: opacity 1s ease .35s, transform 1s ease .35s;
@@ -244,7 +258,7 @@
         }
         
         .frame-number {
-            font-family: 'IBM Plex Mono', monospace;
+            font-family: var(--font-body);
             font-size: 12px;
             color: var(--rust);
             padding-top: 3px;
@@ -254,18 +268,42 @@
         .frame-caption-group {
             max-width: 38ch;
         }
+        /* small screens: stack image over text */
+        
+        @media (max-width: 760px) {
+            .frame,
+            .frame:nth-child(even) {
+                flex-direction: column;
+                gap: 20px;
+                padding: 4vh 6vw 8vh;
+            }
+            .frame-figure {
+                flex: 1 1 auto;
+                width: 100%;
+                height: auto;
+                min-height: 0;
+            }
+            .frame-figure img {
+                max-height: 58vh;
+            }
+            .frame-text {
+                flex: 0 0 auto;
+                max-width: 90vw;
+            }
+        }
         
         .frame-caption {
+            font-family: var(--font-heading);
             font-size: clamp(1.05rem, 2vw, 1.4rem);
             font-style: italic;
             font-weight: 300;
             line-height: 1.4;
             margin: 0 0 8px;
-            color: var(--paper);
+            color: var(--heading);
         }
         
         .frame-exif {
-            font-family: 'IBM Plex Mono', monospace;
+            font-family: var(--font-body);
             font-size: 11px;
             letter-spacing: 0.03em;
             color: var(--paper-dim);
@@ -281,14 +319,16 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 0 8vw;
+            padding: 6vh 4vw 11vh;
         }
         
         .closing-content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            max-width: 42ch;
+            width: 100%;
+            height: 100%;
+            max-width: none;
         }
         
         .closing-body {
@@ -297,16 +337,17 @@
             font-weight: 300;
             font-style: italic;
             color: var(--paper);
-            margin: 0 0 2.6rem;
+            margin: 0 0 2rem;
+            max-width: 42ch;
         }
         
         .gallery-link {
-            font-family: 'IBM Plex Mono', monospace;
+            font-family: var(--font-body);
             font-size: 12px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             text-decoration: none;
-            color: var(--paper);
+            color: var(--rust);
             background: transparent;
             border: 1px solid var(--rust);
             padding: 16px 38px;
@@ -318,17 +359,189 @@
         .gallery-link:focus-visible {
             background: var(--rust);
             border-color: var(--rust);
-            color: var(--paper);
+            color: var(--bg);
+        }
+        /* -------- closing cards -------- */
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            background: #1b1b1d;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            padding: 0;
+            overflow: hidden;
+            transition: border-color 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .card:hover,
+        .card:focus-within {
+            border-color: var(--rust);
+            transform: translateY(-3px);
+        }
+        
+        .card-media {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            color: var(--rust);
+            background: radial-gradient(circle at 50% 40%, #222224 0%, #151516 100%);
+            border-bottom: 1px solid var(--line);
+            overflow: hidden;
+        }
+        
+        .card-icon {
+            width: 55%;
+            max-width: 300px;
+            height: 70%;
+            opacity: 0.85;
+            transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+        }
+        
+        .card:hover .card-icon,
+        .card:focus-within .card-icon {
+            transform: scale(1.08);
+            opacity: 1;
+        }
+        
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 0 0 auto;
+            width: 100%;
+            padding: 12px 18px 15px;
+        }
+        
+        .card-number {
+            font-family: var(--font-body);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: var(--rust);
+        }
+        
+        .card-title {
+            font-family: var(--font-heading);
+            font-weight: 400;
+            font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+            color: var(--heading);
+            margin: 6px 0 6px;
+            line-height: 1.1;
+        }
+        
+        .card-desc {
+            font-family: var(--font-body);
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--paper-dim);
+            margin: 0 0 12px;
+            flex: 1;
+        }
+        
+        .card-link {
+            font-family: var(--font-body);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--rust);
+            border: 1px solid var(--rust);
+            padding: 10px 20px;
+            border-radius: 2px;
+            transition: background 0.35s ease, color 0.35s ease;
+        }
+        
+        .card-link:hover,
+        .card-link:focus-visible {
+            background: var(--rust);
+            color: var(--bg);
+        }
+        
+        @media (max-width: 760px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(3, minmax(0, 1fr));
+                gap: 14px;
+            }
+            .card-body {
+                padding: 12px 14px 14px;
+            }
+            .card-desc {
+                display: none;
+            }
+            .card-title {
+                margin-bottom: 14px;
+            }
+            .card-link {
+                padding: 8px 12px;
+                font-size: 10px;
+            }
         }
         
         .closing-hint {
-            margin-top: 2.2rem;
-            font-family: 'IBM Plex Mono', monospace;
+            margin-top: 1.8rem;
+            font-family: var(--font-body);
             font-size: 10px;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--paper-dim);
             opacity: 0.75;
+        }
+        /* -------- custom inverted cursor (mouse devices only) -------- */
+        
+        .cursor {
+            display: none;
+        }
+        
+        @media (hover: hover) and (pointer: fine) {
+            body,
+            a,
+            button,
+            img,
+            [role="button"],
+            .cursor-grow,
+            [data-cursor-grow] {
+                cursor: none;
+            }
+            .cursor {
+                display: block;
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: #fff;
+                mix-blend-mode: difference;
+                pointer-events: none;
+                z-index: 9999;
+                transform: translate(-50%, -50%);
+                opacity: 0;
+                transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+                will-change: left, top, width, height;
+            }
+            .cursor.is-visible {
+                opacity: 1;
+            }
+            .cursor.is-active {
+                width: 48px;
+                height: 48px;
+            }
         }
         
         @media (prefers-reduced-motion: reduce) {
@@ -369,26 +582,92 @@
 
         <footer class="closing">
             <div class="closing-content">
-                <p class="closing-body">This is only a preview. See every photograph in the full collection.</p>
-                <a class="gallery-link" href="../Gallery/Gallery.html">View Full Gallery</a>
-                <span class="closing-hint">Keep scrolling to know about the artist / photographer</span>
+                <div class="cards">
+                    <article class="card">
+                        <div class="card-media">
+                            <svg class="card-icon" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="40" y="16" width="120" height="88"/><rect x="50" y="26" width="100" height="68"/><polyline points="50,84 80,56 100,74 122,46 150,80"/><circle cx="72" cy="40" r="6"/></svg>
+                        </div>
+                        <div class="card-body">
+                            <span class="card-number">01</span>
+                            <h2 class="card-title">Gallery</h2>
+                            <p class="card-desc">Every photograph in the full collection.</p>
+                            <a class="card-link" href="../Gallery/Gallery.html">View Gallery</a>
+                        </div>
+                    </article>
+                    <article class="card">
+                        <div class="card-media">
+                            <svg class="card-icon" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="44" y="34" width="112" height="66" rx="4"/><path d="M78 34l7-12h30l7 12"/><circle cx="100" cy="67" r="21"/><circle cx="100" cy="67" r="9"/><circle cx="143" cy="46" r="2"/></svg>
+                        </div>
+                        <div class="card-body">
+                            <span class="card-number">02</span>
+                            <h2 class="card-title">Services</h2>
+                            <p class="card-desc">Commissions, portraits and prints.</p>
+                            <a class="card-link" href="../Services/Services.html">View Services</a>
+                        </div>
+                    </article>
+                    <article class="card">
+                        <div class="card-media">
+                            <svg class="card-icon" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M32 60Q100 4 168 60Q100 116 32 60Z"/><circle cx="100" cy="60" r="21"/><circle cx="100" cy="60" r="7"/></svg>
+                        </div>
+                        <div class="card-body">
+                            <span class="card-number">03</span>
+                            <h2 class="card-title">Artist</h2>
+                            <p class="card-desc">The story behind the photographer.</p>
+                            <a class="card-link" href="../Artist/Artist.html">Meet the Artist</a>
+                        </div>
+                    </article>
+                    <article class="card">
+                        <div class="card-media">
+                            <svg class="card-icon" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="100" cy="60" r="46"/><circle cx="100" cy="60" r="38"/><polygon points="100,32 108,52 130,54 113,68 118,90 100,78 82,90 87,68 70,54 92,52"/></svg>
+                        </div>
+                        <div class="card-body">
+                            <span class="card-number">04</span>
+                            <h2 class="card-title">Awards</h2>
+                            <p class="card-desc">Recognition and published work.</p>
+                            <a class="card-link" href="../Awards/Awards.html">See Awards</a>
+                        </div>
+                    </article>
+                    <article class="card">
+                        <div class="card-media">
+                            <svg class="card-icon" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="rotate(-40 100 60)"><rect x="50" y="50" width="76" height="20"/><polygon points="126,50 156,60 126,70"/><line x1="66" y1="50" x2="66" y2="70"/></g><line x1="48" y1="104" x2="152" y2="104"/></svg>
+                        </div>
+                        <div class="card-body">
+                            <span class="card-number">05</span>
+                            <h2 class="card-title">Blog</h2>
+                            <p class="card-desc">Field notes and stories from the frame.</p>
+                            <a class="card-link" href="../Blog/Blog.html">Read Blog</a>
+                        </div>
+                    </article>
+                    <article class="card">
+                        <div class="card-media">
+                            <svg class="card-icon" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="40" y="24" width="120" height="76" rx="3"/><polyline points="40,28 100,72 160,28"/></svg>
+                        </div>
+                        <div class="card-body">
+                            <span class="card-number">06</span>
+                            <h2 class="card-title">Contact</h2>
+                            <p class="card-desc">Say hello, or start a project.</p>
+                            <a class="card-link" href="../Contact/Contact.html">Get in Touch</a>
+                        </div>
+                    </article>
+                </div>
             </div>
         </footer>
 
     </div>
 
     <nav class="rail" id="rail" aria-label="Frame progress"></nav>
+    <div class="cursor" id="cursor" aria-hidden="true"></div>
 
     <script>
         /* ============================================================
-                                                   IMAGE FILES
-                                                   Each "src" below is the filename you gave me. Place the actual
-                                                   files in the same folder as this HTML page (or update src to
-                                                   the correct relative path, e.g. "images/_DSC1683.jpg"). Until
-                                                   a file is found, that frame falls back to a placeholder swatch
-                                                   automatically (see the onerror handler below) — nothing breaks
-                                                   in the meantime.
-                                                   ============================================================ */
+                                                                   IMAGE FILES
+                                                                   Each "src" below is the filename you gave me. Place the actual
+                                                                   files in the same folder as this HTML page (or update src to
+                                                                   the correct relative path, e.g. "images/_DSC1683.jpg"). Until
+                                                                   a file is found, that frame falls back to a placeholder swatch
+                                                                   automatically (see the onerror handler below) — nothing breaks
+                                                                   in the meantime.
+                                                                   ============================================================ */
         const CLICKS = [{
             src: "_DSC1683.jpg",
             caption: "Morning finds the forest floor first.",
@@ -479,7 +758,7 @@
     <rect width="${w}" height="${h}" fill="url(#g)"/>
     <rect width="${w}" height="${h}" filter="url(#grain)"/>
     <circle cx="${w*0.62}" cy="${h*0.5}" r="${Math.min(w,h)*0.16}" fill="none" stroke="hsla(${hue},40%,70%,0.18)" stroke-width="1.5"/>
-    <text x="${w-30}" y="${h-26}" text-anchor="end" font-family="monospace" font-size="20" fill="hsla(${hue},20%,80%,0.28)">0${n} / placeholder</text>
+    <text x="${w-30}" y="${h-26}" text-anchor="end" font-family="Inter, sans-serif" font-size="20" fill="hsla(${hue},20%,80%,0.28)">0${n} / placeholder</text>
   </svg>`;
             return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
         }
@@ -673,6 +952,33 @@
         window.addEventListener("resize", () => {
             scroller.scrollLeft = currentIndex * scroller.clientWidth;
         });
+    </script>
+    <script>
+        /* ---- custom inverted cursor ---- */
+        (function() {
+            const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+            const cursor = document.getElementById("cursor");
+            if (!mq.matches || !cursor) return;
+
+            const GROW_SELECTOR = "a, button, [role='button'], .cursor-grow, [data-cursor-grow]";
+
+            document.addEventListener("mousemove", (e) => {
+                cursor.style.left = e.clientX + "px";
+                cursor.style.top = e.clientY + "px";
+                cursor.classList.add("is-visible");
+            });
+
+            document.addEventListener("mouseover", (e) => {
+                cursor.classList.toggle("is-active", !!e.target.closest(GROW_SELECTOR));
+            });
+
+            document.documentElement.addEventListener("mouseleave", () => {
+                cursor.classList.remove("is-visible");
+            });
+            document.documentElement.addEventListener("mouseenter", () => {
+                cursor.classList.add("is-visible");
+            });
+        })();
     </script>
     <script src="../Sidebar/sidebar-widget.js"></script>
 

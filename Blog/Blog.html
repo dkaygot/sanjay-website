@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Field Notes — A simple blog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --bg: #0e0e0f;
+            --bg-alt: #151516;
+            --card: #1b1b1d;
+            --border: #2d2d30;
+            --body: #d9d6d0;
+            --muted: #9a978f;
+            --heading: #f4f1ea;
+            --accent: #c9a96a;
+            --glow: #222224;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px);
+        }
+        
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--body);
+            font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+            line-height: 1.65;
+        }
+        
+        h1,
+        h2,
+        h3 {
+            font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+            color: var(--heading);
+            font-weight: 600;
+            line-height: 1.15;
+            margin: 0;
+        }
+        
+        a {
+            color: var(--accent);
+        }
+        
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+        
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        
+        .hero {
+            background: radial-gradient(ellipse at top, var(--glow) 0%, var(--bg) 70%);
+            padding: 88px 0 72px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.6rem, 7vw, 4.4rem);
+        }
+        
+        .hero p {
+            color: var(--muted);
+            max-width: 480px;
+            margin: 18px auto 0;
+            font-size: 1.05rem;
+        }
+        
+        .rule {
+            width: 56px;
+            height: 2px;
+            background: var(--accent);
+            margin: 28px auto 0;
+            border: 0;
+        }
+        
+        section {
+            padding: 72px 0;
+        }
+        
+        section.alt {
+            background: var(--bg-alt);
+            border-top: 1px solid var(--border);
+        }
+        
+        .section-head {
+            margin-bottom: 36px;
+        }
+        
+        .section-head h2 {
+            font-size: 2.2rem;
+        }
+        
+        .section-head p {
+            color: var(--muted);
+            margin: 8px 0 0;
+        }
+        /* Posts */
+        
+        .posts {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .post {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px;
+        }
+        
+        .post h3 {
+            font-size: 1.7rem;
+            margin-bottom: 6px;
+        }
+        
+        .meta {
+            color: var(--muted);
+            font-size: .85rem;
+            margin-bottom: 14px;
+        }
+        
+        .post p {
+            margin: 0;
+            white-space: pre-line;
+        }
+        
+        .post .actions {
+            margin-top: 18px;
+        }
+        
+        .link-btn {
+            background: none;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            color: var(--muted);
+            font: inherit;
+            font-size: .85rem;
+        }
+        
+        .link-btn:hover {
+            color: var(--accent);
+        }
+        
+        .empty {
+            color: var(--muted);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 28px;
+            text-align: center;
+        }
+        /* Form */
+        
+        form {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px;
+            display: grid;
+            gap: 18px;
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        
+        label {
+            display: grid;
+            gap: 6px;
+            font-size: .9rem;
+            color: var(--muted);
+        }
+        
+        input,
+        textarea {
+            font: inherit;
+            color: var(--body);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 14px;
+            width: 100%;
+            transition: border-color .2s;
+        }
+        
+        input:hover,
+        textarea:hover {
+            border-color: #3d3d41;
+        }
+        
+        input:focus,
+        textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            justify-self: start;
+            background: var(--accent);
+            color: #0e0e0f;
+            border: 0;
+            border-radius: 6px;
+            padding: 12px 26px;
+            font: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: filter .2s;
+        }
+        
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+        
+        .status {
+            font-size: .9rem;
+            color: var(--accent);
+            min-height: 1.2em;
+        }
+        
+        .error {
+            color: #c0574a;
+        }
+        
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+            .hero {
+                padding: 64px 0 52px;
+            }
+            section {
+                padding: 52px 0;
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero" id="top">
+        <div class="wrap">
+            <h1>Field Notes</h1>
+            <p>Short posts on things worth writing down. Read the latest below, or add your own.</p>
+            <hr class="rule">
+        </div>
+    </div>
+
+    <section id="posts">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Latest posts</h2>
+                <p id="count"></p>
+            </div>
+            <div class="posts" id="postList"></div>
+        </div>
+    </section>
+
+    <section class="alt" id="write">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Write a post</h2>
+                <p>Fill in the form and your post appears at the top of the list.</p>
+            </div>
+            <form id="postForm" novalidate>
+                <div class="row">
+                    <label>Title
+          <input id="title" name="title" type="text" maxlength="90" required>
+        </label>
+                    <label>Your name
+          <input id="author" name="author" type="text" maxlength="50" required>
+        </label>
+                </div>
+                <label>Post
+        <textarea id="body" name="body" required></textarea>
+      </label>
+                <div class="status" id="status" role="status"></div>
+                <button class="btn" type="submit">Publish post</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        (function() {
+            var KEY = "fieldnotes:posts";
+            var seed = [{
+                id: 3,
+                title: "Why small habits win",
+                author: "Maya Lin",
+                date: "2026-09-14",
+                body: "Big goals are easy to set and easy to drop. A ten-minute daily routine is harder to argue with.\n\nStart with something so small it feels silly, then let it grow on its own schedule."
+            }, {
+                id: 2,
+                title: "A better way to take notes",
+                author: "Daniel Ortiz",
+                date: "2026-09-02",
+                body: "Write down decisions and the reasons behind them, not just what was said. Six months later, the reasons are the part you'll actually need."
+            }, {
+                id: 1,
+                title: "Notes from a slow week",
+                author: "Maya Lin",
+                date: "2026-08-21",
+                body: "Not every week needs to be productive. Some weeks are for reading, walking, and letting ideas settle."
+            }];
+
+            var posts = load();
+            var list = document.getElementById("postList");
+            var count = document.getElementById("count");
+            var form = document.getElementById("postForm");
+            var status = document.getElementById("status");
+
+            function load() {
+                try {
+                    var raw = localStorage.getItem(KEY);
+                    if (raw) {
+                        var p = JSON.parse(raw);
+                        if (Array.isArray(p)) return p;
+                    }
+                } catch (e) {}
+                return seed.slice();
+            }
+
+            function save() {
+                try {
+                    localStorage.setItem(KEY, JSON.stringify(posts));
+                } catch (e) {}
+            }
+
+            function fmt(d) {
+                var dt = new Date(d + "T00:00:00");
+                return isNaN(dt) ? d : dt.toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                });
+            }
+
+            function render() {
+                list.innerHTML = "";
+                count.textContent = posts.length + (posts.length === 1 ? " post" : " posts");
+                if (!posts.length) {
+                    var e = document.createElement("div");
+                    e.className = "empty";
+                    e.textContent = "No posts yet. Write the first one below.";
+                    list.appendChild(e);
+                    return;
+                }
+                posts.forEach(function(p) {
+                    var art = document.createElement("article");
+                    art.className = "post";
+
+                    var h = document.createElement("h3");
+                    h.textContent = p.title;
+                    var m = document.createElement("div");
+                    m.className = "meta";
+                    m.textContent = "By " + p.author + " on " + fmt(p.date);
+                    var b = document.createElement("p");
+                    b.textContent = p.body;
+
+                    var a = document.createElement("div");
+                    a.className = "actions";
+                    var del = document.createElement("button");
+                    del.className = "link-btn";
+                    del.type = "button";
+                    del.textContent = "Delete post";
+                    del.addEventListener("click", function() {
+                        posts = posts.filter(function(x) {
+                            return x.id !== p.id;
+                        });
+                        save();
+                        render();
+                    });
+                    a.appendChild(del);
+
+                    art.append(h, m, b, a);
+                    list.appendChild(art);
+                });
+            }
+
+            form.addEventListener("submit", function(ev) {
+                ev.preventDefault();
+                var title = form.title.value.trim();
+                var author = form.author.value.trim();
+                var body = form.body.value.trim();
+                status.classList.remove("error");
+                if (!title || !author || !body) {
+                    status.classList.add("error");
+                    status.textContent = "Add a title, your name, and the post text.";
+                    return;
+                }
+                var maxId = posts.reduce(function(n, p) {
+                    return Math.max(n, p.id);
+                }, 0);
+                posts.unshift({
+                    id: maxId + 1,
+                    title: title,
+                    author: author,
+                    body: body,
+                    date: new Date().toISOString().slice(0, 10)
+                });
+                save();
+                render();
+                form.reset();
+                status.textContent = "Published.";
+                document.getElementById("posts").scrollIntoView({
+                    behavior: "smooth"
+                });
+            });
+
+            render();
+        })();
+    </script>
+    <script src="../Sidebar/sidebar-widget.js"></script>
+</body>
+
+</html>

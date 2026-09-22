@@ -1,0 +1,32 @@
+Role	Hex	Used for
+Background	
+#0e0e0f	Main page background, near black
+Background alt	
+#151516	Alternating sections (Printing, Contact)
+Card	
+#1b1b1d	Feature boxes, price cards, step cards, image frames
+Border / lines	
+#2d2d30	Section dividers, card outlines, FAQ separators
+Body text	
+#d9d6d0	Paragraph text, a warm off-white
+Muted text	
+#9a978f	Captions, descriptions, nav links, secondary copy
+Headings	
+#f4f1ea	Titles and the brand name, a soft cream
+Accent (gold)	
+#c9a96a	Eyebrow labels, buttons, prices, dividers, hover states, the "+" in the FAQ
+
+The hero also uses a soft radial glow, going from 
+#222224 at the top to the base black 
+#0e0e0f.
+
+Fonts: Cormorant Garamond (Montserrat) for headings and Inter (Lora) for body text.
+
+If you'd like a different accent, change --accent in the :root block at the top of the CSS and it updates across the page. Some options:
+
+Copper: 
+#b87a4b
+Silver: 
+#b8bcc4
+Muted red: 
+#c0574a

@@ -6,18 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Sanjay Patil | Photographer, Mumbai</title>
     <meta name="description" content="Sanjay Patil is a Mumbai-based photographer. Light is everything.">
-    <meta name="theme-color" content="#0a0906">
+    <meta name="theme-color" content="#0e0e0f">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
          :root {
-            --bg: #0a0906;
-            --ink: #f4f1ea;
-            --ink-dim: rgba(244, 241, 234, 0.62);
-            --ink-faint: rgba(244, 241, 234, 0.38);
-            --gold: #d4a24e;
-            --line: rgba(244, 241, 234, 0.16);
+            --bg: #0e0e0f;
+            --bg-alt: #151516;
+            --card: #1b1b1d;
+            --border: #2d2d30;
+            --text: #d9d6d0;
+            --muted: #9a978f;
+            --heading: #f4f1ea;
+            --accent: #c9a96a;
+            --glow: #222224;
+            --font-serif: 'Montserrat', Georgia, serif;
+            --font-sans: 'Lora', system-ui, sans-serif;
+            /* legacy names mapped onto the new palette */
+            --ink: var(--heading);
+            --ink-dim: var(--muted);
+            --ink-faint: var(--muted);
+            --gold: var(--accent);
+            --line: var(--border);
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
@@ -33,20 +44,19 @@
         
         body {
             margin: 0;
-            background: var(--bg);
-            color: var(--ink);
-            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(ellipse at 50% 0%, var(--glow) 0%, var(--bg) 70%) no-repeat, var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
             overflow: hidden;
             -webkit-font-smoothing: antialiased;
         }
         
         h1,
         h2 {
-            font-family: 'Anton', sans-serif;
-            font-weight: 400;
-            text-transform: uppercase;
-            line-height: 0.92;
-            letter-spacing: 0.2px;
+            font-family: var(--font-serif);
+            font-weight: 600;
+            line-height: 1;
+            letter-spacing: 0;
             margin: 0;
         }
         
@@ -105,7 +115,7 @@
         .bg-scrim {
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, rgba(6, 5, 3, 0.92) 0%, rgba(6, 5, 3, 0.72) 32%, rgba(6, 5, 3, 0.18) 62%, rgba(6, 5, 3, 0.05) 100%), linear-gradient(180deg, rgba(6, 5, 3, 0.55) 0%, rgba(6, 5, 3, 0.05) 22%, rgba(6, 5, 3, 0.05) 70%, rgba(6, 5, 3, 0.75) 100%);
+            background: linear-gradient(90deg, rgba(14, 14, 15, 0.92) 0%, rgba(14, 14, 15, 0.72) 32%, rgba(14, 14, 15, 0.18) 62%, rgba(14, 14, 15, 0.05) 100%), linear-gradient(180deg, rgba(14, 14, 15, 0.55) 0%, rgba(14, 14, 15, 0.05) 22%, rgba(14, 14, 15, 0.05) 70%, rgba(14, 14, 15, 0.75) 100%);
         }
         
         .grain {
@@ -130,7 +140,7 @@
             column-gap: clamp(1rem, 3vw, 2.5rem);
             padding: 1.7rem clamp(1.25rem, 4vw, 3rem) 2.6rem;
             padding-top: calc(1.7rem + var(--safe-top));
-            background: linear-gradient(180deg, rgba(6, 5, 3, 0.5) 0%, rgba(6, 5, 3, 0.22) 55%, rgba(6, 5, 3, 0) 100%);
+            background: linear-gradient(180deg, rgba(14, 14, 15, 0.5) 0%, rgba(14, 14, 15, 0.22) 55%, rgba(14, 14, 15, 0) 100%);
             pointer-events: none;
         }
         
@@ -148,7 +158,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Anton', sans-serif;
+            font-family: var(--font-serif);
+            font-weight: 600;
             font-size: 0.95rem;
             letter-spacing: 0.5px;
             text-decoration: none;
@@ -192,7 +203,8 @@
         }
         
         .nav-num {
-            font-family: 'Anton', sans-serif;
+            font-family: var(--font-serif);
+            font-weight: 600;
             font-size: 0.72rem;
             color: var(--ink-faint);
             transition: color 0.25s ease;
@@ -357,18 +369,111 @@
         
         .intro-subline strong {
             display: block;
-            font-family: 'Anton', sans-serif;
-            text-transform: uppercase;
-            font-size: clamp(1rem, 2vw, 1.2rem);
-            letter-spacing: 1px;
+            font-family: var(--font-serif);
+            font-weight: 600;
+            font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+            letter-spacing: 0.3px;
             margin-bottom: 0.4rem;
         }
         
         .intro-subline span {
             display: block;
             font-size: 0.98rem;
-            color: var(--ink-dim);
+            color: var(--text);
             max-width: 34ch;
+        }
+        
+        .intro-portrait {
+            position: absolute;
+            top: 0;
+            left: 55.2vw;
+            width: 34.5vw;
+            height: 100%;
+            margin: 0;
+            pointer-events: none;
+        }
+        /* background effect behind the cut-out portrait: warm golden glow */
+        
+        .intro-portrait::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 34%;
+            width: 190%;
+            aspect-ratio: 1;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(201, 169, 106, 0.42) 0%, rgba(201, 169, 106, 0.18) 32%, rgba(201, 169, 106, 0) 62%);
+            animation: portrait-glow 7s ease-in-out infinite alternate;
+        }
+        
+        @keyframes portrait-glow {
+            from {
+                opacity: 0.75;
+                transform: translate(-50%, -50%) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.04);
+            }
+        }
+        
+        .intro-portrait img {
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.55));
+            /* soften the cropped shoulder edges into the background */
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%), linear-gradient(180deg, #000 78%, transparent 100%);
+            -webkit-mask-composite: source-in;
+            mask-image: linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%), linear-gradient(180deg, #000 78%, transparent 100%);
+            mask-composite: intersect;
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+        }
+        /* slide photos: original aspect ratio, bleeding off the right edge,
+           fading into the background on the text side */
+        
+        .panel-photo {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 54vw;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            pointer-events: none;
+        }
+        
+        .panel-photo .frame {
+            /* the smaller of: the column width, or what fits in 78% of the screen height */
+            width: min(100%, calc(78vh * var(--ratio)));
+            aspect-ratio: var(--ratio);
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.55) 22%, #000 55%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.55) 22%, #000 55%);
+        }
+        
+        .panel-photo img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @media (min-width: 901px) {
+            .content-panel {
+                max-width: min(640px, 44vw);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .intro-portrait,
+            .panel-photo {
+                display: none;
+            }
         }
         
         .hero-title {
@@ -408,12 +513,13 @@
             font-size: 0.82rem;
             letter-spacing: 1.4px;
             text-transform: uppercase;
-            color: var(--ink-faint);
+            color: var(--accent);
             margin-bottom: 1.1rem;
         }
         
         .section-kicker span {
-            font-family: 'Anton', sans-serif;
+            font-family: var(--font-serif);
+            font-weight: 600;
             color: var(--gold);
             font-size: 0.95rem;
         }
@@ -426,7 +532,7 @@
         .panel-copy p {
             font-size: 1.02rem;
             line-height: 1.65;
-            color: var(--ink-dim);
+            color: var(--text);
             margin: 0 0 1.05rem;
             max-width: 52ch;
         }
@@ -451,7 +557,7 @@
             height: 42px;
             border-radius: 50%;
             border: 1px solid var(--line);
-            background: rgba(10, 9, 6, 0.5);
+            background: rgba(14, 14, 15, 0.5);
             color: var(--ink);
             cursor: pointer;
             display: flex;
@@ -511,7 +617,7 @@
             height: 78px;
             border-radius: 50%;
             border: 1px solid rgba(244, 241, 234, 0.35);
-            background: rgba(10, 9, 6, 0.35);
+            background: rgba(14, 14, 15, 0.35);
             color: var(--ink);
             font-size: 0.72rem;
             letter-spacing: 1px;
@@ -545,7 +651,7 @@
         }
         
         .custom-cursor.is-active {
-            background: rgba(212, 162, 78, 0.25);
+            background: rgba(201, 169, 106, 0.25);
             border-color: var(--gold);
         }
         /* ---------- mobile nav ---------- */
@@ -598,7 +704,7 @@
         .legal-backdrop {
             position: absolute;
             inset: 0;
-            background: rgba(6, 5, 3, 0.78);
+            background: rgba(14, 14, 15, 0.78);
             border: none;
             cursor: pointer;
         }
@@ -608,7 +714,7 @@
             z-index: 1;
             max-width: 520px;
             width: 100%;
-            background: #141210;
+            background: var(--card);
             border: 1px solid var(--line);
             border-radius: 14px;
             padding: 2.2rem;
@@ -617,6 +723,7 @@
         }
         
         .legal-card h2 {
+            color: var(--heading);
             font-size: 1.5rem;
             margin-bottom: 1rem;
         }
@@ -651,7 +758,7 @@
                 height: 100vh;
                 height: 100dvh;
                 width: min(78vw, 340px);
-                background: #0d0c09;
+                background: var(--bg-alt);
                 border-left: 1px solid var(--line);
                 flex-direction: column;
                 justify-content: center;
@@ -715,12 +822,11 @@
 <body>
 
     <div class="bg-stage" aria-hidden="true">
-        <div class="bg-layer" data-bg="0"><img src="2.png" alt=""></div>
-        <div class="bg-layer" data-bg="1"><img src="1.png" alt=""></div>
-        <div class="bg-layer" data-bg="2"><img src="2.png" alt=""></div>
-        <div class="bg-layer" data-bg="3"><img src="3.png" alt=""></div>
-        <div class="bg-layer" data-bg="4"><img src="1.png" alt=""></div>
-        <div class="bg-scrim"></div>
+        <div class="bg-layer" data-bg="0"></div>
+        <div class="bg-layer" data-bg="1"></div>
+        <div class="bg-layer" data-bg="2"></div>
+        <div class="bg-layer" data-bg="3"></div>
+        <div class="bg-layer" data-bg="4"></div>
         <div class="grain"></div>
     </div>
 
@@ -740,7 +846,7 @@
         </nav>
 
         <div class="header-actions">
-            <a class="contact-button" href="mailto:hello@sanjaypatil.com">Contact</a>
+            <a class="contact-button" href="../Contact/Contact.html">Contact</a>
         </div>
     </header>
 
@@ -762,6 +868,9 @@
                     </span>
                 </h1>
             </div>
+            <figure class="intro-portrait fade-item">
+                <img src="0.png" alt="Sanjay Patil portrait">
+            </figure>
         </section>
 
         <section class="panel" id="philosophy" data-index="1" aria-labelledby="philosophy-title">
@@ -773,6 +882,9 @@
                 <p class="fade-item">For Sanjay, photography begins not with the camera, but with light. He looks at how light shapes a subject, creates mood, reveals texture, defines form — and transforms an ordinary moment into an extraordinary photograph.</p>
                 <p class="fade-item">Whether photographing wildlife, landscapes, festivals, or people, his approach is guided by a constant search for the quality, direction, colour, and emotion of light.</p>
             </div>
+            <figure class="panel-photo fade-item" style="--ratio: 1400 / 934;">
+                <div class="frame"><img src="1.jpg" alt="Photographer standing on a rocky ridge with snow-covered mountains behind"></div>
+            </figure>
         </section>
 
         <section class="panel" id="photography" data-index="2" aria-labelledby="photography-title">
@@ -783,6 +895,9 @@
                 <p class="fade-item">Each journey has further strengthened his understanding of natural light and its ability to tell stories, whether on a wildlife trail at first light, a landscape at dusk, or a festival lit by colour and celebration.</p>
                 <p class="fade-item">Across every genre, the instinct stays the same: watch how the light moves, wait for the moment it says something, and be ready when it does.</p>
             </div>
+            <figure class="panel-photo fade-item" style="--ratio: 3091 / 1864;">
+                <div class="frame"><img src="2.jpg" alt="Photographer on a snowy Lofoten peak above the fjord at sunrise"></div>
+            </figure>
         </section>
 
         <section class="panel" id="teaching" data-index="3" aria-labelledby="teaching-title">
@@ -793,6 +908,9 @@
                 <p class="fade-item">His teaching goes beyond cameras and technique. It is about learning to see light, understanding composition, and building the instincts for visual storytelling.</p>
                 <p class="fade-item">More than anything, he encourages every student to develop a photographic vision that is their own.</p>
             </div>
+            <figure class="panel-photo fade-item" style="--ratio: 1200 / 800;">
+                <div class="frame"><img src="3.jpg" alt="Photographer lying on the ground to photograph a fan-throated lizard"></div>
+            </figure>
         </section>
 
         <section class="panel" id="legacy" data-index="4" aria-labelledby="legacy-title">
@@ -803,6 +921,9 @@
                 <p class="fade-item">For him, a photograph on a screen is only half the journey.</p>
                 <p class="fade-item">The journey is complete only when the light captured in a moment becomes an image that can endure for generations.</p>
             </div>
+            <figure class="panel-photo fade-item" style="--ratio: 1400 / 934;">
+                <div class="frame"><img src="4.jpg" alt="Photographer standing on a rocky ridge with snow-covered mountains behind"></div>
+            </figure>
         </section>
 
     </main>
