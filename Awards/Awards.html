@@ -223,6 +223,11 @@
             background: rgba(14, 14, 15, .6);
         }
         
+        .feature img {
+            width: 100%;
+            height: auto;
+        }
+        
         .feature figcaption {
             padding: 1.1rem .4rem .4rem;
         }
@@ -397,7 +402,7 @@
         
         .press-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.5rem;
         }
         
@@ -515,6 +520,63 @@
                 transition: none !important;
             }
         }
+        /* ---------- Additions ---------- */
+        
+        .year.small {
+            font-size: 1.9rem;
+            padding-top: .4rem;
+        }
+        
+        .about {
+            display: grid;
+            grid-template-columns: .8fr 1.2fr;
+            gap: clamp(2rem, 5vw, 4.5rem);
+            align-items: start;
+        }
+        
+        .about h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1.6rem;
+        }
+        
+        .facts {
+            display: grid;
+            gap: 1.2rem;
+            border-left: 2px solid var(--accent);
+            padding-left: 1.4rem;
+        }
+        
+        .facts strong {
+            display: block;
+            font-family: var(--font-head);
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--heading);
+            line-height: 1.2;
+        }
+        
+        .facts span {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+        
+        .bio p+p {
+            margin-top: 1.2rem;
+        }
+        
+        .bio p {
+            max-width: 65ch;
+        }
+        
+        @media (max-width: 860px) {
+            .about {
+                grid-template-columns: 1fr;
+            }
+            .year.small {
+                font-size: 1.6rem;
+                padding-top: 0;
+            }
+        }
     </style>
 </head>
 
@@ -534,27 +596,20 @@
             <div class="wrap">
                 <div>
                     <h1>Awards and recognition</h1>
-                    <p class="lead">Competition wins, gallery selections and magazine features from the past decade. Each entry lists the photograph that earned it, so you can see the work behind the title.</p>
+                    <p class="lead">Honors from more than 35 years behind the camera, at international and national level: Sony World Photography Awards, National Geographic, Lonely Planet, the Nikon Comedy Wildlife Awards and more, alongside features in international
+                        magazines.</p>
                     <div class="actions">
                         <a class="btn btn-solid" href="#honors">Browse all honors</a>
-                        <a class="btn btn-ghost" href="#contact">Commission a shoot</a>
+                        <a class="btn btn-ghost" href="#contact">Get in touch</a>
                     </div>
                 </div>
 
                 <figure class="feature">
-                    <!-- Replace .ph with: <img src="your-photo.jpg" alt="Describe the photograph"> -->
-                    <div class="ph" role="img" aria-label="Placeholder for the featured award photograph">
-                        <svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <path d="M0 360 L90 270 L150 320 L250 200 L330 290 L400 240 L400 500 L0 500Z" fill="#0e0e0f"/>
-            <path d="M0 420 L120 350 L200 400 L300 330 L400 380 L400 500 L0 500Z" fill="#151516"/>
-            <circle cx="290" cy="120" r="28" fill="#2d2d30"/>
-          </svg>
-                        <span>Featured photo, 4:5</span>
-                    </div>
+                    <img src="1.jpg" width="1400" height="933" alt="A lizard standing upright on one leg on a rock, clutching a dry twig to its chest with its mouth open, as if singing">
                     <figcaption>
-                        <p class="eyebrow">Most recent top honor</p>
-                        <h3>Grand Prize, Landscape of the Year</h3>
-                        <p>International Photography Awards, 2025. Awarded for <em>Salt Flat at First Light</em>.</p>
+                        <p class="eyebrow">Most recent honor</p>
+                        <h3>Highly Commended</h3>
+                        <p>Nikon Comedy Wildlife Awards, 2024.</p>
                     </figcaption>
                 </figure>
             </div>
@@ -565,77 +620,62 @@
             <div class="wrap">
                 <div class="section-head">
                     <h2>Every honor, by year</h2>
-                    <p>Filter by the kind of recognition. Duplicate a row inside a year to add an award, or copy a whole year block to start a new one.</p>
+                    <p>Competition results and editorial features from 2010 to today. Filter by the kind of recognition.</p>
                 </div>
 
                 <div class="filters" role="group" aria-label="Filter honors by type">
                     <button type="button" data-filter="all" aria-pressed="true">All</button>
                     <button type="button" data-filter="competition" aria-pressed="false">Competitions</button>
-                    <button type="button" data-filter="exhibition" aria-pressed="false">Exhibitions</button>
-                    <button type="button" data-filter="publication" aria-pressed="false">Publications</button>
+                    <button type="button" data-filter="publication" aria-pressed="false">Features &amp; publications</button>
                 </div>
 
                 <div id="ledger">
 
                     <!-- ===== YEAR BLOCK ===== -->
                     <div class="year-group">
-                        <div class="year">2025</div>
-                        <div class="entries">
-                            <article class="entry" data-cat="competition">
-                                <h3>Grand Prize, Landscape of the Year</h3>
-                                <span class="result top">Winner</span>
-                                <p class="org">International Photography Awards, New York</p>
-                                <p class="work">Photograph: <em>Salt Flat at First Light</em></p>
-                            </article>
-                            <article class="entry" data-cat="exhibition">
-                                <h3>Selected for the Emerging Voices Show</h3>
-                                <span class="result">Selected</span>
-                                <p class="org">Northlight Gallery, Copenhagen</p>
-                                <p class="work">Series: <em>Quiet Coastlines</em></p>
-                            </article>
-                        </div>
-                    </div>
-
-                    <!-- ===== YEAR BLOCK ===== -->
-                    <div class="year-group">
                         <div class="year">2024</div>
                         <div class="entries">
                             <article class="entry" data-cat="competition">
-                                <h3>First Place, Fine Art Portrait</h3>
-                                <span class="result top">Winner</span>
-                                <p class="org">Monochrome Photography Awards, London</p>
-                                <p class="work">Photograph: <em>The Weaver's Hands</em></p>
-                            </article>
-                            <article class="entry" data-cat="publication">
-                                <h3>Cover Story, Autumn Issue</h3>
-                                <span class="result top">Cover</span>
-                                <p class="org">Lumen Magazine</p>
-                                <p class="work">Series: <em>Fog Season</em></p>
-                            </article>
-                            <article class="entry" data-cat="competition">
-                                <h3>Finalist, Documentary Series</h3>
-                                <span class="result">Finalist</span>
-                                <p class="org">Sony World Photography Awards</p>
-                                <p class="work">Series: <em>Last Ferry Home</em></p>
+                                <h3>Highly Commended</h3>
+                                <span class="result top">Highly commended</span>
+                                <p class="org">Nikon Comedy Wildlife Awards 2024</p>
                             </article>
                         </div>
                     </div>
 
                     <!-- ===== YEAR BLOCK ===== -->
                     <div class="year-group">
-                        <div class="year">2022</div>
+                        <div class="year">2023</div>
                         <div class="entries">
-                            <article class="entry" data-cat="exhibition">
-                                <h3>Solo Exhibition, Still Water</h3>
-                                <span class="result top">Solo show</span>
-                                <p class="org">The Foundry Gallery, Portland</p>
-                                <p class="work">Twenty-four prints, six weeks</p>
+                            <article class="entry" data-cat="publication">
+                                <h3>Article on archival printing</h3>
+                                <span class="result">Published</span>
+                                <p class="org">Smart Photography magazine, April 2023 issue</p>
+                                <p class="work">India&rsquo;s leading photography magazine</p>
                             </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2021</div>
+                        <div class="entries">
                             <article class="entry" data-cat="competition">
-                                <h3>Honorable Mention, Nature</h3>
-                                <span class="result">Honorable mention</span>
-                                <p class="org">Nature Photographer of the Year</p>
-                                <p class="work">Photograph: <em>Heron in Reeds</em></p>
+                                <h3>Selected in the Top 101</h3>
+                                <span class="result">Top 101</span>
+                                <p class="org">International Portrait Photographer of the Year 2021</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2020</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="publication">
+                                <h3>Photograph featured in Kinfolk</h3>
+                                <span class="result">Featured</span>
+                                <p class="org">Kinfolk, international lifestyle magazine</p>
                             </article>
                         </div>
                     </div>
@@ -644,11 +684,150 @@
                     <div class="year-group">
                         <div class="year">2019</div>
                         <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Winner, Culture category</h3>
+                                <span class="result top">Winner</span>
+                                <p class="org">Sony All India Corporate Photography Contest</p>
+                            </article>
+                            <article class="entry" data-cat="competition">
+                                <h3>Second Prize, Portraits category</h3>
+                                <span class="result top">2nd prize</span>
+                                <p class="org">Sony All India Corporate Photography Contest</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2017</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Best Photographer, Amateur category</h3>
+                                <span class="result top">Best photographer</span>
+                                <p class="org">Photo contest by Navi Mumbai Municipal Corporation, 2017&ndash;18</p>
+                            </article>
+                            <article class="entry" data-cat="competition">
+                                <h3>Winner, Wildlife category</h3>
+                                <span class="result top">Winner</span>
+                                <p class="org">Corporate photography contest</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2016</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Best Photographer, Amateur category</h3>
+                                <span class="result top">Best photographer</span>
+                                <p class="org">Photo contest by Navi Mumbai Municipal Corporation</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2015</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Best Photographer, Amateur category</h3>
+                                <span class="result top">Best photographer</span>
+                                <p class="org">Photo contest by Navi Mumbai Municipal Corporation</p>
+                            </article>
+                            <article class="entry" data-cat="competition">
+                                <h3>Consolation Prize</h3>
+                                <span class="result">Consolation prize</span>
+                                <p class="org">National Geographic, in association with Uttar Pradesh Tourism</p>
+                            </article>
                             <article class="entry" data-cat="publication">
-                                <h3>Featured Photographer of the Month</h3>
+                                <h3>Top photographs of the Holi festival</h3>
                                 <span class="result">Featured</span>
-                                <p class="org">Aperture Journal Online</p>
-                                <p class="work">Interview and eight-image portfolio</p>
+                                <p class="org">121 Clicks</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2013</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Selected Works Prize</h3>
+                                <span class="result top">Winner</span>
+                                <p class="org">3rd International Filter Photo Contest 2012&ndash;13</p>
+                                <p class="work">Sponsored by Kenko-Tokina Co. Ltd.</p>
+                            </article>
+                            <article class="entry" data-cat="competition">
+                                <h3>Tamron Challenge 2013 &ldquo;Top 20&rdquo;</h3>
+                                <span class="result">Top 20</span>
+                                <p class="org">Tamron Challenge</p>
+                                <p class="work">Certificate of Recognition</p>
+                            </article>
+                            <article class="entry" data-cat="competition">
+                                <h3>Special Mention, Best Photo category</h3>
+                                <span class="result">Special mention</span>
+                                <p class="org">Photothon 2013, organised by Maharashtra Nature Park</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2012</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Worldwide Winner</h3>
+                                <span class="result top">Winner</span>
+                                <p class="org">A Magazine International Photo Contest by AkzoNobel, Netherlands</p>
+                                <p class="work">Category: <em>Color in the Urban World</em></p>
+                            </article>
+                            <article class="entry" data-cat="publication">
+                                <h3>Featured artist</h3>
+                                <span class="result">Featured</span>
+                                <p class="org">A Magazine by AkzoNobel</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2011</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Shortlisted in the 50 Most Commendable Photographs</h3>
+                                <span class="result">Shortlisted</span>
+                                <p class="org">Sony World Photography Awards</p>
+                            </article>
+                            <article class="entry" data-cat="competition">
+                                <h3>Shortlisted in the 100 Best Photographs</h3>
+                                <span class="result">Shortlisted</span>
+                                <p class="org">Red Frames, India</p>
+                                <p class="work">Theme: <em>Frames of My City</em></p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year">2010</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Finalist</h3>
+                                <span class="result">Finalist</span>
+                                <p class="org">The Lonely Planet 100 Million Travel Photography Competition, by Lonely Planet</p>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- ===== YEAR BLOCK ===== -->
+                    <div class="year-group">
+                        <div class="year small">Undated</div>
+                        <div class="entries">
+                            <article class="entry" data-cat="competition">
+                                <h3>Finalist and Featured Artist</h3>
+                                <span class="result">Finalist</span>
+                                <p class="org">&ldquo;1000 for 1&rdquo; International Photographic Competition</p>
                             </article>
                         </div>
                     </div>
@@ -663,46 +842,51 @@
             <div class="wrap">
                 <div class="section-head">
                     <h2>Featured in</h2>
-                    <p>Publications and galleries that have shown the work.</p>
+                    <p>Magazines and publications that have carried the work.</p>
                 </div>
                 <div class="press-grid">
+                    <!-- To add a link, append inside a card: <a class="more" href="URL">Read the feature</a> -->
                     <div class="card">
-                        <h3>Lumen Magazine</h3>
-                        <p class="meta">Autumn 2024, cover and 12-page feature</p>
-                        <p>A profile of the Fog Season series and the weeks spent waiting on the coast for the right light.</p>
-                        <a class="more" href="#">Read the feature</a>
+                        <h3>A Magazine</h3>
+                        <p class="meta">AkzoNobel, 2012</p>
+                        <p>Featured artist, in the same year he was named Worldwide Winner of the magazine&rsquo;s international photo contest.</p>
                     </div>
                     <div class="card">
-                        <h3>Aperture Journal</h3>
-                        <p class="meta">March 2019, online interview</p>
-                        <p>A conversation on patience, film versus digital, and how to plan a season around one photograph.</p>
-                        <a class="more" href="#">Read the interview</a>
+                        <h3>121 Clicks</h3>
+                        <p class="meta">2015</p>
+                        <p>Selected among the top photographs of the Holi festival.</p>
                     </div>
                     <div class="card">
-                        <h3>Northlight Gallery</h3>
-                        <p class="meta">2025, group exhibition</p>
-                        <p>Four prints from Quiet Coastlines were hung in the main hall for the Emerging Voices show.</p>
-                        <a class="more" href="#">View the exhibition</a>
+                        <h3>Kinfolk</h3>
+                        <p class="meta">2020</p>
+                        <p>A photograph featured in the leading international lifestyle magazine.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Smart Photography</h3>
+                        <p class="meta">April 2023 issue</p>
+                        <p>An article on archival printing, written for India&rsquo;s leading photography magazine.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ============ JUROR WORDS ============ -->
+        <!-- ============ ABOUT ============ -->
         <section>
-            <div class="wrap">
-                <div class="section-head">
-                    <h2>What the judges said</h2>
+            <div class="wrap about">
+                <div>
+                    <h2>About Sanjay</h2>
+                    <div class="facts">
+                        <div><strong>35+ years</strong><span>of photography</span></div>
+                        <div><strong>Engineer turned artist</strong><span>years in the corporate petroleum sector</span></div>
+                        <div><strong>Fine art printing</strong><span>archival print specialist and mentor</span></div>
+                    </div>
                 </div>
-                <div class="quotes">
-                    <blockquote>
-                        <p>Replace this with a short line from a juror or editor about your winning image.</p>
-                        <footer>Juror name, International Photography Awards 2025</footer>
-                    </blockquote>
-                    <blockquote>
-                        <p>Add a second quote here, or delete this block if you only have one.</p>
-                        <footer>Editor name, Lumen Magazine</footer>
-                    </blockquote>
+                <div class="bio">
+                    <p>Sanjay Patil is a distinguished and multi-talented individual with a unique blend of technical expertise and creative passion. With a background in engineering, he spent several years in the corporate petroleum sector, honing his skills
+                        in building projects, technical analysis and innovative thinking. His true passion, though, lies in photography, a field he has dedicated himself to for over 35 years.</p>
+                    <p>Sanjay is not only an award-winning photographer but also a passionate teacher, mentoring students and sharing his knowledge of the art. He specializes in fine art archival printing, offering expert guidance on producing high-quality
+                        prints that preserve the essence of the artwork.</p>
+                    <p>An avid trekker, he finds inspiration in nature&rsquo;s most rugged landscapes, and that love shapes his landscape and outdoor work. His journey as a photographer, mentor and adventurer continues to inspire hundreds of fellow photographers.</p>
                 </div>
             </div>
         </section>
@@ -710,9 +894,10 @@
         <!-- ============ CONTACT ============ -->
         <section class="alt cta" id="contact">
             <div class="wrap">
-                <h2>Work with an award-winning photographer</h2>
-                <p>Available for commissions, editorial assignments and print licensing. Tell me about your project and I'll reply within two working days.</p>
-                <a class="btn btn-solid" href="mailto:hello@yourname.com">Email me</a>
+                <h2>Learn, print or collaborate</h2>
+                <p>Mentoring and workshops for photographers, expert fine art archival printing, and photography projects. Get in touch to talk about yours.</p>
+                <!-- Replace with the real email address -->
+                <a class="btn btn-solid" href="mailto:hello@yourname.com">Email Sanjay</a>
             </div>
         </section>
 

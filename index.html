@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scroll Slide Pages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0e0e0e">
+    <title>Sanjay Patil — Photography</title>
     <style>
         * {
             box-sizing: border-box;
@@ -22,11 +23,15 @@
             height: 100%;
             background: #0e0e0e;
             overflow: hidden;
+            overscroll-behavior: none;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
         }
         
         #stage {
-            position: relative;
-            width: 100vw;
+            position: fixed;
+            inset: 0;
+            width: 100%;
             height: 100vh;
             height: 100dvh;
             overflow: hidden;
@@ -38,8 +43,9 @@
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 600ms ease;
+            transition: opacity 600ms ease, visibility 0s linear 600ms;
             z-index: 1;
+            contain: strict;
         }
         
         .page.active {
@@ -47,6 +53,7 @@
             visibility: visible;
             pointer-events: auto;
             z-index: 2;
+            transition: opacity 600ms ease;
         }
         
         .page iframe {
@@ -57,7 +64,8 @@
         }
         
         @media (prefers-reduced-motion: reduce) {
-            .page {
+            .page,
+            .page.active {
                 transition: none;
             }
         }
@@ -70,80 +78,117 @@
 
     <script>
         /* ======================================================================
-                                   ADD YOUR PAGE FILES HERE — each entry is a path to a local .html file,
-                                   relative to THIS file's location. Use forward slashes, e.g.
-                                   "media-home/chapter-two.html".
+                   ADD YOUR PAGE FILES HERE — each entry is a path to a local .html file,
+                   relative to THIS file, with forward slashes ("media-home/lens.html").
 
-                                   IMPORTANT: for auto-advance-on-scroll to work, each of these files
-                                   must include the small bridge script — see oni-bridge.js and the
-                                   one-line <script> tag you add to each page.
-                                   Without the bridge script a page still displays and you can still
-                                   navigate it with the arrow keys, just not by scrolling past its end.
-                                   ====================================================================== */
-        const pages = [
-            "lens.html",
-            "media-home/chapter-two.html",
-            "Artist/Artist.html"
-        ];
+                   For auto-advance-on-scroll each page must include oni-bridge.js.
+                   Without it a page still displays and arrow keys still work.
+
+                   Loading: only the first page loads straight away. Its neighbours load
+                   once it has finished and the browser is idle, and every other page
+                   loads just before it is needed — so the opening screen isn't competing
+                   with pages nobody has reached yet.
+                   ====================================================================== */
+        const pages = [{
+            src: "media-home/lens.html",
+            title: "Home"
+        }, {
+            src: "Artist/Artist.html",
+            title: "Artist"
+        }];
         /* ====================================================================== */
 
         const stage = document.getElementById('stage');
+        const idle = window.requestIdleCallback || ((f) => setTimeout(f, 800));
 
-        stage.innerHTML = pages.map(path =>
-            `<section class="page"><iframe src="${path}"></iframe></section>`
-        ).join('');
+        const slots = pages.map((p, i) => {
+            const section = document.createElement('section');
+            section.className = 'page';
+            const iframe = document.createElement('iframe');
+            iframe.title = p.title;
+            iframe.setAttribute('allow', 'fullscreen');
+            section.appendChild(iframe);
+            stage.appendChild(section);
+            return {
+                section,
+                iframe,
+                src: p.src,
+                requested: false,
+                loaded: false,
+                pending: null
+            };
+        });
 
-        const pageEls = Array.from(stage.children);
+        function load(i) {
+            const slot = slots[i];
+            if (!slot || slot.requested) return;
+            slot.requested = true;
+            slot.iframe.addEventListener('load', () => {
+                slot.loaded = true;
+                // deliver a "land at top/bottom" command that arrived before the page was ready
+                if (slot.pending) {
+                    slot.iframe.contentWindow.postMessage(slot.pending, '*');
+                    slot.pending = null;
+                }
+                if (i === current) idle(() => {
+                    load(i + 1);
+                    load(i - 1);
+                });
+            }, {
+                once: true
+            });
+            slot.iframe.src = slot.src;
+        }
+
         let current = 0;
         let busy = false;
         const DUR = 600;
 
         function setActive(i) {
-            pageEls.forEach((p, idx) => p.classList.toggle('active', idx === i));
+            slots.forEach((s, idx) => s.section.classList.toggle('active', idx === i));
         }
 
         function goTo(i) {
-            if (i < 0 || i >= pageEls.length || i === current || busy) return;
+            if (i < 0 || i >= slots.length || i === current || busy) return;
             busy = true;
             const direction = i > current ? 'forward' : 'backward';
             current = i;
+            load(i);
             setActive(i);
 
-            // tell the page we just landed on which end to scroll to, so
-            // moving backward lands at its bottom and moving forward lands
-            // at its top (mirrors how the user is scrolling)
-            const iframe = pageEls[i].querySelector('iframe');
-            if (iframe && iframe.contentWindow) {
-                iframe.contentWindow.postMessage({
-                    source: 'oni-parent',
-                    type: 'scrollTo',
-                    position: direction === 'backward' ? 'bottom' : 'top'
-                }, '*');
+            // moving backward lands at the page's bottom, forward at its top
+            const msg = {
+                source: 'oni-parent',
+                type: 'scrollTo',
+                position: direction === 'backward' ? 'bottom' : 'top'
+            };
+            const slot = slots[i];
+            if (slot.loaded) {
+                slot.iframe.contentWindow.postMessage(msg, '*');
+                idle(() => {
+                    load(i + 1);
+                    load(i - 1);
+                });
+            } else {
+                slot.pending = msg;
             }
 
             setTimeout(() => busy = false, DUR + 50);
         }
 
-        // ---- receive edge-of-scroll signals from the child pages ----
+        // edge-of-scroll signals from the child pages
         window.addEventListener('message', (e) => {
             const data = e.data;
             if (!data || data.source !== 'oni-bridge') return;
-            console.log('[parent] received', data, 'from a child; current page index =', current);
-
-            // only react to messages coming from the currently active page's iframe
-            const activeFrame = pageEls[current].querySelector('iframe');
-            if (e.source !== activeFrame.contentWindow) {
-                console.log('[parent] ignored — message did not come from the active iframe');
-                return;
-            }
-
+            // only react to the currently active page
+            if (e.source !== slots[current].iframe.contentWindow) return;
             if (data.type === 'navigate') {
                 if (data.direction === 'next') goTo(current + 1);
                 if (data.direction === 'prev') goTo(current - 1);
             }
         }, false);
 
-        // arrow keys always work, regardless of whether a page has the bridge script
+        // arrow keys always work, whether or not a page has the bridge script
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowDown' || e.key === 'PageDown') {
                 e.preventDefault();
@@ -155,6 +200,7 @@
             }
         });
 
+        load(0);
         setActive(0);
     </script>
 

@@ -1233,6 +1233,40 @@
             })();
         })();
     </script>
+    <script>
+        /* FAQ: open a question on hover (mouse/trackpad only), one at a time */
+        (function() {
+            if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+            var items = document.querySelectorAll('#faq details');
+            var timer;
+
+            function openOnly(d) {
+                items.forEach(function(o) {
+                    if (o !== d) o.open = false;
+                });
+                d.open = true;
+            }
+            items.forEach(function(d) {
+                d.addEventListener('mouseenter', function() {
+                    clearTimeout(timer);
+                    timer = setTimeout(function() {
+                        openOnly(d);
+                    }, 120);
+                });
+                d.addEventListener('mouseleave', function() {
+                    clearTimeout(timer);
+                });
+                /* a mouse click shouldn't collapse the question you're hovering;
+                   keyboard (Enter/Space) toggling still works */
+                d.querySelector('summary').addEventListener('click', function(e) {
+                    if (e.detail > 0) {
+                        e.preventDefault();
+                        openOnly(d);
+                    }
+                });
+            });
+        })();
+    </script>
     <script src="../Sidebar/sidebar-widget.js"></script>
 </body>
 
