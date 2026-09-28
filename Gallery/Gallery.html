@@ -243,6 +243,41 @@
             transform: scale(1.07);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
         }
+        /* Number tag (category/image), e.g. 2/5 */
+        
+        .img-tag {
+            position: absolute;
+            left: 0.6rem;
+            bottom: 0.6rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 3px;
+            background: rgba(14, 14, 15, 0.72);
+            color: var(--heading);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            line-height: 1.4;
+            pointer-events: none;
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        /* keep the tag on the image's corner while it pops out */
+        
+        .masonry-item:hover .img-tag {
+            transform: translate(-3.5%, 3.5%);
+        }
+        
+        .lightbox-tag {
+            position: absolute;
+            left: 50%;
+            bottom: 1.1rem;
+            transform: translateX(-50%);
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+        }
         /* Responsive Layout Adjustments */
         
         @media (max-width: 1024px) {
@@ -441,8 +476,9 @@
         
         .lightbox-nav {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
+            /* sits near the bottom edge of the image, clear of the left sidebar handle
+               (JS lines it up with the image; 3rem is the fallback = overlay padding) */
+            bottom: 3rem;
             width: 2.75rem;
             height: 2.75rem;
             border: none;
@@ -470,10 +506,27 @@
         }
         
         @media (max-width: 640px) {
+            /* Phone: extra room at the bottom for the arrows */
+            .lightbox-overlay {
+                padding-bottom: 5rem;
+            }
+            /* Arrows sit at the bottom of the screen, below the image,
+               with the number tag centred between them */
             .lightbox-nav {
-                width: 2.25rem;
-                height: 2.25rem;
+                width: 2.5rem;
+                height: 2.5rem;
                 font-size: 1.1rem;
+                bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+            }
+            .lightbox-prev {
+                left: 1.5rem;
+            }
+            .lightbox-next {
+                right: 1.5rem;
+            }
+            .lightbox-tag {
+                bottom: calc(1.25rem + 1.25rem + env(safe-area-inset-bottom, 0px));
+                transform: translate(-50%, 50%);
             }
             .lightbox-close {
                 top: 1rem;
@@ -554,6 +607,7 @@
         <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
         <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous image">&#10094;</button>
         <img id="lightbox-img" src="" alt="">
+        <span class="lightbox-tag" id="lightbox-tag"></span>
         <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next image">&#10095;</button>
     </div>
 
@@ -856,6 +910,29 @@
         const lightboxClose = document.getElementById('lightbox-close');
         const lightboxPrev = document.getElementById('lightbox-prev');
         const lightboxNext = document.getElementById('lightbox-next');
+        const lightboxTag = document.getElementById('lightbox-tag');
+
+        // Line the arrows' bottom edge up with the image's bottom edge (slightly inset).
+        // offsetTop/offsetHeight ignore the open-animation scale, so this is exact.
+        const isPhoneLayout = window.matchMedia('(max-width: 640px)');
+
+        function positionLightboxNav() {
+            // Phone: arrows stay fixed at the bottom of the screen (set in CSS)
+            if (isPhoneLayout.matches) {
+                lightboxPrev.style.bottom = lightboxNext.style.bottom = '';
+                return;
+            }
+            if (!lightboxImg.offsetHeight) return;
+            const imgBottom = lightboxImg.offsetTop + lightboxImg.offsetHeight;
+            const fromBottom = lightbox.clientHeight - imgBottom + 8; // 8px above the image end
+            lightboxPrev.style.bottom = lightboxNext.style.bottom = `${Math.max(fromBottom, 8)}px`;
+        }
+        lightboxImg.addEventListener('load', positionLightboxNav);
+        window.addEventListener('resize', () => {
+            if (lightbox.classList.contains('open')) positionLightboxNav();
+        }, {
+            passive: true
+        });
 
         let currentImageList = []; // { src, alt } in numeric order, for lightbox navigation
         let currentImageIndex = 0;
@@ -866,7 +943,9 @@
             const item = currentImageList[currentImageIndex];
             lightboxImg.src = item.src;
             lightboxImg.alt = item.alt;
+            lightboxTag.textContent = item.tag;
             lightbox.classList.add('open');
+            if (lightboxImg.complete) positionLightboxNav();
             document.body.style.overflow = 'hidden';
 
             // Fetch the previous and next images in the background so arrows feel instant
@@ -972,9 +1051,12 @@
             const sizes = columnSizes(currentColumnCount);
 
             // Lightbox steps through images in numeric order (full-size files)
-            currentImageList = order.map(name => ({
+            // Tag = category number / image number, e.g. 1/1, 1/2 ... 2/1, 2/2
+            const categoryNumber = Object.keys(galleryData).indexOf(categoryName) + 1;
+            currentImageList = order.map((name, i) => ({
                 src: fileUrl(categoryName, name, 'full'),
-                alt: `${categoryName} ${name}`
+                alt: `${categoryName} ${name}`,
+                tag: `${categoryNumber}/${i + 1}`
             }));
 
             const fragment = document.createDocumentFragment();
@@ -1017,7 +1099,12 @@
 
                     img.addEventListener('click', () => openLightbox(index));
 
+                    const tag = document.createElement('span');
+                    tag.className = 'img-tag';
+                    tag.textContent = currentImageList[index].tag;
+
                     wrapper.appendChild(img);
+                    wrapper.appendChild(tag);
                     col.appendChild(wrapper);
                 });
 

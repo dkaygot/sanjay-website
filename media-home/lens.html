@@ -198,7 +198,7 @@
         }
     </style>
     <style>
-        /* ================= chapter two ================= */
+    /* ================= chapter two ================= */
         
         #chapter2 {
             --bg: #0e0e0f;
@@ -240,7 +240,7 @@
             overflow: visible;
             touch-action: none;
             transform: translate3d(0, 0, 0);
-            transition: transform .7s cubic-bezier(.65, 0, .35, 1);
+            /* moved every frame by script, so no CSS transition */
             will-change: transform;
         }
         
@@ -248,61 +248,9 @@
             height: 0;
         }
         
-        #frames {
+        #frames,
+        .pair {
             display: contents;
-        }
-        /* -------- progress rail (bottom, horizontal) -------- */
-        
-        .rail {
-            position: fixed;
-            left: 50%;
-            bottom: calc(22px + env(safe-area-inset-bottom, 0px));
-            transform: translateX(-50%);
-            z-index: 20;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 12px;
-        }
-        /* the visible dot stays 6px, but the button is a comfortable tap target */
-        
-        .rail button {
-            position: relative;
-            width: 18px;
-            height: 24px;
-            margin: 0 -6px;
-            border: 0;
-            background: transparent;
-            padding: 0;
-            cursor: pointer;
-            touch-action: manipulation;
-        }
-        
-        .rail button::after {
-            content: "";
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 6px;
-            height: 6px;
-            margin: -3px 0 0 -3px;
-            border-radius: 50%;
-            border: 1px solid var(--paper-dim);
-            box-sizing: border-box;
-            transition: background .35s ease, border-color .35s ease, transform .35s ease;
-        }
-        
-        .rail button.active::after {
-            background: var(--rust);
-            border-color: var(--rust);
-            transform: scale(1.6);
-        }
-        
-        @media (max-width: 560px) {
-            .rail {
-                gap: 7px;
-                bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-            }
         }
         /* -------- intro -------- */
         
@@ -408,36 +356,36 @@
         /* -------- click / frame sections -------- */
         
         .frame {
-            flex: 0 0 100vw;
-            width: 100vw;
+            /* each frame is only as wide as its photo, with a small even gap between frames */
+            flex: 0 0 auto;
+            width: auto;
+            margin: 0 2.5vw;
             height: 100vh;
             height: 100svh;
             display: flex;
-            flex-direction: row;
+            /* photo on top, caption directly below it */
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 5vh 6vw 8vh;
-            gap: 5vw;
-        }
-        /* alternate: odd frames = image left / text right, even frames = image right / text left */
-        
-        .frame:nth-child(even) {
-            flex-direction: row-reverse;
+            padding: 5.5vh 0;
+            gap: 18px;
         }
         
         .frame-figure {
             display: flex;
             justify-content: center;
             align-items: center;
-            flex: 1 1 62%;
+            flex: 0 0 auto;
             min-width: 0;
             min-height: 0;
-            height: 100%;
         }
         
         .frame-figure img {
-            max-width: 100%;
-            max-height: 100%;
+            /* same size limits as before, so photos keep their size */
+            max-width: 56.6vw;
+            /* screen height minus the frame padding and room for the caption below */
+            max-height: calc(100vh - 11vh - 120px);
+            max-height: calc(100svh - 11svh - 120px);
             width: auto;
             height: auto;
             display: block;
@@ -467,8 +415,11 @@
             display: flex;
             gap: 22px;
             align-items: baseline;
-            flex: 0 1 30%;
-            min-width: 0;
+            justify-content: center;
+            flex: 0 0 auto;
+            /* as wide as the photo above it, never wider */
+            width: 0;
+            min-width: 100%;
             opacity: 0;
             transform: translateY(6px);
             transition: opacity .5s ease .1s, transform .5s ease .1s;
@@ -490,336 +441,377 @@
         .frame-caption-group {
             max-width: 38ch;
         }
-        /* small screens: stack image over text */
+        /* small screens: every two photos are stacked in one column, close together,
+           and the pair is centred on the screen. Every photo fits on screen, and you
+           scroll sideways from pair to pair. */
         
         @media (max-width: 760px) {
+            #frames {
+                display: flex;
+                flex: 0 0 auto;
+                flex-direction: row;
+                align-items: center;
+                gap: 22px;
+                height: 100%;
+                padding: 0 18px;
+            }
+            .hide-on-phone,
+            .pair:not(:has(> .frame:not(.hide-on-phone))) {
+                display: none;
+            }
+            .pair {
+                display: flex;
+                flex: 0 0 auto;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 18px;
+            }
             .frame,
             .frame:nth-child(even) {
+                flex: 0 0 auto;
                 flex-direction: column;
-                gap: 20px;
-                padding: calc(4svh + env(safe-area-inset-top, 0px)) 6vw calc(8svh + env(safe-area-inset-bottom, 0px));
+                align-items: center;
+                width: auto;
+                height: auto;
+                min-height: 0;
+                margin: 0;
+                padding: 0;
+                gap: 10px;
             }
             .frame-figure {
-                /* size to the photo so the caption sits right under it, both centred as a group */
-                flex: 0 1 auto;
-                width: 100%;
+                flex: 0 0 auto;
                 height: auto;
                 min-height: 0;
             }
             .frame-figure img {
-                max-height: 58vh;
-                max-height: 58svh;
+                max-width: 84vw;
+                /* half the screen, minus the gap and room for the caption */
+                max-height: calc(47svh - 11px - 84px);
             }
             .frame-text {
                 flex: 0 0 auto;
-                max-width: 90vw;
+                gap: 10px;
+                width: auto;
+                min-width: 0;
+                max-width: 84vw;
+            }
+            .frame-caption-group {
+                max-width: min(34ch, 76vw);
+            }
+            .frame-caption {
+                font-size: 1rem;
+                margin-bottom: 4px;
+            }
+            .frame-exif {
+                font-size: 10px;
             }
         }
         
         .frame-caption {
-            font-family: var(--font-heading);
-            font-size: clamp(1.05rem, 2vw, 1.4rem);
-            font-style: italic;
-            font-weight: 300;
-            line-height: 1.4;
-            margin: 0 0 8px;
-            color: var(--heading);
+            font-size: 1rem;
+            margin-bottom: 4px;
         }
         
         .frame-exif {
-            font-family: var(--font-body);
-            font-size: 11px;
-            letter-spacing: 0.03em;
-            color: var(--paper-dim);
+            font-size: 10px;
         }
-        /* -------- close -------- */
+    }
+    .frame-caption {
+        font-family: var(--font-heading);
+        font-size: clamp(1.05rem, 2vw, 1.4rem);
+        font-style: italic;
+        font-weight: 300;
+        line-height: 1.4;
+        margin: 0 0 8px;
+        color: var(--heading);
+    }
+    .frame-exif {
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 0.03em;
+        color: var(--paper-dim);
+    }
+    /* -------- close -------- */
+    .closing {
+        flex: 0 0 100vw;
+        width: 100vw;
+        height: 100vh;
+        height: 100svh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: calc(6vh + env(safe-area-inset-top, 0px)) 4vw calc(11vh + env(safe-area-inset-bottom, 0px));
+    }
+    .closing-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        container-type: size;
+        /* lets the cards size from the space available */
+    }
+    .closing-body {
+        font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+        line-height: 1.7;
+        font-weight: 300;
+        font-style: italic;
+        color: var(--paper);
+        margin: 0 0 2rem;
+        max-width: 42ch;
+    }
+    .gallery-link {
+        font-family: var(--font-body);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--rust);
+        background: transparent;
+        border: 1px solid var(--rust);
+        padding: 16px 38px;
+        border-radius: 2px;
+        transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+    }
+    .gallery-link:focus-visible {
+        background: var(--rust);
+        border-color: var(--rust);
+        color: var(--bg);
+    }
+    /* -------- closing cards -------- */
+    .cards {
+        --gap: 24px;
+        /* card width: the largest 3:4 card that fits 3 across and 2 down */
         
-        .closing {
-            flex: 0 0 100vw;
-            width: 100vw;
-            height: 100vh;
-            height: 100svh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: calc(6vh + env(safe-area-inset-top, 0px)) 4vw calc(11vh + env(safe-area-inset-bottom, 0px));
-        }
-        
-        .closing-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            max-width: none;
-            container-type: size;
-            /* lets the cards size from the space available */
-        }
-        
-        .closing-body {
-            font-size: clamp(0.95rem, 1.4vw, 1.05rem);
-            line-height: 1.7;
-            font-weight: 300;
-            font-style: italic;
-            color: var(--paper);
-            margin: 0 0 2rem;
-            max-width: 42ch;
-        }
-        
-        .gallery-link {
-            font-family: var(--font-body);
-            font-size: 12px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: var(--rust);
-            background: transparent;
-            border: 1px solid var(--rust);
-            padding: 16px 38px;
-            border-radius: 2px;
-            transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
-        }
-        
-        .gallery-link:focus-visible {
+        --cw: min((100cqw - 2 * var(--gap)) / 3, (100cqh - var(--gap)) / 2 * 0.75);
+        display: grid;
+        grid-template-columns: repeat(3, var(--cw));
+        grid-auto-rows: calc(var(--cw) * 4 / 3);
+        gap: var(--gap);
+        justify-content: center;
+        align-content: center;
+        width: 100%;
+        height: 100%;
+    }
+    .card {
+        aspect-ratio: 3 / 4;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        background: #1b1b1d;
+        border: 1px solid var(--line);
+        border-radius: 2px;
+        padding: 0;
+        overflow: hidden;
+        touch-action: manipulation;
+        transition: border-color 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card:active {
+        border-color: var(--rust);
+    }
+    .card:focus-visible {
+        outline: 2px solid var(--rust);
+        outline-offset: 3px;
+    }
+    .card:focus-visible {
+        border-color: var(--rust);
+        transform: translateY(-3px);
+    }
+    @media (hover: hover) {
+        .gallery-link:hover {
             background: var(--rust);
             border-color: var(--rust);
             color: var(--bg);
         }
-        /* -------- closing cards -------- */
         
-        .cards {
-            --gap: 24px;
-            /* card width: the largest 3:4 card that fits 3 across and 2 down */
-            --cw: min((100cqw - 2 * var(--gap)) / 3, (100cqh - var(--gap)) / 2 * 0.75);
-            display: grid;
-            grid-template-columns: repeat(3, var(--cw));
-            grid-auto-rows: calc(var(--cw) * 4 / 3);
-            gap: var(--gap);
-            justify-content: center;
-            align-content: center;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .card {
-            aspect-ratio: 3 / 4;
-            text-decoration: none;
-            color: inherit;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-            background: #1b1b1d;
-            border: 1px solid var(--line);
-            border-radius: 2px;
-            padding: 0;
-            overflow: hidden;
-            touch-action: manipulation;
-            transition: border-color 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
-        .card:active {
-            border-color: var(--rust);
-        }
-        
-        .card:focus-visible {
-            outline: 2px solid var(--rust);
-            outline-offset: 3px;
-        }
-        
-        .card:focus-visible {
+        .card:hover {
             border-color: var(--rust);
             transform: translateY(-3px);
         }
         
-        @media (hover: hover) {
-            .gallery-link:hover {
-                background: var(--rust);
-                border-color: var(--rust);
-                color: var(--bg);
-            }
-            .card:hover {
-                border-color: var(--rust);
-                transform: translateY(-3px);
-            }
-            .card:hover .card-img {
-                transform: scale(1.05);
-                opacity: 1;
-            }
-        }
-        
-        .card-media {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 1 1 auto;
-            min-height: 0;
-            width: 100%;
-            color: var(--rust);
-            background: radial-gradient(circle at 50% 40%, #222224 0%, #151516 100%);
-            border-bottom: 1px solid var(--line);
-            overflow: hidden;
-        }
-        
-        .card-media {
-            position: relative;
-        }
-        
-        .card-img {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            opacity: 0.9;
-            transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-        }
-        
-        .card:focus-visible .card-img {
+        .card:hover .card-img {
             transform: scale(1.05);
             opacity: 1;
         }
+    }
+    .card-media {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        color: var(--rust);
+        background: radial-gradient(circle at 50% 40%, #222224 0%, #151516 100%);
+        border-bottom: 1px solid var(--line);
+        overflow: hidden;
+    }
+    .card-media {
+        position: relative;
+    }
+    .card-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        opacity: 0.9;
+        transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+    }
+    .card:focus-visible .card-img {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        flex: 0 0 auto;
+        width: 100%;
+        padding: 12px 18px 15px;
+    }
+    .card-number {
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--rust);
+    }
+    .card-title {
+        font-family: var(--font-heading);
+        font-weight: 400;
+        font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+        color: var(--heading);
+        margin: 6px 0 6px;
+        line-height: 1.1;
+    }
+    .card-desc {
+        font-family: var(--font-body);
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--paper-dim);
+        margin: 0 0 12px;
+        min-height: 3.1em;
+        /* two lines, so every image is the same height */
+    }
+    @media (max-width: 760px) {
+        .cards {
+            --gap: 14px;
+            /* shorter cards on phones: close to square instead of 3:4 */
+            --cw: min((100cqw - var(--gap)) / 2, (100cqh - 2 * var(--gap)) / 3 / 1.05);
+            grid-template-columns: repeat(2, var(--cw));
+            grid-auto-rows: calc(var(--cw) * 1.05);
+        }
+        
+        .card {
+            aspect-ratio: auto;
+        }
         
         .card-body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 0 0 auto;
-            width: 100%;
-            padding: 12px 18px 15px;
-        }
-        
-        .card-number {
-            font-family: var(--font-body);
-            font-size: 11px;
-            letter-spacing: 0.08em;
-            color: var(--rust);
-        }
-        
-        .card-title {
-            font-family: var(--font-heading);
-            font-weight: 400;
-            font-size: clamp(1.5rem, 2.6vw, 2.2rem);
-            color: var(--heading);
-            margin: 6px 0 6px;
-            line-height: 1.1;
+            padding: 8px 10px 10px;
         }
         
         .card-desc {
-            font-family: var(--font-body);
-            font-size: 13px;
-            line-height: 1.55;
-            color: var(--paper-dim);
-            margin: 0 0 12px;
-            min-height: 3.1em;
-            /* two lines, so every image is the same height */
-        }
-        
-        @media (max-width: 760px) {
-            .cards {
-                --gap: 14px;
-                --cw: min((100cqw - var(--gap)) / 2, (100cqh - 2 * var(--gap)) / 3 * 0.75);
-                grid-template-columns: repeat(2, var(--cw));
-            }
-            .card-body {
-                padding: 8px 10px 10px;
-            }
-            .card-desc {
-                display: none;
-            }
-            .card-number {
-                font-size: 10px;
-            }
-            .card-title {
-                font-size: clamp(1.1rem, 5vw, 1.5rem);
-                margin: 4px 0 2px;
-            }
-        }
-        
-        .closing-hint {
-            margin-top: 1.8rem;
-            font-family: var(--font-body);
-            font-size: 10px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--paper-dim);
-            opacity: 0.75;
-        }
-        /* -------- custom inverted cursor (mouse devices only) -------- */
-        
-        #chapter2.is-active {
-            opacity: 1;
-            visibility: visible;
-            transition: opacity .6s ease;
-        }
-        
-        body.ch2-active .cursor {
-            opacity: 0;
-        }
-        
-        .c2-cursor {
             display: none;
         }
         
-        @media (hover: hover) and (pointer: fine) {
-            #chapter2,
-            #chapter2 a,
-            #chapter2 button,
-            #chapter2 img,
-            #chapter2 [role="button"],
-            #chapter2 .cursor-grow,
-            #chapter2 [data-cursor-grow] {
-                cursor: none;
-            }
-            .c2-cursor {
-                display: block;
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 26px;
-                height: 26px;
-                border-radius: 50%;
-                background: #fff;
-                mix-blend-mode: difference;
-                pointer-events: none;
-                z-index: 9999;
-                transform: translate(-50%, -50%);
-                opacity: 0;
-                transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-                will-change: left, top, width, height;
-            }
-            .c2-cursor.is-visible {
-                opacity: 1;
-            }
-            .c2-cursor.is-active {
-                width: 48px;
-                height: 48px;
-            }
+        .card-number {
+            font-size: 10px;
         }
         
-        @media (prefers-reduced-motion: reduce) {
-            #scroller {
-                transition: none !important;
-            }
-            .hero-intro h1,
-            .hero-intro .scroll-cue {
-                animation: none !important;
-                opacity: 1 !important;
-                filter: none !important;
-                transform: none !important;
-            }
-            .frame-figure img,
-            .frame-text {
-                transition: none !important;
-                opacity: 1 !important;
-                transform: none !important;
-                filter: none !important;
-            }
+        .card-title {
+            font-size: clamp(1.1rem, 5vw, 1.5rem);
+            margin: 4px 0 2px;
         }
+    }
+    .closing-hint {
+        margin-top: 1.8rem;
+        font-family: var(--font-body);
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--paper-dim);
+        opacity: 0.75;
+    }
+    /* -------- custom inverted cursor (mouse devices only) -------- */
+    #chapter2.is-active {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity .6s ease;
+    }
+    body.ch2-active .cursor {
+        opacity: 0;
+    }
+    .c2-cursor {
+        display: none;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        #chapter2,
+        #chapter2 a,
+        #chapter2 button,
+        #chapter2 img,
+        #chapter2 [role="button"],
+        #chapter2 .cursor-grow,
+        #chapter2 [data-cursor-grow] {
+            cursor: none;
+        }
+        
+        .c2-cursor {
+            display: block;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #fff;
+            mix-blend-mode: difference;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            will-change: left, top, width, height;
+        }
+        
+        .c2-cursor.is-visible {
+            opacity: 1;
+        }
+        
+        .c2-cursor.is-active {
+            width: 48px;
+            height: 48px;
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        #scroller {
+            transition: none !important;
+        }
+        
+        .hero-intro h1,
+        .hero-intro .scroll-cue {
+            animation: none !important;
+            opacity: 1 !important;
+            filter: none !important;
+            transform: none !important;
+        }
+        
+        .frame-figure img,
+        .frame-text {
+            transition: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+        }
+    }
     </style>
 </head>
 
@@ -835,8 +827,7 @@
             <div class="line line-2" id="line2">differently.</div>
         </div>
         <div class="wordmark" id="wordmark">
-            <div class="name">Sanjay Patil</div>
-            <div class="role">photography, field &amp; frame</div>
+            <div class="name">Sanjay Patil Photography</div>
         </div>
     </div>
 
@@ -931,7 +922,6 @@
 
         </div>
 
-        <nav class="rail" id="rail" aria-label="Frame progress"></nav>
         <div class="c2-cursor" id="c2cursor" aria-hidden="true"></div>
     </div>
 
@@ -1271,6 +1261,7 @@
                 orient: "portrait"
             }, {
                 src: "DSC_0565.jpg",
+                hideOnPhone: true, // left out of the phone layout
                 caption: "One face, found through all that colour.",
                 exif: "50mm · f/2.5 · 1/1000s · Holi",
                 hue: 330,
@@ -1304,9 +1295,12 @@
             }
 
             const frames = document.getElementById("frames");
-            const rail = document.getElementById("rail");
             const scroller = document.getElementById("scroller");
             const container = document.getElementById("chapter2");
+
+            // frames go in pairs; on phones each pair is stacked in one column
+            // (on larger screens the wrapper is invisible to the layout)
+            let pair = null;
 
             CLICKS.forEach((c, i) => {
                 const n = i + 1;
@@ -1314,6 +1308,7 @@
 
                 const section = document.createElement("section");
                 section.className = "frame";
+                if (c.hideOnPhone) section.classList.add("hide-on-phone");
                 section.id = id;
                 section.innerHTML = `
     <div class="frame-figure">
@@ -1327,15 +1322,14 @@
       </div>
     </div>
   `;
-                frames.appendChild(section);
-
-                const dot = document.createElement("button");
-                dot.setAttribute("aria-label", "Jump to frame " + n);
-                dot.dataset.index = n;
-                rail.appendChild(dot);
+                if (i % 2 === 0) {
+                    pair = document.createElement("div");
+                    pair.className = "pair";
+                    frames.appendChild(pair);
+                }
+                pair.appendChild(section);
             });
 
-            const dots = Array.from(rail.children);
             const sections = Array.from(document.querySelectorAll(".frame"));
 
             /* ---- lazy image loading ----
@@ -1385,104 +1379,117 @@
 
 
             /* ============================================================
-               PAGED NAVIGATION
-               One scroll gesture, swipe, arrow key, or dot click moves
-               exactly one frame and centers it — no free scrolling.
+               FREE HORIZONTAL SCROLLING
+               The strip moves sideways by exactly as much as you scroll,
+               the same way a page moves down when you scroll normally.
+               Wheel / trackpad, touch drag, keys and dot clicks all move
+               the same position; nothing snaps to a frame.
                ============================================================ */
             const heroEl = document.querySelector(".hero-intro");
             const closingEl = document.querySelector(".closing");
             const allSections = [heroEl, ...sections, closingEl];
-
-            let currentIndex = 0;
-            let locked = false;
-            let heroRevealed = false;
-
-            function revealHero() {
-                heroRevealed = true;
-                heroEl.classList.add("revealed");
-                locked = true;
-                setTimeout(() => {
-                    locked = false;
-                }, 600);
-            }
-
-            function setActiveDot(index) {
-                dots.forEach(d => d.classList.toggle("active", Number(d.dataset.index) === index));
-            }
-
             const inFrame = window.top !== window.self;
+            const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-            function goTo(index) {
-                // already at the very first frame and asked to go further back:
-                // this page has nothing before it, hand off to the parent
-                // before the first frame now sits the aperture intro, so go back to it
-                if (index < 0) {
-                    if (currentIndex === 0 && !locked) exitToLens();
-                    return;
-                }
-                // already at the very last frame and asked to go further forward:
-                // hand off to the parent instead of doing nothing
-                if (index > allSections.length - 1) {
-                    if (inFrame && currentIndex === allSections.length - 1 && !locked) {
-                        window.parent.postMessage({
-                            source: 'oni-bridge',
-                            type: 'navigate',
-                            direction: 'next'
-                        }, '*');
+            let vw = window.innerWidth;
+            let pos = 0; // what is drawn, in px from the left edge of the strip
+            let target = 0; // where the scroll is heading
+            let rafId = 0;
+            let active = false;
+            let lockUntil = 0; // swallows leftover trackpad momentum after hand-offs
+            let lastNearest = -1;
+            let lastMax = 0; // strip length at the last draw, to tell if we were resting at the end
+
+            // positions come from the real layout, since frames are narrower than the screen
+            const maxPos = () => Math.max(0, scroller.scrollWidth - vw);
+            const leftOf = (i) => Math.max(0, Math.min(maxPos(), allSections[i].offsetLeft));
+            const clampPos = (v) => Math.max(0, Math.min(maxPos(), v));
+
+            function render() {
+                lastMax = maxPos();
+                scroller.style.transform = `translate3d(${-pos}px, 0, 0)`;
+                // fade in each frame as soon as it starts to come on screen
+                const mid = pos + vw / 2;
+                let nearest = 0,
+                    best = Infinity;
+                allSections.forEach((s, i) => {
+                    if (!s.offsetParent) return; // hidden on this screen size
+                    const l = s.offsetLeft,
+                        r = l + s.offsetWidth;
+                    if (!s.classList.contains("is-visible") && l < pos + vw * 0.95 && r > pos + vw * 0.05) {
+                        s.classList.add("is-visible");
                     }
-                    return;
+                    const d = Math.abs((l + r) / 2 - mid);
+                    if (d < best) {
+                        best = d;
+                        nearest = i;
+                    }
+                });
+                if (nearest !== lastNearest) {
+                    lastNearest = nearest;
+                    preloadAround(nearest);
                 }
-
-                const target = index;
-                if (target === currentIndex && !locked) return;
-                currentIndex = target;
-                locked = true;
-                showSlide(currentIndex, true);
-                // unlock after the slide finishes, plus a short pause so a
-                // trackpad's leftover momentum doesn't trigger a second slide
-                setTimeout(() => {
-                    locked = false;
-                }, SLIDE_MS + 250);
             }
 
-            /* ---- simple slide change: move the whole strip one screen ---- */
-            const SLIDE_MS = 700; // keep in sync with #scroller transition
-            function showSlide(index, animate) {
-                if (!animate) scroller.style.transition = "none";
-                preloadAround(index);
-                scroller.style.transform = `translate3d(${-index * 100}vw, 0, 0)`;
-                allSections[index].classList.add("is-visible");
-                setActiveDot(index);
-                if (!animate) {
-                    scroller.offsetWidth; // apply instantly
-                    scroller.style.transition = "";
+            function tick() {
+                const diff = target - pos;
+                if (reduceMotion || Math.abs(diff) < 0.5) {
+                    pos = target;
+                    render();
+                    rafId = 0;
+                    return;
+                }
+                pos += diff * 0.14; // a little easing, like smooth scrolling
+                render();
+                rafId = requestAnimationFrame(tick);
+            }
+
+            function scrollToPos(v, instant) {
+                target = clampPos(v);
+                if (instant) {
+                    pos = target;
+                    render();
+                    return;
+                }
+                if (!rafId) rafId = requestAnimationFrame(tick);
+            }
+
+            /* ---- leaving the strip at either end ----
+               Scrolling past the start goes back to the aperture; past the end
+               hands off to the parent. Only a fresh gesture that begins at the
+               edge counts, so momentum that carries you into an edge never
+               throws you off the page by accident. */
+            const atStart = () => target <= 0.5;
+            const atEnd = () => target >= maxPos() - 0.5;
+
+            function leave(dir) {
+                if (performance.now() < lockUntil) return;
+                if (dir < 0) {
+                    exitToLens();
+                } else if (inFrame) {
+                    lockUntil = performance.now() + 900;
+                    window.parent.postMessage({
+                        source: 'oni-bridge',
+                        type: 'navigate',
+                        direction: 'next'
+                    }, '*');
                 }
             }
 
             /* ---- hand-off with the aperture intro above ---- */
-            let active = false;
-
             function activate(landIndex, instant) {
                 if (active) return;
                 active = true;
                 container.classList.add("is-active");
                 container.setAttribute("aria-hidden", "false");
                 document.body.classList.add("ch2-active");
-                currentIndex = landIndex || 0;
-                showSlide(currentIndex, false);
-                heroRevealed = true;
+                vw = window.innerWidth;
+                lastNearest = -1;
+                scrollToPos(leftOf(landIndex || 0), true);
                 heroEl.classList.remove("revealed");
                 void heroEl.offsetWidth; // replay the heading's entrance each time
                 heroEl.classList.add("revealed");
-                if (instant) {
-                    locked = false;
-                    return;
-                }
-                // swallow leftover trackpad momentum from the zoom
-                locked = true;
-                setTimeout(() => {
-                    locked = false;
-                }, SLIDE_MS + 250);
+                lockUntil = instant ? 0 : performance.now() + 900;
             }
 
             function deactivate() {
@@ -1514,7 +1521,7 @@
 
                     deactivate();
                     if (data.position === 'bottom') {
-                        // arriving from the next page: jump past the intro to the last frame
+                        // arriving from the next page: jump past the intro to the end of the strip
                         if (window.lensIntro) window.lensIntro.jumpTo('end');
                         activate(allSections.length - 1, true);
                     } else {
@@ -1523,67 +1530,156 @@
                 }, false);
             }
 
-            dots.forEach(d => d.addEventListener("click", () => goTo(Number(d.dataset.index))));
 
+            /* ---- wheel / trackpad: move by exactly the scroll amount ---- */
+            let lastWheel = 0;
+            let edgeArmed = 0; // -1 armed at start, 1 armed at end, 0 not armed
+            let edgePush = 0;
             window.addEventListener("wheel", (e) => {
                 if (!active) return; // the aperture intro handles the wheel until we're shown
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                if (locked) return;
-                if (!heroRevealed && currentIndex === 0) {
-                    revealHero();
+
+                let delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+                if (e.deltaMode === 1) delta *= 16; // lines
+                else if (e.deltaMode === 2) delta *= window.innerHeight; // pages
+                if (!delta) return;
+
+                const now = performance.now();
+                if (now < lockUntil) {
+                    lastWheel = now;
                     return;
                 }
-                const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-                if (Math.abs(delta) < 4) return;
-                goTo(currentIndex + (delta > 0 ? 1 : -1));
+                // a pause means a new gesture: arm the edge only if it starts there
+                if (now - lastWheel > 250) {
+                    edgeArmed = atStart() && delta < 0 ? -1 : atEnd() && delta > 0 ? 1 : 0;
+                    edgePush = 0;
+                }
+                lastWheel = now;
+
+                if (edgeArmed && Math.sign(delta) === edgeArmed) {
+                    edgePush += Math.abs(delta);
+                    if (edgePush > 120) {
+                        edgeArmed = 0;
+                        leave(Math.sign(delta));
+                    }
+                    return;
+                }
+                edgeArmed = 0;
+                scrollToPos(target + delta);
             }, {
                 passive: false
             });
 
-            let touchStartX = 0;
-            let touchStartY = 0;
-            window.addEventListener("touchstart", (e) => {
+            /* ---- touch: the strip follows the finger, then glides ---- */
+            let touchX = 0,
+                touchY = 0,
+                startX = 0,
+                startY = 0,
+                lastT = 0,
+                velocity = 0,
+                touchEdge = 0;
+            container.addEventListener("touchstart", (e) => {
                 if (!active) return;
-                e.stopImmediatePropagation();
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
+                startX = touchX = e.touches[0].clientX;
+                startY = touchY = e.touches[0].clientY;
+                lastT = performance.now();
+                velocity = 0;
+                touchEdge = atStart() ? -1 : atEnd() ? 1 : 0;
+                target = pos; // catch a strip that's still gliding
             }, {
                 passive: true
             });
-            window.addEventListener("touchend", (e) => {
+            container.addEventListener("touchmove", (e) => {
                 if (!active) return;
-                e.stopImmediatePropagation();
-                if (locked) return;
-                if (!heroRevealed && currentIndex === 0) {
-                    revealHero();
+                const x = e.touches[0].clientX,
+                    y = e.touches[0].clientY;
+                // follow whichever way the finger mostly moves, like the wheel does
+                const d = Math.abs(touchX - x) >= Math.abs(touchY - y) ? touchX - x : touchY - y;
+                const now = performance.now();
+                const dt = Math.max(now - lastT, 1);
+                velocity = velocity * 0.6 + (d / dt) * 0.4;
+                touchX = x;
+                touchY = y;
+                lastT = now;
+                target = clampPos(target + d);
+                pos = target;
+                render();
+            }, {
+                passive: true
+            });
+            container.addEventListener("touchend", (e) => {
+                if (!active) return;
+                const dx = startX - e.changedTouches[0].clientX;
+                const dy = startY - e.changedTouches[0].clientY;
+                const d = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
+                if (touchEdge && Math.sign(d) === touchEdge && Math.abs(d) > 60) {
+                    leave(touchEdge);
                     return;
                 }
-                // follow whichever direction the swipe mostly went, like the wheel does
-                const dx = touchStartX - e.changedTouches[0].clientX;
-                const dy = touchStartY - e.changedTouches[0].clientY;
-                const d = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
-                if (Math.abs(d) < 40) return;
-                goTo(currentIndex + (d > 0 ? 1 : -1));
+                // carry the flick's momentum a little further
+                if (performance.now() - lastT < 80) scrollToPos(target + velocity * 260);
             }, {
                 passive: true
             });
 
+            /* ---- keyboard: arrows nudge, page keys move a screen ---- */
             window.addEventListener("keydown", (e) => {
                 if (!active) return;
                 const t = e.target;
                 if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-                let dir = 0;
-                if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === "PageDown" || (e.key === " " && !e.shiftKey)) dir = 1;
-                else if (e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "PageUp" || (e.key === " " && e.shiftKey)) dir = -1;
-                if (!dir) return;
+                let step = 0;
+                if (e.key === "ArrowRight" || e.key === "ArrowDown") step = vw * 0.2;
+                else if (e.key === "ArrowLeft" || e.key === "ArrowUp") step = -vw * 0.2;
+                else if (e.key === "PageDown" || (e.key === " " && !e.shiftKey)) step = vw * 0.9;
+                else if (e.key === "PageUp" || (e.key === " " && e.shiftKey)) step = -vw * 0.9;
+                else if (e.key === "Home") step = -Infinity;
+                else if (e.key === "End") step = Infinity;
+                if (!step) return;
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                if (locked) return;
-                goTo(currentIndex + dir);
+                if ((step < 0 && atStart()) || (step > 0 && atEnd())) {
+                    leave(Math.sign(step));
+                    return;
+                }
+                scrollToPos(target + step);
             });
 
-            // vw-based transform keeps the current slide aligned on resize automatically
+            // photos load lazily and widen their frame; if that happens to the left
+            // of the view, shift by the same amount so what you're looking at stays put
+            if (window.ResizeObserver) {
+                const widths = new Map();
+                const ro = new ResizeObserver((entries) => {
+                    // resting at the very end: stay pinned to the end as widths change
+                    const pinned = active && target >= lastMax - 1;
+                    let shift = 0;
+                    entries.forEach((en) => {
+                        const el = en.target;
+                        const w = el.offsetWidth;
+                        const prev = widths.has(el) ? widths.get(el) : w;
+                        widths.set(el, w);
+                        if (active && el.offsetLeft + prev <= pos + 1) shift += w - prev;
+                    });
+                    if (pinned) {
+                        pos = target = maxPos();
+                        render();
+                    } else if (shift) {
+                        pos += shift;
+                        target += shift;
+                        render();
+                    }
+                    lastMax = maxPos();
+                });
+
+                allSections.forEach((el) => ro.observe(el));
+            }
+
+            // keep the same spot in the strip when the window is resized
+            window.addEventListener("resize", () => {
+                const ratio = scroller.scrollWidth ? pos / scroller.scrollWidth : 0;
+                vw = window.innerWidth;
+                scrollToPos(ratio * scroller.scrollWidth, true);
+            });
         })();
     </script>
     <script>
