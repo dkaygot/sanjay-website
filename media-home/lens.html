@@ -198,7 +198,7 @@
         }
     </style>
     <style>
-    /* ================= chapter two ================= */
+        /* ================= chapter two ================= */
         
         #chapter2 {
             --bg: #0e0e0f;
@@ -441,11 +441,38 @@
         .frame-caption-group {
             max-width: 38ch;
         }
-        /* small screens: every two photos are stacked in one column, close together,
-           and the pair is centred on the screen. Every photo fits on screen, and you
-           scroll sideways from pair to pair. */
+        /* base caption styles (these used to sit after a stray "}" that made
+           the browser drop the caption rule, so captions fell back to Inter) */
+        
+        .frame-caption {
+            font-family: var(--font-heading);
+            font-size: clamp(1.05rem, 2vw, 1.4rem);
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.4;
+            margin: 0 0 8px;
+            color: var(--heading);
+        }
+        
+        .frame-exif {
+            font-family: var(--font-body);
+            font-size: 11px;
+            letter-spacing: 0.03em;
+            color: var(--paper-dim);
+        }
+        /* small screens: two photos stacked per column, every photo in the SAME
+           fixed-size box (cropped with object-fit) above a fixed-height caption.
+           Nothing depends on the photo's own size, so the columns line up and
+           nothing shifts when a photo finishes loading. */
         
         @media (max-width: 760px) {
+            #chapter2 {
+                --cap-h: 64px;
+                --gap-in: 10px;
+                --gap-pair: 22px;
+                --ph: calc((100svh - 2 * var(--cap-h) - 2 * var(--gap-in) - var(--gap-pair) - 56px) / 2);
+                --pw: min(84vw, calc(var(--ph) * 1.5));
+            }
             #frames {
                 display: flex;
                 flex: 0 0 auto;
@@ -464,354 +491,361 @@
                 flex: 0 0 auto;
                 flex-direction: column;
                 justify-content: center;
-                align-items: center;
-                gap: 18px;
+                align-items: stretch;
+                gap: var(--gap-pair);
+                width: var(--pw);
             }
             .frame,
             .frame:nth-child(even) {
                 flex: 0 0 auto;
                 flex-direction: column;
-                align-items: center;
-                width: auto;
+                align-items: stretch;
+                width: var(--pw);
                 height: auto;
                 min-height: 0;
                 margin: 0;
                 padding: 0;
-                gap: 10px;
+                gap: var(--gap-in);
             }
             .frame-figure {
                 flex: 0 0 auto;
-                height: auto;
+                width: var(--pw);
+                height: var(--ph);
                 min-height: 0;
+                background: #19191b;
+                overflow: hidden;
             }
             .frame-figure img {
-                max-width: 84vw;
-                /* half the screen, minus the gap and room for the caption */
-                max-height: calc(47svh - 11px - 84px);
+                width: 100%;
+                height: 100%;
+                max-width: none;
+                max-height: none;
+                object-fit: cover;
+                object-position: center;
             }
             .frame-text {
-                flex: 0 0 auto;
+                flex: 0 0 var(--cap-h);
+                height: var(--cap-h);
                 gap: 10px;
-                width: auto;
+                width: 100%;
                 min-width: 0;
-                max-width: 84vw;
+                max-width: none;
+                justify-content: flex-start;
+                overflow: hidden;
             }
             .frame-caption-group {
-                max-width: min(34ch, 76vw);
+                max-width: none;
+                min-width: 0;
             }
             .frame-caption {
                 font-size: 1rem;
+                line-height: 1.3;
                 margin-bottom: 4px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
             .frame-exif {
                 font-size: 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
         }
+        /* -------- close -------- */
         
-        .frame-caption {
-            font-size: 1rem;
-            margin-bottom: 4px;
+        .closing {
+            flex: 0 0 100vw;
+            width: 100vw;
+            height: 100vh;
+            height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: calc(6vh + env(safe-area-inset-top, 0px)) 4vw calc(11vh + env(safe-area-inset-bottom, 0px));
         }
         
-        .frame-exif {
-            font-size: 10px;
+        .closing-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            container-type: size;
+            /* lets the cards size from the space available */
         }
-    }
-    .frame-caption {
-        font-family: var(--font-heading);
-        font-size: clamp(1.05rem, 2vw, 1.4rem);
-        font-style: italic;
-        font-weight: 300;
-        line-height: 1.4;
-        margin: 0 0 8px;
-        color: var(--heading);
-    }
-    .frame-exif {
-        font-family: var(--font-body);
-        font-size: 11px;
-        letter-spacing: 0.03em;
-        color: var(--paper-dim);
-    }
-    /* -------- close -------- */
-    .closing {
-        flex: 0 0 100vw;
-        width: 100vw;
-        height: 100vh;
-        height: 100svh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: calc(6vh + env(safe-area-inset-top, 0px)) 4vw calc(11vh + env(safe-area-inset-bottom, 0px));
-    }
-    .closing-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        max-width: none;
-        container-type: size;
-        /* lets the cards size from the space available */
-    }
-    .closing-body {
-        font-size: clamp(0.95rem, 1.4vw, 1.05rem);
-        line-height: 1.7;
-        font-weight: 300;
-        font-style: italic;
-        color: var(--paper);
-        margin: 0 0 2rem;
-        max-width: 42ch;
-    }
-    .gallery-link {
-        font-family: var(--font-body);
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        text-decoration: none;
-        color: var(--rust);
-        background: transparent;
-        border: 1px solid var(--rust);
-        padding: 16px 38px;
-        border-radius: 2px;
-        transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
-    }
-    .gallery-link:focus-visible {
-        background: var(--rust);
-        border-color: var(--rust);
-        color: var(--bg);
-    }
-    /* -------- closing cards -------- */
-    .cards {
-        --gap: 24px;
-        /* card width: the largest 3:4 card that fits 3 across and 2 down */
         
-        --cw: min((100cqw - 2 * var(--gap)) / 3, (100cqh - var(--gap)) / 2 * 0.75);
-        display: grid;
-        grid-template-columns: repeat(3, var(--cw));
-        grid-auto-rows: calc(var(--cw) * 4 / 3);
-        gap: var(--gap);
-        justify-content: center;
-        align-content: center;
-        width: 100%;
-        height: 100%;
-    }
-    .card {
-        aspect-ratio: 3 / 4;
-        text-decoration: none;
-        color: inherit;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
-        background: #1b1b1d;
-        border: 1px solid var(--line);
-        border-radius: 2px;
-        padding: 0;
-        overflow: hidden;
-        touch-action: manipulation;
-        transition: border-color 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .card:active {
-        border-color: var(--rust);
-    }
-    .card:focus-visible {
-        outline: 2px solid var(--rust);
-        outline-offset: 3px;
-    }
-    .card:focus-visible {
-        border-color: var(--rust);
-        transform: translateY(-3px);
-    }
-    @media (hover: hover) {
-        .gallery-link:hover {
+        .closing-body {
+            font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+            line-height: 1.7;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--paper);
+            margin: 0 0 2rem;
+            max-width: 42ch;
+        }
+        
+        .gallery-link {
+            font-family: var(--font-body);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--rust);
+            background: transparent;
+            border: 1px solid var(--rust);
+            padding: 16px 38px;
+            border-radius: 2px;
+            transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+        }
+        
+        .gallery-link:focus-visible {
             background: var(--rust);
             border-color: var(--rust);
             color: var(--bg);
         }
+        /* -------- closing cards -------- */
         
-        .card:hover {
+        .cards {
+            --gap: 24px;
+            /* card width: the largest 3:4 card that fits 3 across and 2 down */
+            --cw: min((100cqw - 2 * var(--gap)) / 3, (100cqh - var(--gap)) / 2 * 0.75);
+            display: grid;
+            grid-template-columns: repeat(3, var(--cw));
+            grid-auto-rows: calc(var(--cw) * 4 / 3);
+            gap: var(--gap);
+            justify-content: center;
+            align-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .card {
+            aspect-ratio: 3 / 4;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            background: #1b1b1d;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            padding: 0;
+            overflow: hidden;
+            touch-action: manipulation;
+            transition: border-color 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .card:active {
+            border-color: var(--rust);
+        }
+        
+        .card:focus-visible {
+            outline: 2px solid var(--rust);
+            outline-offset: 3px;
+        }
+        
+        .card:focus-visible {
             border-color: var(--rust);
             transform: translateY(-3px);
         }
         
-        .card:hover .card-img {
+        @media (hover: hover) {
+            .gallery-link:hover {
+                background: var(--rust);
+                border-color: var(--rust);
+                color: var(--bg);
+            }
+            .card:hover {
+                border-color: var(--rust);
+                transform: translateY(-3px);
+            }
+            .card:hover .card-img {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+        
+        .card-media {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            color: var(--rust);
+            background: radial-gradient(circle at 50% 40%, #222224 0%, #151516 100%);
+            border-bottom: 1px solid var(--line);
+            overflow: hidden;
+        }
+        
+        .card-media {
+            position: relative;
+        }
+        
+        .card-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0.9;
+            transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+        }
+        
+        .card:focus-visible .card-img {
             transform: scale(1.05);
             opacity: 1;
         }
-    }
-    .card-media {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex: 1 1 auto;
-        min-height: 0;
-        width: 100%;
-        color: var(--rust);
-        background: radial-gradient(circle at 50% 40%, #222224 0%, #151516 100%);
-        border-bottom: 1px solid var(--line);
-        overflow: hidden;
-    }
-    .card-media {
-        position: relative;
-    }
-    .card-img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        opacity: 0.9;
-        transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-    }
-    .card:focus-visible .card-img {
-        transform: scale(1.05);
-        opacity: 1;
-    }
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        flex: 0 0 auto;
-        width: 100%;
-        padding: 12px 18px 15px;
-    }
-    .card-number {
-        font-family: var(--font-body);
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        color: var(--rust);
-    }
-    .card-title {
-        font-family: var(--font-heading);
-        font-weight: 400;
-        font-size: clamp(1.5rem, 2.6vw, 2.2rem);
-        color: var(--heading);
-        margin: 6px 0 6px;
-        line-height: 1.1;
-    }
-    .card-desc {
-        font-family: var(--font-body);
-        font-size: 13px;
-        line-height: 1.55;
-        color: var(--paper-dim);
-        margin: 0 0 12px;
-        min-height: 3.1em;
-        /* two lines, so every image is the same height */
-    }
-    @media (max-width: 760px) {
-        .cards {
-            --gap: 14px;
-            /* shorter cards on phones: close to square instead of 3:4 */
-            --cw: min((100cqw - var(--gap)) / 2, (100cqh - 2 * var(--gap)) / 3 / 1.05);
-            grid-template-columns: repeat(2, var(--cw));
-            grid-auto-rows: calc(var(--cw) * 1.05);
-        }
-        
-        .card {
-            aspect-ratio: auto;
-        }
         
         .card-body {
-            padding: 8px 10px 10px;
-        }
-        
-        .card-desc {
-            display: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 0 0 auto;
+            width: 100%;
+            padding: 12px 18px 15px;
         }
         
         .card-number {
-            font-size: 10px;
+            font-family: var(--font-body);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: var(--rust);
         }
         
         .card-title {
-            font-size: clamp(1.1rem, 5vw, 1.5rem);
-            margin: 4px 0 2px;
+            font-family: var(--font-heading);
+            font-weight: 400;
+            font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+            color: var(--heading);
+            margin: 6px 0 6px;
+            line-height: 1.1;
         }
-    }
-    .closing-hint {
-        margin-top: 1.8rem;
-        font-family: var(--font-body);
-        font-size: 10px;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--paper-dim);
-        opacity: 0.75;
-    }
-    /* -------- custom inverted cursor (mouse devices only) -------- */
-    #chapter2.is-active {
-        opacity: 1;
-        visibility: visible;
-        transition: opacity .6s ease;
-    }
-    body.ch2-active .cursor {
-        opacity: 0;
-    }
-    .c2-cursor {
-        display: none;
-    }
-    @media (hover: hover) and (pointer: fine) {
-        #chapter2,
-        #chapter2 a,
-        #chapter2 button,
-        #chapter2 img,
-        #chapter2 [role="button"],
-        #chapter2 .cursor-grow,
-        #chapter2 [data-cursor-grow] {
-            cursor: none;
+        
+        .card-desc {
+            font-family: var(--font-body);
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--paper-dim);
+            margin: 0 0 12px;
+            min-height: 3.1em;
+            /* two lines, so every image is the same height */
+        }
+        
+        @media (max-width: 760px) {
+            .cards {
+                --gap: 14px;
+                /* shorter cards on phones: close to square instead of 3:4 */
+                --cw: min((100cqw - var(--gap)) / 2, (100cqh - 2 * var(--gap)) / 3 / 1.05);
+                grid-template-columns: repeat(2, var(--cw));
+                grid-auto-rows: calc(var(--cw) * 1.05);
+            }
+            .card {
+                aspect-ratio: auto;
+            }
+            .card-body {
+                padding: 8px 10px 10px;
+            }
+            .card-desc {
+                display: none;
+            }
+            .card-number {
+                font-size: 10px;
+            }
+            .card-title {
+                font-size: clamp(1.1rem, 5vw, 1.5rem);
+                margin: 4px 0 2px;
+            }
+        }
+        
+        .closing-hint {
+            margin-top: 1.8rem;
+            font-family: var(--font-body);
+            font-size: 10px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--paper-dim);
+            opacity: 0.75;
+        }
+        /* -------- custom inverted cursor (mouse devices only) -------- */
+        
+        #chapter2.is-active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity .6s ease;
+        }
+        
+        body.ch2-active .cursor {
+            opacity: 0;
         }
         
         .c2-cursor {
-            display: block;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background: #fff;
-            mix-blend-mode: difference;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-            will-change: left, top, width, height;
+            display: none;
         }
         
-        .c2-cursor.is-visible {
-            opacity: 1;
+        @media (hover: hover) and (pointer: fine) {
+            #chapter2,
+            #chapter2 a,
+            #chapter2 button,
+            #chapter2 img,
+            #chapter2 [role="button"],
+            #chapter2 .cursor-grow,
+            #chapter2 [data-cursor-grow] {
+                cursor: none;
+            }
+            .c2-cursor {
+                display: block;
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: #fff;
+                mix-blend-mode: difference;
+                pointer-events: none;
+                z-index: 9999;
+                transform: translate(-50%, -50%);
+                opacity: 0;
+                transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+                will-change: left, top, width, height;
+            }
+            .c2-cursor.is-visible {
+                opacity: 1;
+            }
+            .c2-cursor.is-active {
+                width: 48px;
+                height: 48px;
+            }
         }
         
-        .c2-cursor.is-active {
-            width: 48px;
-            height: 48px;
+        @media (prefers-reduced-motion: reduce) {
+            #scroller {
+                transition: none !important;
+            }
+            .hero-intro h1,
+            .hero-intro .scroll-cue {
+                animation: none !important;
+                opacity: 1 !important;
+                filter: none !important;
+                transform: none !important;
+            }
+            .frame-figure img,
+            .frame-text {
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
+            }
         }
-    }
-    @media (prefers-reduced-motion: reduce) {
-        #scroller {
-            transition: none !important;
-        }
-        
-        .hero-intro h1,
-        .hero-intro .scroll-cue {
-            animation: none !important;
-            opacity: 1 !important;
-            filter: none !important;
-            transform: none !important;
-        }
-        
-        .frame-figure img,
-        .frame-text {
-            transition: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-            filter: none !important;
-        }
-    }
     </style>
 </head>
 
@@ -1361,15 +1395,19 @@
 
             // slide index (0 = hero, 1..n = frames, n+1 = closing) -> load it and its neighbours
             function preloadAround(index) {
-                for (let k = index - 1; k <= index + 2; k++) {
+                const phone = window.matchMedia("(max-width: 760px)").matches;
+                const back = phone ? 2 : 1,
+                    ahead = phone ? 5 : 2;
+                for (let k = index - back; k <= index + ahead; k++) {
                     if (k >= 1 && k <= sections.length) loadFrame(k - 1);
                 }
                 if (index >= sections.length - 1) loadCards();
             }
 
             function prefetch() {
-                loadFrame(0);
-                loadFrame(1);
+                // phones show two photos per screen, so warm up the first two columns
+                const n = window.matchMedia("(max-width: 760px)").matches ? 4 : 2;
+                for (let i = 0; i < n; i++) loadFrame(i);
             }
 
             // once the intro photo is on screen and the browser is idle, fetch the first frame
@@ -1416,7 +1454,7 @@
                     if (!s.offsetParent) return; // hidden on this screen size
                     const l = s.offsetLeft,
                         r = l + s.offsetWidth;
-                    if (!s.classList.contains("is-visible") && l < pos + vw * 0.95 && r > pos + vw * 0.05) {
+                    if (!s.classList.contains("is-visible") && l < pos + vw * 1.15 && r > pos - vw * 0.15) {
                         s.classList.add("is-visible");
                     }
                     const d = Math.abs((l + r) / 2 - mid);
