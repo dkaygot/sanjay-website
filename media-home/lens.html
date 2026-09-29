@@ -467,7 +467,7 @@
         
         @media (max-width: 760px) {
             #chapter2 {
-                --cap-h: 64px;
+                --cap-h: 44px;
                 --gap-in: 10px;
                 --gap-pair: 22px;
                 --ph: calc((100svh - 2 * var(--cap-h) - 2 * var(--gap-in) - var(--gap-pair) - 56px) / 2);
@@ -538,13 +538,13 @@
                 min-width: 0;
             }
             .frame-caption {
-                font-size: 1rem;
+                /* smaller on phones so even the longest title fits on one line */
+                font-size: min(0.875rem, 3.7vw);
                 line-height: 1.3;
-                margin-bottom: 4px;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
+                margin-bottom: 3px;
+                white-space: nowrap;
                 overflow: hidden;
+                text-overflow: ellipsis;
             }
             .frame-exif {
                 font-size: 10px;
@@ -1146,11 +1146,16 @@
                 passive: false
             });
 
-            // touch swipe
-            var touchY = null,
+            // touch: a swipe in ANY direction or a simple tap plays the zoom.
+            // Swipe up or left = forward, swipe down or right = back, tap = forward.
+            var touchX = null,
+                touchY = null,
+                touchT = 0,
                 touchFired = false;
             window.addEventListener('touchstart', function(e) {
+                touchX = e.touches[0].clientX;
                 touchY = e.touches[0].clientY;
+                touchT = performance.now();
                 touchFired = false;
             }, {
                 passive: true
@@ -1163,10 +1168,12 @@
                     return;
                 }
                 if (touchY === null) return;
-                var dy = touchY - e.touches[0].clientY; // > 0 means swipe up = scroll down
-                var dir = dy > 0 ? 1 : -1;
+                var dx = touchX - e.touches[0].clientX; // > 0 means finger moved left
+                var dy = touchY - e.touches[0].clientY; // > 0 means finger moved up
+                var d = Math.abs(dx) > Math.abs(dy) ? dx : dy; // whichever way it mostly moved
+                var dir = d > 0 ? 1 : -1;
                 if (!touchFired) {
-                    if (Math.abs(dy) < 8) {
+                    if (Math.abs(d) < 8) {
                         if (animating || inZone(dir)) e.preventDefault();
                         return;
                     }
@@ -1178,10 +1185,21 @@
             }, {
                 passive: false
             });
-            window.addEventListener('touchend', function() {
-                touchY = null;
+            window.addEventListener('touchend', function(e) {
+                var wasTap = touchY !== null && !touchFired &&
+                    performance.now() - touchT < 400 &&
+                    Math.abs(touchX - e.changedTouches[0].clientX) < 10 &&
+                    Math.abs(touchY - e.changedTouches[0].clientY) < 10;
+                touchX = touchY = null;
+                if (wasTap && !ch2Active()) handleIntent(1, e); // tap = go forward
             }, {
-                passive: true
+                passive: false
+            });
+
+            // mouse click on the intro also plays it forward
+            window.addEventListener('click', function(e) {
+                if (ch2Active()) return;
+                handleIntent(1, e);
             });
 
             // keyboard
