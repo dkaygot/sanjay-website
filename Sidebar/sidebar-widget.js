@@ -120,13 +120,15 @@
 }
 
 /* ---------- Desktop edge handle ---------- */
+/* At rest the hit box is the semicircle itself (border-radius also
+   clips pointer hit-testing), so only the handle opens the menu. */
 #sidebar-hover-trigger {
     position: fixed;
-    top: 0;
+    top: calc(50% - ${HANDLE_WIDTH}px);
     left: 0;
     width: ${HANDLE_WIDTH}px;
-    height: 100vh;
-    height: 100dvh;
+    height: ${HANDLE_WIDTH * 2}px;
+    border-radius: 0 ${HANDLE_WIDTH}px ${HANDLE_WIDTH}px 0;
     z-index: 2147483001;
     cursor: pointer;
     margin: 0;
@@ -137,6 +139,16 @@
     appearance: none;
     font: inherit;
     color: inherit;
+}
+
+/* Opened by mouse hover: widen the hit box to the whole panel so the
+   pointer can travel across it without the menu closing. */
+#sidebar-widget-root.open.hover #sidebar-hover-trigger {
+    top: 0;
+    width: ${SIDEBAR_WIDTH}px;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
 }
 
 #sidebar-hover-trigger:focus {
@@ -559,6 +571,7 @@
             mode = open ? how : null;
             root.classList.toggle('open', open);
             root.classList.toggle('modal', open && how === 'modal');
+            root.classList.toggle('hover', open && how === 'hover');
 
             var label = open ? 'Close menu' : 'Open menu';
             [trigger, menuButton].forEach(function(btn) {
@@ -566,9 +579,6 @@
                 btn.setAttribute('aria-label', label);
             });
 
-            // Widen the desktop hit box only for mouse hover, so the
-            // pointer can travel across the panel without it closing.
-            trigger.style.width = (open && how === 'hover') ? SIDEBAR_WIDTH + 'px' : '';
             ensureAnimating();
         }
 
@@ -742,7 +752,6 @@
         if (mobileMq) {
             var onLayoutChange = function() {
                 if (isOpen) setOpen(false);
-                trigger.style.width = '';
                 if (animationId === null) render();
             };
             if (mobileMq.addEventListener) mobileMq.addEventListener('change', onLayoutChange);
