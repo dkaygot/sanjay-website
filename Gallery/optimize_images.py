@@ -17,7 +17,7 @@ Then set  USE_OPTIMIZED = true  in gallery.html.
 from pathlib import Path
 from PIL import Image, ImageOps
 
-CATEGORIES = ["Landscape", "Wildlife", "Travel", "Holi", "Theyyam", "Taj Mahal"]
+CATEGORIES = ["Landscape", "Wildlife", "Travel"]
 THUMB_WIDTH = 800      # grid columns are at most ~530px wide; 800 stays sharp on most screens
 THUMB_QUALITY = 78
 FULL_QUALITY = 85
