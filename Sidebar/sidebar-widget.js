@@ -70,8 +70,8 @@
 
     // Shape geometry.
     var SIDEBAR_WIDTH = 220;
-    var HANDLE_WIDTH = 48;
-    var HANDLE_HEIGHT = 96;
+    var HANDLE_WIDTH = 54;
+    var HANDLE_HEIGHT = 108;
 
     // Mobile header height (kept minimal; 44px is the smallest
     // comfortable tap target for the button inside it).
@@ -165,7 +165,7 @@
 .handle-label-text {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.18em;
     line-height: 1;
@@ -259,7 +259,7 @@
 #sidebar-path {
     fill: ${THEME.card};
     stroke: var(--accent, ${THEME.accent});
-    stroke-width: 1.5;
+    stroke-width: 2.5;
     filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.45));
     transition: fill 0.25s ease, stroke-width 0.25s ease;
 }
