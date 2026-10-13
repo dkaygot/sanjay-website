@@ -70,8 +70,8 @@
 
     // Shape geometry.
     var SIDEBAR_WIDTH = 220;
-    var HANDLE_WIDTH = 33.75;
-    var HANDLE_HEIGHT = 67.5;
+    var HANDLE_WIDTH = 48;
+    var HANDLE_HEIGHT = 96;
 
     // Mobile header height (kept minimal; 44px is the smallest
     // comfortable tap target for the button inside it).
@@ -143,46 +143,39 @@
     outline: none;
 }
 
-#sidebar-hover-trigger:focus-visible ~ #handle-dots .handle-dot {
-    animation: none;
-    opacity: 1;
-    box-shadow: 0 0 0 3px rgba(201, 169, 106, 0.35);
+#sidebar-hover-trigger:focus-visible ~ #handle-label .handle-label-text {
+    text-shadow: 0 0 6px rgba(201, 169, 106, 0.6);
 }
 
-#handle-dots {
+#handle-label {
     position: fixed;
     top: 50%;
     left: 0;
     width: ${HANDLE_WIDTH}px;
     transform: translateY(-50%) translateX(-6px);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 9px;
     z-index: 2147483002;
     pointer-events: none;
     transition: opacity 0.25s ease;
 }
 
-.handle-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent, ${THEME.accent});
-    opacity: 0.5;
-    animation: sidebar-dot-pulse 2.4s ease-in-out infinite;
+/* "Menu" written vertically, reading bottom to top. */
+.handle-label-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--accent, ${THEME.accent});
+    white-space: nowrap;
+    user-select: none;
 }
 
-.handle-dot:nth-child(2) { animation-delay: 0.3s; }
-.handle-dot:nth-child(3) { animation-delay: 0.6s; }
-
-@keyframes sidebar-dot-pulse {
-    0%, 100% { opacity: 0.4; transform: scale(0.85); }
-    50% { opacity: 1; transform: scale(1); }
-}
-
-#sidebar-widget-root.open #handle-dots {
+#sidebar-widget-root.open #handle-label {
     opacity: 0;
 }
 
@@ -412,7 +405,7 @@
 
     /* The edge handle is replaced by the header button. */
     #sidebar-hover-trigger,
-    #handle-dots {
+    #handle-label {
         display: none;
     }
 
@@ -440,11 +433,6 @@
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-    .handle-dot {
-        animation: none;
-        opacity: 0.8;
-    }
-
     #sidebar-content,
     #sidebar-widget-root.open #sidebar-content,
     #sidebar-backdrop {
@@ -491,10 +479,8 @@
         '</svg>' +
         '<div id="sidebar-backdrop" aria-hidden="true"></div>' +
         '<button type="button" id="sidebar-hover-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar-content"></button>' +
-        '<div id="handle-dots" aria-hidden="true">' +
-        '<span class="handle-dot"></span>' +
-        '<span class="handle-dot"></span>' +
-        '<span class="handle-dot"></span>' +
+        '<div id="handle-label" aria-hidden="true">' +
+        '<span class="handle-label-text">Menu</span>' +
         '</div>' +
         '<nav id="sidebar-content" aria-label="Site">' + menuItemsHtml + '</nav>';
 
