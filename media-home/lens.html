@@ -1039,6 +1039,15 @@
                 animateTo(dir > 0 ? trackEnd() : 0);
             }
 
+            // input aimed at the sidebar menu or a link/button is left alone,
+            // so menu links navigate instead of playing the zoom
+            var UI_SELECTOR = '#sidebar-widget-root, #sidebar-mobile-header, a, button';
+
+            function fromUi(e) {
+                var t = e.target;
+                return !!(t && t.closest && t.closest(UI_SELECTOR));
+            }
+
             // mouse wheel / trackpad
             window.addEventListener('wheel', function(e) {
                 if (e.ctrlKey || Math.abs(e.deltaY) < 2) return; // ignore pinch-zoom & jitter
@@ -1054,6 +1063,10 @@
                 touchT = 0,
                 touchFired = false;
             window.addEventListener('touchstart', function(e) {
+                if (fromUi(e)) {
+                    touchX = touchY = null;
+                    return;
+                }
                 touchX = e.touches[0].clientX;
                 touchY = e.touches[0].clientY;
                 touchT = performance.now();
@@ -1099,13 +1112,13 @@
 
             // mouse click on the intro also plays it forward
             window.addEventListener('click', function(e) {
-                if (ch2Active()) return;
+                if (ch2Active() || fromUi(e)) return;
                 handleIntent(1, e);
             });
 
             // keyboard
             window.addEventListener('keydown', function(e) {
-                if (ch2Active()) return;
+                if (ch2Active() || fromUi(e)) return;
                 var t = e.target;
                 if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
                 var dir = 0;

@@ -454,13 +454,17 @@
 
     var currentLabel = '';
 
+    // When the page is shown inside index.html's frame, links must replace
+    // the whole window rather than load inside the frame.
+    var linkTarget = window.top !== window.self ? ' target="_top"' : '';
+
     var menuItemsHtml = MENU_ITEMS.map(function(item) {
         var href = new URL(item.path, SITE_ROOT).href;
         var isCurrent = currentPath.indexOf(item.path.replace(/\\/g, '/')) !== -1;
         if (isCurrent && !currentLabel) currentLabel = item.label;
         var cls = 'sidebar-menu-item' + (isCurrent ? ' active' : '');
         var current = isCurrent ? ' aria-current="page"' : '';
-        return '<a class="' + cls + '" href="' + href + '"' + current + '>' + item.label + '</a>';
+        return '<a class="' + cls + '" href="' + href + '"' + linkTarget + current + '>' + item.label + '</a>';
     }).join('');
 
     var markup =
