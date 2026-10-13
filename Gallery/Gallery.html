@@ -1175,7 +1175,7 @@
                 tabsContainer.appendChild(btn);
             });
 
-            renderCategory('Landscape'); // first load: no fade delay
+            renderCategory(Object.keys(galleryData)[0]); // first tab (Wildlife); first load: no fade delay
         }
 
         // The script sits at the end of <body>, so the page is ready: start now
