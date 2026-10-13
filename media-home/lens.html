@@ -49,54 +49,6 @@
             height: 0;
         }
         
-        @media (pointer:fine) {
-            body.cursor-ready {
-                cursor: none;
-            }
-        }
-        /* ---------- custom cursor ---------- */
-        
-        .cursor {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 84px;
-            height: 84px;
-            margin-left: -42px;
-            margin-top: -42px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            letter-spacing: 0.14em;
-            color: #fff;
-            pointer-events: none;
-            z-index: 999;
-            mix-blend-mode: difference;
-            transition: width .35s ease, height .35s ease, margin .35s ease, opacity .35s ease;
-            opacity: 0;
-        }
-        
-        .cursor.visible {
-            opacity: 1;
-        }
-        
-        .cursor .cursor-label {
-            transition: opacity .3s ease;
-        }
-        
-        .cursor.scrolled {
-            width: 14px;
-            height: 14px;
-            margin-left: -7px;
-            margin-top: -7px;
-        }
-        
-        .cursor.scrolled .cursor-label {
-            opacity: 0;
-        }
         /* ---------- fixed image, never translates ---------- */
         
         .photo-stage {
@@ -191,8 +143,7 @@
         
         @media (prefers-reduced-motion: reduce) {
             .photo-layer,
-            .photo-fade,
-            .cursor {
+            .photo-fade {
                 transition: none !important;
             }
         }
@@ -783,10 +734,6 @@
             transition: opacity .6s ease;
         }
         
-        body.ch2-active .cursor {
-            opacity: 0;
-        }
-        
         .c2-cursor {
             display: none;
         }
@@ -850,8 +797,6 @@
 </head>
 
 <body>
-
-    <div class="cursor" id="cursor"><span class="cursor-label">scroll</span></div>
 
     <div class="photo-stage">
         <div class="photo-layer" id="photoLayer"></div>
@@ -964,50 +909,6 @@
 
     <script>
         (function() {
-            var isFinePointer = window.matchMedia('(pointer:fine)').matches;
-
-            var cursor = document.getElementById('cursor');
-            if (isFinePointer) {
-                document.body.classList.add('cursor-ready');
-                cursor.classList.add('visible');
-                var mx = 0,
-                    my = 0,
-                    cx = 0,
-                    cy = 0;
-                var cursorRunning = false;
-
-                function cursorStep() {
-                    cx += (mx - cx) * 0.22;
-                    cy += (my - cy) * 0.22;
-                    cursor.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
-                    // stop the loop once the ring has caught up, instead of running every frame forever
-                    if (Math.abs(mx - cx) < 0.1 && Math.abs(my - cy) < 0.1) {
-                        cursorRunning = false;
-                        return;
-                    }
-                    requestAnimationFrame(cursorStep);
-                }
-                window.addEventListener('mousemove', function(e) {
-                    mx = e.clientX;
-                    my = e.clientY;
-                    if (!cursorRunning) {
-                        cursorRunning = true;
-                        requestAnimationFrame(cursorStep);
-                    }
-                }, {
-                    passive: true
-                });
-                var scrolledOnce = false;
-                window.addEventListener('scroll', function() {
-                    if (!scrolledOnce) {
-                        scrolledOnce = true;
-                        cursor.classList.add('scrolled');
-                    }
-                }, {
-                    passive: true
-                });
-            }
-
             var track = document.getElementById('scrollTrack');
             var photoLayer = document.getElementById('photoLayer');
             var photoFade = document.getElementById('photoFade');
