@@ -415,6 +415,10 @@
         }
         
         @media (min-width: 901px) {
+            /* nudge every section's text a little to the right */
+            .panel-copy {
+                margin-left: clamp(1.5rem, 3vw, 4rem);
+            }
             .content-panel {
                 max-width: min(640px, 44vw);
             }
