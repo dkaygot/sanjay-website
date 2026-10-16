@@ -143,24 +143,6 @@
             white-space: pre-line;
         }
         
-        .post .actions {
-            margin-top: 18px;
-        }
-        
-        .link-btn {
-            background: none;
-            border: 0;
-            padding: 0;
-            cursor: pointer;
-            color: var(--muted);
-            font: inherit;
-            font-size: .85rem;
-        }
-        
-        .link-btn:hover {
-            color: var(--accent);
-        }
-        
         .empty {
             color: var(--muted);
             border: 1px dashed var(--border);
@@ -246,6 +228,19 @@
         .error {
             color: #c0574a;
         }
+
+        .hp {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .btn[disabled] {
+            opacity: .6;
+            cursor: wait;
+        }
         
         @media (max-width: 600px) {
             .row {
@@ -291,9 +286,13 @@
         <div class="wrap">
             <div class="section-head">
                 <h2>Write a post</h2>
-                <p>Fill in the form and your post appears at the top of the list.</p>
+                <p>Send in your post and it appears in the list once it has been reviewed.</p>
             </div>
             <form id="postForm" novalidate>
+                <!-- left empty by people; bots that fill every field get dropped -->
+                <div class="hp" aria-hidden="true">
+                    <label>Website <input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+                </div>
                 <div class="row">
                     <label>Title
           <input id="title" name="title" type="text" maxlength="90" required>
@@ -306,55 +305,31 @@
         <textarea id="body" name="body" required></textarea>
       </label>
                 <div class="status" id="status" role="status"></div>
-                <button class="btn" type="submit">Publish post</button>
+                <button class="btn" type="submit" id="submitBtn">Send for review</button>
             </form>
         </div>
     </section>
 
+    <script src="../api/site-store.js"></script>
     <script>
         (function() {
-            var KEY = "fieldnotes:posts";
-            var seed = [{
-                id: 3,
-                title: "Why small habits win",
-                author: "Maya Lin",
-                date: "2026-09-14",
-                body: "Big goals are easy to set and easy to drop. A ten-minute daily routine is harder to argue with.\n\nStart with something so small it feels silly, then let it grow on its own schedule."
-            }, {
-                id: 2,
-                title: "A better way to take notes",
-                author: "Daniel Ortiz",
-                date: "2026-09-02",
-                body: "Write down decisions and the reasons behind them, not just what was said. Six months later, the reasons are the part you'll actually need."
-            }, {
-                id: 1,
-                title: "Notes from a slow week",
-                author: "Maya Lin",
-                date: "2026-08-21",
-                body: "Not every week needs to be productive. Some weeks are for reading, walking, and letting ideas settle."
-            }];
-
-            var posts = load();
+            var API = "/api/api";
+            var posts = [];
             var list = document.getElementById("postList");
             var count = document.getElementById("count");
             var form = document.getElementById("postForm");
+            var writeSection = document.getElementById("write");
             var status = document.getElementById("status");
+            var submitBtn = document.getElementById("submitBtn");
 
-            function load() {
-                try {
-                    var raw = localStorage.getItem(KEY);
-                    if (raw) {
-                        var p = JSON.parse(raw);
-                        if (Array.isArray(p)) return p;
-                    }
-                } catch (e) {}
-                return seed.slice();
-            }
-
-            function save() {
-                try {
-                    localStorage.setItem(KEY, JSON.stringify(posts));
-                } catch (e) {}
+            // Apply admin settings
+            if (window.SiteStore) {
+                var settings = window.SiteStore.getSettings();
+                if (settings.allowPublicBlogSubmissions === false) {
+                    var headP = writeSection.querySelector(".section-head p");
+                    if (headP) headP.textContent = "Guest submissions are currently paused by the administrator.";
+                    if (form) form.style.display = "none";
+                }
             }
 
             function fmt(d) {
@@ -366,16 +341,18 @@
                 });
             }
 
-            function render() {
+            function message(text) {
                 list.innerHTML = "";
+                var e = document.createElement("div");
+                e.className = "empty";
+                e.textContent = text;
+                list.appendChild(e);
+            }
+
+            function render() {
                 count.textContent = posts.length + (posts.length === 1 ? " post" : " posts");
-                if (!posts.length) {
-                    var e = document.createElement("div");
-                    e.className = "empty";
-                    e.textContent = "No posts yet. Write the first one below.";
-                    list.appendChild(e);
-                    return;
-                }
+                if (!posts.length) return message("No posts yet. Write the first one below.");
+                list.innerHTML = "";
                 posts.forEach(function(p) {
                     var art = document.createElement("article");
                     art.className = "post";
@@ -384,28 +361,42 @@
                     h.textContent = p.title;
                     var m = document.createElement("div");
                     m.className = "meta";
-                    m.textContent = "By " + p.author + " on " + fmt(p.date);
+                    var catTag = p.category ? " • " + p.category : "";
+                    m.textContent = "By " + p.author + " on " + fmt(p.date) + catTag;
                     var b = document.createElement("p");
                     b.textContent = p.body;
 
-                    var a = document.createElement("div");
-                    a.className = "actions";
-                    var del = document.createElement("button");
-                    del.className = "link-btn";
-                    del.type = "button";
-                    del.textContent = "Delete post";
-                    del.addEventListener("click", function() {
-                        posts = posts.filter(function(x) {
-                            return x.id !== p.id;
-                        });
-                        save();
-                        render();
-                    });
-                    a.appendChild(del);
-
-                    art.append(h, m, b, a);
+                    art.append(h, m, b);
                     list.appendChild(art);
                 });
+            }
+
+            // Load posts with automatic offline / local storage fallback
+            function load() {
+                message("Loading posts…");
+                fetch(API + "?action=public_posts", {
+                    cache: "no-store"
+                }).then(function(r) {
+                    return r.json();
+                }).then(function(res) {
+                    if (!res.ok) throw new Error(res.error);
+                    posts = res.posts || [];
+                    render();
+                }).catch(function() {
+                    // Fallback to local storage store
+                    if (window.SiteStore) {
+                        posts = window.SiteStore.getPosts("approved");
+                        render();
+                    } else {
+                        count.textContent = "";
+                        message("Posts couldn't be loaded right now. Please try again later.");
+                    }
+                });
+            }
+
+            function setStatus(text, isError) {
+                status.textContent = text;
+                status.classList.toggle("error", !!isError);
             }
 
             form.addEventListener("submit", function(ev) {
@@ -413,32 +404,52 @@
                 var title = form.title.value.trim();
                 var author = form.author.value.trim();
                 var body = form.body.value.trim();
-                status.classList.remove("error");
                 if (!title || !author || !body) {
-                    status.classList.add("error");
-                    status.textContent = "Add a title, your name, and the post text.";
+                    setStatus("Add a title, your name, and the post text.", true);
                     return;
                 }
-                var maxId = posts.reduce(function(n, p) {
-                    return Math.max(n, p.id);
-                }, 0);
-                posts.unshift({
-                    id: maxId + 1,
-                    title: title,
-                    author: author,
-                    body: body,
-                    date: new Date().toISOString().slice(0, 10)
-                });
-                save();
-                render();
-                form.reset();
-                status.textContent = "Published.";
-                document.getElementById("posts").scrollIntoView({
-                    behavior: "smooth"
+                submitBtn.disabled = true;
+                setStatus("Sending…");
+
+                // Save via SiteStore (saves locally and attempts remote server sync)
+                if (window.SiteStore) {
+                    window.SiteStore.addPost({
+                        title: title,
+                        author: author,
+                        body: body,
+                        category: "Guest Submission",
+                        status: "pending"
+                    });
+                }
+
+                fetch(API + "?action=submit_post", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        author: author,
+                        body: body,
+                        website: form.website.value
+                    })
+                }).then(function(r) {
+                    return r.json().catch(function() {
+                        return {};
+                    });
+                }).then(function(res) {
+                    form.reset();
+                    setStatus("Thank you! Your post has been sent and will appear here once it's approved by admin.");
+                }).catch(function() {
+                    // Even if server is offline, SiteStore already saved locally!
+                    form.reset();
+                    setStatus("Thank you! Your post has been submitted for admin review and will appear once approved.");
+                }).then(function() {
+                    submitBtn.disabled = false;
                 });
             });
 
-            render();
+            load();
         })();
     </script>
     <script src="../Sidebar/sidebar-widget.js"></script>

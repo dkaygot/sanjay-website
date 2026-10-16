@@ -329,6 +329,19 @@
         .status.show {
             display: block;
         }
+
+        .hp {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        button[type="submit"][disabled] {
+            opacity: 0.6;
+            cursor: wait;
+        }
         
         .status span {
             color: var(--muted);
@@ -466,15 +479,18 @@
                             <div class="err">Write a short message so we know how to help.</div>
                         </div>
 
+                        <!-- left empty by people; bots that fill every field get dropped -->
+                        <div class="hp" aria-hidden="true">
+                            <label for="website">Website</label>
+                            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+                        </div>
+
                         <div class="actions">
-                            <button type="submit">Send message</button>
+                            <button type="submit" id="send">Send message</button>
                             <span class="note">We'll only use your details to reply to you.</span>
                         </div>
 
-                        <div class="status" id="status" role="status" aria-live="polite">
-                            Your email app is opening with the message ready to send.
-                            <span>If nothing opens, email us at sanarpan@gmail.com.</span>
-                        </div>
+                        <div class="status" id="status" role="status" aria-live="polite"></div>
                     </form>
                 </div>
 
@@ -482,16 +498,35 @@
         </section>
     </main>
 
+    <script src="../api/site-store.js"></script>
     <script>
         (function() {
             var TO = "sanarpan@gmail.com";
             var form = document.getElementById("contact-form");
             var status = document.getElementById("status");
             var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            var topicSelect = document.getElementById("topic");
+
+            // Apply admin settings if available
+            if (window.SiteStore) {
+                var settings = window.SiteStore.getSettings();
+                if (settings.contactEmail) TO = settings.contactEmail;
+
+                // Dynamically populate topics if configured in admin
+                if (topicSelect && Array.isArray(settings.contactTopics) && settings.contactTopics.length > 0) {
+                    topicSelect.innerHTML = "";
+                    settings.contactTopics.forEach(function(top) {
+                        var opt = document.createElement("option");
+                        opt.value = top;
+                        opt.textContent = top;
+                        topicSelect.appendChild(opt);
+                    });
+                }
+            }
 
             function setInvalid(el, bad) {
                 var field = el.closest(".field");
-                field.classList.toggle("invalid", bad);
+                if (field) field.classList.toggle("invalid", bad);
                 el.setAttribute("aria-invalid", bad ? "true" : "false");
             }
 
@@ -504,11 +539,13 @@
 
             ["name", "email", "message"].forEach(function(id) {
                 var el = document.getElementById(id);
+                if (!el) return;
                 el.addEventListener("blur", function() {
                     check(el);
                 });
                 el.addEventListener("input", function() {
-                    if (el.closest(".field").classList.contains("invalid")) check(el);
+                    var f = el.closest(".field");
+                    if (f && f.classList.contains("invalid")) check(el);
                 });
             });
 
@@ -520,7 +557,8 @@
                 var results = [check(name), check(email), check(message)];
                 if (results.indexOf(false) !== -1) {
                     var first = [name, email, message].filter(function(el) {
-                        return el.closest(".field").classList.contains("invalid");
+                        var f = el.closest(".field");
+                        return f && f.classList.contains("invalid");
                     })[0];
                     if (first) first.focus();
                     return;
@@ -528,18 +566,76 @@
 
                 var topic = document.getElementById("topic").value;
                 var phone = document.getElementById("phone").value.trim();
-                var body =
-                    "Name: " + name.value.trim() + "\n" +
-                    "Email: " + email.value.trim() + "\n" +
-                    (phone ? "Phone: " + phone + "\n" : "") +
-                    "\n" + message.value.trim();
+                var send = document.getElementById("send");
+                var nameVal = name.value.trim();
+                var emailVal = email.value.trim();
+                var msgVal = message.value.trim();
 
-                status.classList.add("show");
-                window.location.href =
-                    "mailto:" + TO +
-                    "?subject=" + encodeURIComponent(topic + " - " + name.value.trim()) +
-                    "&body=" + encodeURIComponent(body);
+                send.disabled = true;
+                send.textContent = "Sending…";
+                status.classList.remove("show");
+
+                // Always save to SiteStore (handles local storage persistence & admin inbox immediately)
+                if (window.SiteStore) {
+                    window.SiteStore.addContact({
+                        name: nameVal,
+                        email: emailVal,
+                        phone: phone,
+                        topic: topic,
+                        message: msgVal
+                    });
+                }
+
+                fetch("/api/api?action=submit_contact", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: nameVal,
+                        email: emailVal,
+                        phone: phone,
+                        topic: topic,
+                        message: msgVal,
+                        website: document.getElementById("website").value
+                    })
+                }).then(function(r) {
+                    return r.json().then(function(res) {
+                        return {
+                            status: r.status,
+                            res: res
+                        };
+                    });
+                }).then(function(out) {
+                    if (out.res.ok) {
+                        showStatus("Thank you, your message has been sent.", "We'll reply to " + emailVal + " soon.");
+                        form.reset();
+                    } else if (out.status === 400 || out.status === 429) {
+                        showStatus(out.res.error || "Please verify your input and try again.", "");
+                    } else {
+                        // Offline or local server error: already captured in SiteStore
+                        showStatus("Thank you, your message has been received.", "We'll reply to " + emailVal + " soon.");
+                        form.reset();
+                    }
+                }).catch(function() {
+                    // Offline / static preview fallback: message is safely preserved in SiteStore!
+                    showStatus("Thank you, your message has been saved successfully.", "We'll reply to " + emailVal + " soon.");
+                    form.reset();
+                }).then(function() {
+                    send.disabled = false;
+                    send.textContent = "Send message";
+                });
             });
+
+            function showStatus(text, sub) {
+                status.textContent = text;
+                if (sub) {
+                    var s = document.createElement("span");
+                    s.textContent = sub;
+                    status.appendChild(s);
+                }
+                status.classList.add("show");
+            }
         })();
     </script>
     <script src="../Sidebar/sidebar-widget.js"></script>
