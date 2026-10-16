@@ -127,14 +127,21 @@ function sha256(s) {
 /* ---------- admin session ---------- */
 
 async function requireAdmin(req) {
-    const token = readCookie(req, SESSION_COOKIE);
+    let token = req.headers['x-admin-token'] || '';
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+        token = req.headers.authorization.slice(7).trim();
+    }
+    if (!token) {
+        token = readCookie(req, SESSION_COOKIE);
+    }
     if (!/^[0-9a-f]{64}$/.test(token) || !(await redis(['GET', 'session:' + token]))) {
         throw new HttpError(401, 'Please log in.');
     }
 }
 
-function sessionCookie(token, maxAge) {
-    return SESSION_COOKIE + '=' + token + '; Path=/api; HttpOnly; Secure; SameSite=Strict; Max-Age=' + maxAge;
+function sessionCookie(token, maxAge, req) {
+    const isHttps = Boolean(req && (req.headers['x-forwarded-proto'] === 'https' || req.headers['x-forwarded-ssl'] === 'on'));
+    return SESSION_COOKIE + '=' + token + '; Path=/; HttpOnly; SameSite=Lax;' + (isHttps ? ' Secure;' : '') + ' Max-Age=' + maxAge;
 }
 
 /* ---------- actions ---------- */
@@ -145,7 +152,14 @@ const actions = {
     async public_posts() {
         const posts = (await getAll(POSTS)).filter((p) => p.status === 'approved');
         return {
-            posts: posts.map((p) => ({ id: p.id, title: p.title, author: p.author, body: p.body, date: p.date }))
+            posts: posts.map((p) => ({
+                id: p.id,
+                title: p.title,
+                author: p.author,
+                body: p.body,
+                date: p.date,
+                category: p.category || 'Field Notes'
+            }))
         };
     },
 
@@ -201,14 +215,15 @@ const actions = {
         }
         const token = crypto.randomBytes(32).toString('hex');
         await redis(['SET', 'session:' + token, '1', 'EX', SESSION_TTL]);
-        res.setHeader('Set-Cookie', sessionCookie(token, SESSION_TTL));
-        return {};
+        res.setHeader('Set-Cookie', sessionCookie(token, SESSION_TTL, req));
+        return { token };
     },
 
     async logout(req, res) {
-        const token = readCookie(req, SESSION_COOKIE);
+        let token = req.headers['x-admin-token'] || '';
+        if (!token) token = readCookie(req, SESSION_COOKIE);
         if (/^[0-9a-f]{64}$/.test(token)) await redis(['DEL', 'session:' + token]);
-        res.setHeader('Set-Cookie', sessionCookie('', 0));
+        res.setHeader('Set-Cookie', sessionCookie('', 0, req));
         return {};
     },
 
@@ -238,14 +253,14 @@ const actions = {
         const b = body(req);
         const now = new Date().toISOString();
         const post = {
-            id: crypto.randomUUID(),
+            id: (typeof b.id === 'string' && b.id.trim()) ? b.id.trim() : crypto.randomUUID(),
             title: text(b, 'title', 90, 'a title'),
             author: text(b, 'author', 50, "the author's name"),
             body: text(b, 'body', 20000, 'the post text'),
             category: text(b, 'category', 50, 'a category', true) || 'Field Notes',
             status: b.status === 'approved' ? 'approved' : (b.status === 'draft' ? 'draft' : 'pending'),
             date: b.date || now.slice(0, 10),
-            createdAt: now
+            createdAt: b.createdAt || now
         };
         await put(POSTS, post);
         return { post };
@@ -255,22 +270,57 @@ const actions = {
         await requireAdmin(req);
         const b = body(req);
         if (b.status !== 'pending' && b.status !== 'approved' && b.status !== 'draft') throw new HttpError(400, 'Unknown status.');
-        const post = await getOne(POSTS, b.id);
-        post.status = b.status;
+        let post;
+        try {
+            post = await getOne(POSTS, b.id);
+            post.status = b.status;
+        } catch (e) {
+            // Upsert if post wasn't in Redis yet but full post content was provided
+            if (b.title && b.body) {
+                const now = new Date().toISOString();
+                post = {
+                    id: String(b.id || crypto.randomUUID()),
+                    title: text(b, 'title', 90, 'a title'),
+                    author: text(b, 'author', 50, "the author's name", true) || 'Sanjay Patil',
+                    body: text(b, 'body', 20000, 'the post text'),
+                    category: text(b, 'category', 50, 'a category', true) || 'Field Notes',
+                    status: b.status,
+                    date: b.date || now.slice(0, 10),
+                    createdAt: b.createdAt || now
+                };
+            } else {
+                throw e;
+            }
+        }
         await put(POSTS, post);
-        return {};
+        return { post };
     },
 
     async update_post(req) {
         await requireAdmin(req);
         const b = body(req);
-        const post = await getOne(POSTS, b.id);
-        post.title = text(b, 'title', 90, 'a title');
-        post.author = text(b, 'author', 50, "the author's name");
-        post.body = text(b, 'body', 20000, 'the post text');
-        if (b.category != null) post.category = text(b, 'category', 50, 'a category', true);
-        if (b.date) post.date = b.date;
-        if (b.status) post.status = b.status;
+        let post;
+        try {
+            post = await getOne(POSTS, b.id);
+            post.title = text(b, 'title', 90, 'a title');
+            post.author = text(b, 'author', 50, "the author's name");
+            post.body = text(b, 'body', 20000, 'the post text');
+            if (b.category != null) post.category = text(b, 'category', 50, 'a category', true);
+            if (b.date) post.date = b.date;
+            if (b.status) post.status = b.status;
+        } catch (e) {
+            const now = new Date().toISOString();
+            post = {
+                id: String(b.id || crypto.randomUUID()),
+                title: text(b, 'title', 90, 'a title'),
+                author: text(b, 'author', 50, "the author's name", true) || 'Sanjay Patil',
+                body: text(b, 'body', 20000, 'the post text'),
+                category: text(b, 'category', 50, 'a category', true) || 'Field Notes',
+                status: b.status || 'approved',
+                date: b.date || now.slice(0, 10),
+                createdAt: now
+            };
+        }
         await put(POSTS, post);
         return { post };
     },
@@ -279,6 +329,31 @@ const actions = {
         await requireAdmin(req);
         await redis(['HDEL', POSTS, String(body(req).id)]);
         return {};
+    },
+
+    async sync_posts(req) {
+        await requireAdmin(req);
+        const b = body(req);
+        const incoming = Array.isArray(b.posts) ? b.posts : [];
+        let count = 0;
+        for (const p of incoming) {
+            if (!p.title || !p.body) continue;
+            const now = new Date().toISOString();
+            const record = {
+                id: String(p.id || crypto.randomUUID()),
+                title: String(p.title).trim(),
+                author: String(p.author || 'Sanjay Patil').trim(),
+                body: String(p.body).trim(),
+                category: String(p.category || 'Field Notes').trim(),
+                status: (p.status === 'approved' || p.status === 'draft') ? p.status : 'pending',
+                date: p.date || now.slice(0, 10),
+                createdAt: p.createdAt || now
+            };
+            await put(POSTS, record);
+            count++;
+        }
+        const allPosts = await getAll(POSTS);
+        return { synced: count, posts: allPosts };
     }
 };
 

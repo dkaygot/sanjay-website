@@ -381,6 +381,13 @@
                 }).then(function(res) {
                     if (!res.ok) throw new Error(res.error);
                     posts = res.posts || [];
+                    // If server returns empty list, check local approved posts
+                    if (!posts.length && window.SiteStore) {
+                        var localApproved = window.SiteStore.getPosts("approved");
+                        if (localApproved && localApproved.length) {
+                            posts = localApproved;
+                        }
+                    }
                     render();
                 }).catch(function() {
                     // Fallback to local storage store

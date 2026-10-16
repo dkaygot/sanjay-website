@@ -1074,6 +1074,7 @@
                     </div>
 
                     <div class="toolbar-right">
+                        <button class="btn ghost sm" type="button" id="syncLiveDbBtn" title="Sync all articles with Upstash Redis live database">☁ Sync to Live DB</button>
                         <select id="postSort" style="width:auto; height:38px; padding-block:6px;">
                             <option value="newest">Newest First</option>
                             <option value="oldest">Oldest First</option>
@@ -1398,7 +1399,7 @@
             });
 
             /* ---------- DATA LOADING ---------- */
-            function loadData() {
+            function loadData(showToast) {
                 state.settings = store.getSettings();
                 state.contacts = store.getContacts();
                 state.posts = store.getPosts('all');
@@ -1408,6 +1409,22 @@
                 renderMessages();
                 renderPosts();
                 renderSettings();
+
+                // If online, fetch live server data from Upstash Redis
+                if (store && store.fetchAdminData && store.isLoggedIn()) {
+                    store.fetchAdminData().then(function(res) {
+                        state.contacts = res.contacts || [];
+                        state.posts = res.posts || [];
+                        renderStats();
+                        renderMessages();
+                        renderPosts();
+                        if (showToast) {
+                            toast('Live database synced (' + state.posts.length + ' articles).');
+                        }
+                    }).catch(function(err) {
+                        console.warn('Could not fetch server admin data:', err);
+                    });
+                }
             }
 
             function renderStats() {
@@ -1591,9 +1608,15 @@
                     toggleReadBtn.textContent = c.read ? 'Mark as Unread' : 'Mark as Read';
                     toggleReadBtn.addEventListener('click', function(ev) {
                         ev.stopPropagation();
-                        store.setContactRead(c.id, !c.read);
-                        loadData();
-                        toast(c.read ? 'Marked as unread.' : 'Marked as read.');
+                        toggleReadBtn.disabled = true;
+                        store.setContactRead(c.id, !c.read).then(function() {
+                            loadData();
+                            toast(c.read ? 'Marked as unread.' : 'Marked as read.');
+                        }).catch(function(err) {
+                            toast('Failed: ' + err.message, true);
+                        }).then(function() {
+                            toggleReadBtn.disabled = false;
+                        });
                     });
                     actions.appendChild(toggleReadBtn);
 
@@ -1604,10 +1627,16 @@
                     deleteBtn.addEventListener('click', function(ev) {
                         ev.stopPropagation();
                         if (!confirm('Are you sure you want to delete this message from ' + c.name + '?')) return;
-                        store.deleteContact(c.id);
-                        delete state.openMsgIds[c.id];
-                        loadData();
-                        toast('Message deleted.');
+                        deleteBtn.disabled = true;
+                        store.deleteContact(c.id).then(function() {
+                            delete state.openMsgIds[c.id];
+                            loadData();
+                            toast('Message deleted.');
+                        }).catch(function(err) {
+                            toast('Failed to delete: ' + err.message, true);
+                        }).then(function() {
+                            deleteBtn.disabled = false;
+                        });
                     });
                     actions.appendChild(deleteBtn);
 
@@ -1617,8 +1646,9 @@
                     item.addEventListener('toggle', function() {
                         state.openMsgIds[c.id] = item.open;
                         if (item.open && !c.read) {
-                            store.setContactRead(c.id, true);
-                            loadData();
+                            store.setContactRead(c.id, true).then(function() {
+                                loadData();
+                            });
                         }
                     });
 
@@ -1681,11 +1711,12 @@
                     phone: $('simPhone').value,
                     topic: $('simTopic').value,
                     message: $('simMessage').value
+                }).then(function() {
+                    $('simulateModal').hidden = true;
+                    $('simulateModalForm').reset();
+                    loadData();
+                    toast('Test contact message created successfully.');
                 });
-                $('simulateModal').hidden = true;
-                $('simulateModalForm').reset();
-                loadData();
-                toast('Test contact message created successfully.');
             });
 
             /* ---------- BLOG POSTS TAB ---------- */
@@ -1712,7 +1743,7 @@
                 });
 
                 if (!filtered.length) {
-                    list.innerHTML = '<div class="empty-state"><h4>No articles found</h4><p>No articles match your selected filter. Create one or submit from the blog!</p></div>';
+                    list.innerHTML = '<div class="empty-state"><h4>No articles found</h4><p>No articles match your selected filter. Create one or sync with the live database!</p></div>';
                     return;
                 }
 
@@ -1752,9 +1783,17 @@
                         approveBtn.className = 'btn sm';
                         approveBtn.textContent = 'Approve & Publish';
                         approveBtn.addEventListener('click', function() {
-                            store.setPostStatus(p.id, 'approved');
-                            loadData();
-                            toast('Article approved and published live.');
+                            approveBtn.disabled = true;
+                            approveBtn.textContent = 'Publishing…';
+                            store.setPostStatus(p.id, 'approved').then(function() {
+                                loadData();
+                                toast('Article approved and published live.');
+                            }).catch(function(err) {
+                                toast('Publish failed: ' + err.message, true);
+                            }).then(function() {
+                                approveBtn.disabled = false;
+                                approveBtn.textContent = 'Approve & Publish';
+                            });
                         });
                         actions.appendChild(approveBtn);
                     } else if (p.status === 'approved') {
@@ -1763,9 +1802,17 @@
                         unpublishBtn.className = 'btn ghost sm';
                         unpublishBtn.textContent = 'Unpublish (Send to Review)';
                         unpublishBtn.addEventListener('click', function() {
-                            store.setPostStatus(p.id, 'pending');
-                            loadData();
-                            toast('Article moved back to review.');
+                            unpublishBtn.disabled = true;
+                            unpublishBtn.textContent = 'Updating…';
+                            store.setPostStatus(p.id, 'pending').then(function() {
+                                loadData();
+                                toast('Article moved back to review.');
+                            }).catch(function(err) {
+                                toast('Update failed: ' + err.message, true);
+                            }).then(function() {
+                                unpublishBtn.disabled = false;
+                                unpublishBtn.textContent = 'Unpublish (Send to Review)';
+                            });
                         });
                         actions.appendChild(unpublishBtn);
                     } else {
@@ -1774,9 +1821,17 @@
                         publishDraftBtn.className = 'btn sm';
                         publishDraftBtn.textContent = 'Publish Now';
                         publishDraftBtn.addEventListener('click', function() {
-                            store.setPostStatus(p.id, 'approved');
-                            loadData();
-                            toast('Draft published live.');
+                            publishDraftBtn.disabled = true;
+                            publishDraftBtn.textContent = 'Publishing…';
+                            store.setPostStatus(p.id, 'approved').then(function() {
+                                loadData();
+                                toast('Draft published live.');
+                            }).catch(function(err) {
+                                toast('Publish failed: ' + err.message, true);
+                            }).then(function() {
+                                publishDraftBtn.disabled = false;
+                                publishDraftBtn.textContent = 'Publish Now';
+                            });
                         });
                         actions.appendChild(publishDraftBtn);
                     }
@@ -1796,9 +1851,15 @@
                     deleteBtn.textContent = 'Delete';
                     deleteBtn.addEventListener('click', function() {
                         if (!confirm('Are you sure you want to delete "' + p.title + '"? This cannot be undone.')) return;
-                        store.deletePost(p.id);
-                        loadData();
-                        toast('Article deleted.');
+                        deleteBtn.disabled = true;
+                        store.deletePost(p.id).then(function() {
+                            loadData();
+                            toast('Article deleted.');
+                        }).catch(function(err) {
+                            toast('Delete failed: ' + err.message, true);
+                        }).then(function() {
+                            deleteBtn.disabled = false;
+                        });
                     });
                     actions.appendChild(deleteBtn);
 
@@ -1826,6 +1887,20 @@
             $('postSort').addEventListener('change', function() {
                 state.postSort = this.value;
                 renderPosts();
+            });
+
+            $('syncLiveDbBtn').addEventListener('click', function() {
+                var btn = $('syncLiveDbBtn');
+                btn.disabled = true;
+                btn.textContent = 'Syncing…';
+                store.syncAllToLiveServer().then(function(res) {
+                    loadData(true);
+                }).catch(function(err) {
+                    toast('Sync failed: ' + err.message, true);
+                }).then(function() {
+                    btn.disabled = false;
+                    btn.textContent = '☁ Sync to Live DB';
+                });
             });
 
             $('exportPostsBtn').addEventListener('click', function() {
@@ -1873,6 +1948,8 @@
 
             $('postModalForm').addEventListener('submit', function(e) {
                 e.preventDefault();
+                var subBtn = $('postModalSubmit');
+                subBtn.disabled = true;
                 var id = $('editPostId').value;
                 var payload = {
                     title: $('postTitle').value.trim(),
@@ -1883,16 +1960,16 @@
                     body: $('postBody').value.trim()
                 };
 
-                if (id) {
-                    store.updatePost(id, payload);
-                    toast('Article updated.');
-                } else {
-                    store.addPost(payload);
-                    toast('New article created.');
-                }
-
-                $('postModal').hidden = true;
-                loadData();
+                var op = id ? store.updatePost(id, payload) : store.addPost(payload);
+                Promise.resolve(op).then(function() {
+                    $('postModal').hidden = true;
+                    loadData();
+                    toast(id ? 'Article updated and synced.' : 'New article created and synced live.');
+                }).catch(function(err) {
+                    toast('Error: ' + err.message, true);
+                }).then(function() {
+                    subBtn.disabled = false;
+                });
             });
 
             /* ---------- SETTINGS & DATA TAB ---------- */

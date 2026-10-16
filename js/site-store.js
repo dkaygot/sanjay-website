@@ -19,7 +19,8 @@
         CONTACTS: 'sp_site_contacts',
         POSTS: 'sp_site_posts',
         SETTINGS: 'sp_site_settings',
-        AUTH: 'sp_admin_session'
+        AUTH: 'sp_admin_session',
+        TOKEN: 'sp_admin_token'
     };
 
     var DEFAULT_SETTINGS = {
@@ -160,6 +161,17 @@
             }
         },
 
+        // Helper to construct authenticated headers for server calls
+        getAuthHeaders: function() {
+            var h = { 'Content-Type': 'application/json' };
+            var token = storage.getItem(STORAGE_KEYS.TOKEN);
+            if (token) {
+                h['X-Admin-Token'] = token;
+                h['Authorization'] = 'Bearer ' + token;
+            }
+            return h;
+        },
+
         // Test if server API endpoint is responding
         checkServer: function(apiUrl) {
             var endpoint = apiUrl || '/api/api';
@@ -171,6 +183,59 @@
                 return res.ok;
             }).catch(function() {
                 return false;
+            });
+        },
+
+        /* ---------- LIVE SERVER DATA FETCHING ---------- */
+
+        fetchAdminData: function(apiUrl) {
+            var self = this;
+            var endpoint = apiUrl || '/api/api';
+            return fetch(endpoint + '?action=admin_data', {
+                method: 'GET',
+                credentials: 'include',
+                cache: 'no-store',
+                headers: self.getAuthHeaders()
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; }).then(function(data) {
+                    if (!r.ok || !data.ok) {
+                        throw new Error(data.error || 'Server returned status ' + r.status);
+                    }
+                    if (Array.isArray(data.contacts)) {
+                        storage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(data.contacts));
+                    }
+                    if (Array.isArray(data.posts)) {
+                        storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(data.posts));
+                    }
+                    return {
+                        ok: true,
+                        contacts: data.contacts || [],
+                        posts: data.posts || [],
+                        isLive: true
+                    };
+                });
+            });
+        },
+
+        syncAllToLiveServer: function(apiUrl) {
+            var self = this;
+            var endpoint = apiUrl || '/api/api';
+            var posts = this.getPosts('all');
+            return fetch(endpoint + '?action=sync_posts', {
+                method: 'POST',
+                credentials: 'include',
+                headers: self.getAuthHeaders(),
+                body: JSON.stringify({ posts: posts })
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; }).then(function(res) {
+                    if (!r.ok || !res.ok) {
+                        throw new Error(res.error || 'Server returned status ' + r.status);
+                    }
+                    if (res.posts && Array.isArray(res.posts)) {
+                        storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(res.posts));
+                    }
+                    return res;
+                });
             });
         },
 
@@ -198,6 +263,7 @@
         },
 
         addContact: function(contact) {
+            var self = this;
             var contacts = this.getContacts();
             var record = {
                 id: contact.id || generateId(),
@@ -213,18 +279,22 @@
             storage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(contacts));
 
             // Also attempt remote server sync
-            fetch('/api/api?action=submit_contact', {
+            return fetch('/api/api?action=submit_contact', {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(record)
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; });
+            }).then(function() {
+                return record;
             }).catch(function() {
-                // Silently keep in local storage if offline
+                return record;
             });
-
-            return record;
         },
 
         setContactRead: function(id, isRead) {
+            var self = this;
             var contacts = this.getContacts();
             var target = null;
             contacts.forEach(function(c) {
@@ -235,13 +305,18 @@
             });
             storage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(contacts));
 
-            fetch('/api/api?action=set_contact_read', {
+            return fetch('/api/api?action=set_contact_read', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                headers: self.getAuthHeaders(),
                 body: JSON.stringify({ id: id, read: !!isRead })
-            }).catch(function() {});
-
-            return target;
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; });
+            }).then(function(res) {
+                return target;
+            }).catch(function() {
+                return target;
+            });
         },
 
         markAllContactsRead: function() {
@@ -254,18 +329,24 @@
         },
 
         deleteContact: function(id) {
+            var self = this;
             var contacts = this.getContacts().filter(function(c) {
                 return c.id !== id;
             });
             storage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(contacts));
 
-            fetch('/api/api?action=delete_contact', {
+            return fetch('/api/api?action=delete_contact', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                headers: self.getAuthHeaders(),
                 body: JSON.stringify({ id: id })
-            }).catch(function() {});
-
-            return contacts;
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; });
+            }).then(function() {
+                return contacts;
+            }).catch(function() {
+                return contacts;
+            });
         },
 
         clearReadContacts: function() {
@@ -292,6 +373,7 @@
         },
 
         addPost: function(post) {
+            var self = this;
             var posts = safeParse(storage.getItem(STORAGE_KEYS.POSTS), []);
             var now = new Date().toISOString();
             var record = {
@@ -307,20 +389,36 @@
             posts.unshift(record);
             storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
 
-            // Also sync to server if available
+            // Sync to server
             var action = (record.status === 'approved' || record.status === 'draft') ? 'create_post' : 'submit_post';
-            fetch('/api/api?action=' + action, {
+            return fetch('/api/api?action=' + action, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                headers: self.getAuthHeaders(),
                 body: JSON.stringify(record)
-            }).catch(function() {});
-
-            return record;
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; }).then(function(res) {
+                    if (!r.ok || !res.ok) {
+                        throw new Error(res.error || 'Server error saving article');
+                    }
+                    if (res.post && res.post.id) {
+                        record.id = res.post.id;
+                        record.createdAt = res.post.createdAt || record.createdAt;
+                        posts[0] = Object.assign({}, record, res.post);
+                        storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
+                    }
+                    return record;
+                });
+            }).catch(function(err) {
+                // If offline / local fallback, return local record
+                return record;
+            });
         },
 
         updatePost: function(id, data) {
+            var self = this;
             var posts = safeParse(storage.getItem(STORAGE_KEYS.POSTS), []);
-            var updated = null;
+            var target = null;
             posts.forEach(function(p) {
                 if (p.id === id) {
                     if (data.title != null) p.title = data.title.trim();
@@ -329,53 +427,97 @@
                     if (data.date != null) p.date = data.date;
                     if (data.body != null) p.body = data.body.trim();
                     if (data.status != null) p.status = data.status;
-                    updated = p;
+                    target = p;
                 }
             });
             storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
 
-            fetch('/api/api?action=update_post', {
+            return fetch('/api/api?action=update_post', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                headers: self.getAuthHeaders(),
                 body: JSON.stringify(Object.assign({ id: id }, data))
-            }).catch(function() {});
-
-            return updated;
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; }).then(function(res) {
+                    if (!r.ok || !res.ok) {
+                        throw new Error(res.error || 'Failed to update article on server.');
+                    }
+                    if (res.post && target) {
+                        Object.assign(target, res.post);
+                        storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
+                    }
+                    return target;
+                });
+            }).catch(function() {
+                return target;
+            });
         },
 
         setPostStatus: function(id, status) {
+            var self = this;
             var posts = safeParse(storage.getItem(STORAGE_KEYS.POSTS), []);
-            var updated = null;
+            var target = null;
             posts.forEach(function(p) {
                 if (p.id === id) {
                     p.status = status;
-                    updated = p;
+                    target = p;
                 }
             });
             storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
 
-            fetch('/api/api?action=set_post_status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: id, status: status })
-            }).catch(function() {});
+            var payload = { id: id, status: status };
+            if (target) {
+                payload.title = target.title;
+                payload.author = target.author;
+                payload.body = target.body;
+                payload.category = target.category;
+                payload.date = target.date;
+            }
 
-            return updated;
+            return fetch('/api/api?action=set_post_status', {
+                method: 'POST',
+                credentials: 'include',
+                headers: self.getAuthHeaders(),
+                body: JSON.stringify(payload)
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; }).then(function(res) {
+                    if (!r.ok || !res.ok) {
+                        throw new Error(res.error || 'Failed to update post status on server.');
+                    }
+                    if (res.post && target) {
+                        Object.assign(target, res.post);
+                        storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
+                    }
+                    return target;
+                });
+            }).catch(function(err) {
+                // If offline / local fallback, return local target
+                return target;
+            });
         },
 
         deletePost: function(id) {
+            var self = this;
             var posts = safeParse(storage.getItem(STORAGE_KEYS.POSTS), []).filter(function(p) {
                 return p.id !== id;
             });
             storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
 
-            fetch('/api/api?action=delete_post', {
+            return fetch('/api/api?action=delete_post', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                headers: self.getAuthHeaders(),
                 body: JSON.stringify({ id: id })
-            }).catch(function() {});
-
-            return posts;
+            }).then(function(r) {
+                return r.json().catch(function() { return {}; }).then(function(res) {
+                    if (!r.ok || !res.ok) {
+                        throw new Error(res.error || 'Failed to delete article on server.');
+                    }
+                    return posts;
+                });
+            }).catch(function() {
+                return posts;
+            });
         },
 
         /* ---------- AUTH & SESSION ---------- */
@@ -386,13 +528,17 @@
             // First try server login
             return fetch(endpoint + '?action=login', {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: password })
             }).then(function(r) {
                 return r.json().catch(function() { return {}; }).then(function(data) {
                     if (data.ok) {
+                        if (data.token) {
+                            storage.setItem(STORAGE_KEYS.TOKEN, data.token);
+                        }
                         storage.setItem(STORAGE_KEYS.AUTH, 'server:' + Date.now());
-                        return { ok: true, mode: 'server' };
+                        return { ok: true, mode: 'server', token: data.token };
                     }
                     throw new Error(data.error || 'Invalid password.');
                 });
@@ -409,10 +555,13 @@
         },
 
         logout: function(apiUrl) {
+            var self = this;
             storage.removeItem(STORAGE_KEYS.AUTH);
+            storage.removeItem(STORAGE_KEYS.TOKEN);
             return fetch((apiUrl || '/api/api') + '?action=logout', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                headers: self.getAuthHeaders(),
                 body: JSON.stringify({})
             }).catch(function() {
                 return { ok: true };
