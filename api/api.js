@@ -99,7 +99,12 @@ function body(req) {
     if (!String(req.headers['content-type'] || '').startsWith('application/json')) {
         throw new HttpError(415, 'Send the request as JSON.');
     }
-    let b = req.body;
+    let b;
+    try {
+        b = req.body;
+    } catch (e) {
+        throw new HttpError(400, 'Invalid JSON body in request.');
+    }
     if (typeof b === 'string') {
         try { b = JSON.parse(b); } catch (e) { b = null; }
     }
