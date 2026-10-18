@@ -378,6 +378,71 @@
             color: var(--muted);
             white-space: nowrap;
         }
+
+        a.result {
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            transition: background .2s, color .2s, border-color .2s;
+        }
+
+        a.result:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg);
+        }
+
+        a.result svg {
+            display: inline-block;
+            vertical-align: middle;
+            transition: transform .2s ease;
+        }
+
+        a.result:hover svg {
+            transform: translate(1px, -1px);
+        }
+
+        .award-thumb {
+            grid-column: 2;
+            grid-row: 1 / span 3;
+            align-self: center;
+            width: auto;
+            height: auto;
+            max-width: 240px;
+            max-height: 165px;
+            object-fit: contain;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: var(--card);
+            display: block;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+        }
+
+        .award-thumb:hover {
+            border-color: var(--accent);
+            transform: scale(1.03);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+        }
+
+        .award-thumb-group {
+            grid-column: 2;
+            grid-row: 1 / span 3;
+            align-self: center;
+            display: flex;
+            gap: .75rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .award-thumb-group .award-thumb {
+            grid-column: auto;
+            grid-row: auto;
+            max-width: 190px;
+            max-height: 140px;
+        }
         
         .result.top {
             border-color: var(--accent);
@@ -503,15 +568,21 @@
             }
         }
         
-        @media (max-width: 520px) {
+        @media (max-width: 640px) {
             .entry {
                 grid-template-columns: 1fr;
             }
-            .result {
+            .result,
+            .award-thumb,
+            .award-thumb-group {
                 grid-column: 1;
                 grid-row: auto;
                 justify-self: start;
-                margin-top: .5rem;
+                margin-top: .8rem;
+            }
+            .award-thumb {
+                max-width: 100%;
+                max-height: 220px;
             }
         }
         
@@ -650,7 +721,10 @@
                         <div class="entries">
                             <article class="entry" data-cat="publication">
                                 <h3>Article on archival printing</h3>
-                                <span class="result">Published</span>
+                                <a href="Archival-printing.pdf" target="_blank" rel="noopener noreferrer" class="result" aria-label="Read article on archival printing (opens PDF in a new tab)">
+                                    Published
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                </a>
                                 <p class="org">Smart Photography magazine, April 2023 issue</p>
                                 <p class="work">India&rsquo;s leading photography magazine</p>
                             </article>
@@ -663,7 +737,10 @@
                         <div class="entries">
                             <article class="entry" data-cat="competition">
                                 <h3>Selected in the Top 101</h3>
-                                <span class="result">Top 101</span>
+                                <a href="2021 Portrait photographer of the year.pdf" target="_blank" rel="noopener noreferrer" class="result" aria-label="View Portrait Photographer of the Year certificate (opens PDF in a new tab)">
+                                    Top 101
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                </a>
                                 <p class="org">International Portrait Photographer of the Year 2021</p>
                             </article>
                         </div>
@@ -687,7 +764,7 @@
                         <div class="entries">
                             <article class="entry" data-cat="competition">
                                 <h3>Winner, Culture category</h3>
-                                <span class="result top">Winner</span>
+                                <img src="Sony 2019 Culture.jpg" alt="Winner, Culture category - Sony All India Corporate Photography Contest" class="award-thumb" loading="lazy">
                                 <p class="org">Sony All India Corporate Photography Contest</p>
                             </article>
                             <article class="entry" data-cat="competition">
@@ -709,7 +786,7 @@
                             </article>
                             <article class="entry" data-cat="competition">
                                 <h3>Winner, Wildlife category</h3>
-                                <span class="result top">Winner</span>
+                                <img src="2017 sony.jpeg" alt="Winner, Wildlife category - Sony All India Corporate Photography Contest" class="award-thumb" loading="lazy">
                                 <p class="org">Sony All India Corporate Photography Contest</p>
                             </article>
                         </div>
@@ -738,7 +815,7 @@
                             </article>
                             <article class="entry" data-cat="competition">
                                 <h3>Consolation Prize</h3>
-                                <span class="result">Consolation prize</span>
+                                <img src="2015 Nat geo.jpg" alt="Consolation Prize - National Geographic" class="award-thumb" loading="lazy">
                                 <p class="org">National Geographic, in association with Uttar Pradesh Tourism</p>
                             </article>
                             <article class="entry" data-cat="publication">
@@ -755,19 +832,25 @@
                         <div class="entries">
                             <article class="entry" data-cat="competition">
                                 <h3>Selected Works Prize</h3>
-                                <span class="result top">Winner</span>
+                                <a href="2013 Selected Work prize.pdf" target="_blank" rel="noopener noreferrer" class="result top" aria-label="View Selected Works Prize certificate (opens PDF in a new tab)">
+                                    Winner
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                </a>
                                 <p class="org">3rd International Filter Photo Contest 2012&ndash;13</p>
                                 <p class="work">Sponsored by Kenko-Tokina Co. Ltd.</p>
                             </article>
                             <article class="entry" data-cat="competition">
                                 <h3>Tamron Challenge 2013 &ldquo;Top 20&rdquo;</h3>
-                                <span class="result">Top 20</span>
+                                <a href="2013 Tamron contest.pdf" target="_blank" rel="noopener noreferrer" class="result" aria-label="View Tamron Challenge certificate (opens PDF in a new tab)">
+                                    Top 20
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                </a>
                                 <p class="org">Tamron Challenge</p>
                                 <p class="work">Certificate of Recognition</p>
                             </article>
                             <article class="entry" data-cat="competition">
                                 <h3>Special Mention, Best Photo category</h3>
-                                <span class="result">Special mention</span>
+                                <img src="2013 Special mention- Best Photo category.jpg" alt="Special Mention, Best Photo category - Photothon 2013" class="award-thumb" loading="lazy">
                                 <p class="org">Photothon 2013, organised by Maharashtra Nature Park</p>
                             </article>
                         </div>
@@ -779,7 +862,7 @@
                         <div class="entries">
                             <article class="entry" data-cat="competition">
                                 <h3>Worldwide Winner</h3>
-                                <span class="result top">Winner</span>
+                                <img src="2012 World wide winner Akzo Nobel.jpg" alt="Worldwide Winner - Akzo Nobel International Photo Contest" class="award-thumb" loading="lazy">
                                 <p class="org">A Magazine International Photo Contest by Akzo Nobel, Netherlands</p>
                                 <p class="work">Category: <em>Color in the Urban World</em></p>
                             </article>
@@ -802,7 +885,10 @@
                             </article>
                             <article class="entry" data-cat="competition">
                                 <h3>Shortlisted in the 100 Best Photographs</h3>
-                                <span class="result">Shortlisted</span>
+                                <div class="award-thumb-group">
+                                    <img src="2011 Shortlisted in the 100 Best Photographs 1.jpg" alt="Shortlisted in the 100 Best Photographs (Photo 1) - Red Frames" class="award-thumb" loading="lazy">
+                                    <img src="2011 Shortlisted in the 100 Best Photographs 2.jpg" alt="Shortlisted in the 100 Best Photographs (Photo 2) - Red Frames" class="award-thumb" loading="lazy">
+                                </div>
                                 <p class="org">Red Frames, India</p>
                                 <p class="work">Theme: <em>Frames of My City</em></p>
                             </article>
@@ -815,7 +901,7 @@
                         <div class="entries">
                             <article class="entry" data-cat="competition">
                                 <h3>Finalist</h3>
-                                <span class="result">Finalist</span>
+                                <img src="2010 Lonely Planet.jpg" alt="Finalist - The Lonely Planet 100 Million Travel Photography Competition" class="award-thumb" loading="lazy">
                                 <p class="org">The Lonely Planet 100 Million Travel Photography Competition, by Lonely Planet</p>
                             </article>
                         </div>
