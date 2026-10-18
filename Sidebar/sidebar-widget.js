@@ -173,11 +173,11 @@
     transition: opacity 0.25s ease;
 }
 
-/* "Menu" written vertically, reading bottom to top. */
+/* "Menu" written vertically, letters stacked (M under E under N under U). */
 .handle-label-text {
     writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-size: 16px;
+    text-orientation: upright;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.18em;
     line-height: 1;
