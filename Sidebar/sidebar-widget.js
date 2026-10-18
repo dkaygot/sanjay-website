@@ -7,7 +7,7 @@
  *
  * Desktop: hover the left-edge handle to open, move away to close.
  *          Keyboard: Tab to the handle, Enter to open, Escape to close.
- * Mobile:  a slim header bar at the top with a three-dots button on the
+ * Mobile:  a slim header bar at the top with a MENU button on the
  *          right. Tap it to open the sidebar; tap the dimmed backdrop,
  *          a link, or press Escape to close.
  */
@@ -305,43 +305,32 @@
     text-overflow: ellipsis;
 }
 
-#sidebar-page-title::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    margin-right: 10px;
-    border-radius: 50%;
-    background: var(--accent, ${THEME.accent});
-    vertical-align: middle;
-    transform: translateY(-1px);
-}
-
 #sidebar-menu-button {
-    flex: 0 0 44px;
-    width: 44px;
+    flex: 0 0 auto;
     min-width: 44px;
-    max-width: 44px;
-    height: 44px;
-    min-height: 0;
+    height: 36px;
     box-sizing: border-box;
     position: static;
     box-shadow: none;
     margin: 0;
-    padding: 0;
+    padding: 0 10px;
     border: 0;
-    border-radius: 50%;
+    border-radius: 6px;
     background: transparent;
     -webkit-appearance: none;
     appearance: none;
     -webkit-tap-highlight-color: transparent;
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    transition: background-color 0.2s ease;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent, ${THEME.accent});
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #sidebar-menu-button:active,
@@ -356,17 +345,6 @@
 #sidebar-menu-button:focus-visible {
     outline: 2px solid var(--accent, ${THEME.accent});
     outline-offset: 2px;
-}
-
-.menu-button-dot {
-    display: block;
-    flex: 0 0 auto;
-    margin: 0;
-    padding: 0;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent, ${THEME.accent});
 }
 
 @media ${MOBILE_QUERY} {
@@ -515,11 +493,7 @@
     pageTitle.textContent = currentLabel || (document.title || '').trim();
 
     mobileHeader.innerHTML =
-        '<button type="button" id="sidebar-menu-button" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar-content">' +
-        '<span class="menu-button-dot"></span>' +
-        '<span class="menu-button-dot"></span>' +
-        '<span class="menu-button-dot"></span>' +
-        '</button>';
+        '<button type="button" id="sidebar-menu-button" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar-content">MENU</button>';
     mobileHeader.insertBefore(pageTitle, mobileHeader.firstChild);
 
     function mount() {
@@ -713,7 +687,7 @@
             if (viaKeyboard) focusFirstLink();
         });
 
-        /* --- Mobile: three-dots button in the header --- */
+        /* --- Mobile: MENU button in the header --- */
         menuButton.addEventListener('click', function(e) {
             if (isOpen) {
                 setOpen(false);

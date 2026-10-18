@@ -93,6 +93,35 @@
             will-change: opacity;
         }
         
+        .wordmark .tap-hint {
+            display: none;
+        }
+        
+        @keyframes tapBlink {
+            0%, 100% {
+                opacity: 0.25;
+                transform: translateY(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-1px);
+            }
+        }
+        
+        @media (max-width: 768px), (hover: none), (pointer: coarse) {
+            .wordmark .tap-hint {
+                display: block;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: 0.16em;
+                color: #c9a96a;
+                margin-bottom: 6px;
+                animation: tapBlink 1.4s ease-in-out infinite;
+                user-select: none;
+                pointer-events: none;
+            }
+        }
+        
         .wordmark .name {
             font-size: 14px;
             letter-spacing: 0.22em;
@@ -143,8 +172,10 @@
         
         @media (prefers-reduced-motion: reduce) {
             .photo-layer,
-            .photo-fade {
+            .photo-fade,
+            .wordmark .tap-hint {
                 transition: none !important;
+                animation: none !important;
             }
         }
     </style>
@@ -726,6 +757,7 @@
             <div class="line line-2" id="line2">differently.</div>
         </div>
         <div class="wordmark" id="wordmark">
+            <div class="tap-hint" id="tapHint">Tap!</div>
             <div class="name">Sanjay Patil Photography</div>
         </div>
     </div>

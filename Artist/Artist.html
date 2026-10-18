@@ -847,8 +847,10 @@
                 height: auto;
                 flex: 1 1 auto;
                 min-height: 0;
-                margin: 1rem auto 0;
-                max-width: 30rem;
+                margin: 0.8rem auto 0;
+                max-width: min(25rem, 82vw);
+                max-height: 50vh;
+                max-height: 50dvh;
             }
 
             .intro-portrait::before {
@@ -857,6 +859,8 @@
             }
 
             .intro-portrait img {
+                max-height: 50vh;
+                max-height: 50dvh;
                 object-fit: contain;
                 object-position: center bottom;
                 -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
