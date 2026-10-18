@@ -73,9 +73,16 @@
 
         header.top .wrap {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             height: 64px
+        }
+
+        header.top nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 28px
         }
 
         .brand {
@@ -89,7 +96,6 @@
 
         nav a {
             color: var(--muted);
-            margin-left: 28px;
             font-size: .78rem;
             letter-spacing: .16em;
             text-transform: uppercase
@@ -445,13 +451,25 @@
 
         .prices {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 24px;
             margin-top: 56px
         }
 
+        @media(max-width:1024px) {
+            .prices {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width:600px) {
+            .prices {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .price {
-            padding: 38px 28px;
+            padding: 38px 22px;
             background: var(--card);
             border: 1px solid var(--line);
             text-align: center;
@@ -761,8 +779,7 @@
             }
 
             .gallery,
-            .steps,
-            .prices {
+            .steps {
                 grid-template-columns: 1fr
             }
 
@@ -770,8 +787,8 @@
                 grid-template-columns: 1fr 1fr
             }
 
-            nav a {
-                margin-left: 16px
+            header.top nav {
+                gap: 18px
             }
 
             .gallery .ph {
@@ -788,8 +805,11 @@
                 font-size: 1.1rem
             }
 
+            header.top nav {
+                gap: 12px
+            }
+
             nav a {
-                margin-left: 12px;
                 font-size: .66rem;
                 letter-spacing: .1em
             }
@@ -959,6 +979,13 @@
                     <p class="note">A one-to-one workshop for travel, wildlife or landscape photography, where budding
                         photographers learn and master the finer elements of the craft. Fee is agreed once location and
                         duration are finalised.</p>
+                </div>
+                <div class="price">
+                    <h3>Corporate/Group workshop</h3>
+                    <div class="dur">Offline, at location</div>
+                    <div class="amt" style="font-size:1.4rem;padding-top:10px">Custom</div>
+                    <p class="note">We undertake group workshop tailored for Corporate professional.
+                        Program can be customized thru guided nature walks, Birding and Safari experience.</p>
                 </div>
             </div>
 
