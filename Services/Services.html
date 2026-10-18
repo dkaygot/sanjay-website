@@ -581,15 +581,17 @@
 
         .split {
             display: grid;
-            grid-template-columns: 1.1fr 1fr;
+            grid-template-columns: 1fr 1.15fr;
             gap: 56px;
-            align-items: center;
+            align-items: start;
             margin-bottom: 64px
         }
 
         .split .frame {
             aspect-ratio: 4/3;
-            padding: 10px
+            padding: 10px;
+            position: sticky;
+            top: 90px
         }
 
         .split .frame img {
@@ -606,6 +608,64 @@
 
         .split .intro-l p+p {
             margin-top: 16px
+        }
+
+        .learn-block {
+            margin-bottom: 34px
+        }
+
+        .learn-block:last-child {
+            margin-bottom: 0
+        }
+
+        .learn-block h3 {
+            font-size: 1.28rem;
+            color: var(--accent);
+            margin-bottom: 14px
+        }
+
+        .learn-lead {
+            font-size: .96rem;
+            line-height: 1.65;
+            color: var(--head);
+            margin-bottom: 14px
+        }
+
+        .learn-sub {
+            font-family: var(--sans);
+            font-size: .84rem;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-weight: 600
+        }
+
+        .learn-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .learn-list li {
+            position: relative;
+            padding-left: 20px;
+            font-size: .92rem;
+            line-height: 1.6;
+            color: var(--muted)
+        }
+
+        .learn-list li::before {
+            content: "·";
+            position: absolute;
+            left: 4px;
+            top: -2px;
+            color: var(--accent);
+            font-size: 1.4rem;
+            font-weight: bold
         }
 
         .banner {
@@ -770,6 +830,10 @@
                 grid-template-columns: 1fr;
                 gap: 34px
             }
+
+            .split .frame {
+                position: static
+            }
         }
 
         @media(max-width:900px) {
@@ -920,13 +984,45 @@
                 <div class="rule"></div>
             </div>
 
+            <div class="quote" style="margin-bottom: 48px;">
+                One-to-one coaching for <em>beginners and amateurs.</em>
+                <span style="font-size: 1.05rem; font-style: normal; color: var(--muted); max-width: 720px; margin: 16px auto 0; line-height: 1.7; display: block;">
+                    Personal coaching and guidance, both online and offline. The programme can be customised to your needs, and runs for a minimum of 2 days (approx. 15 hrs) or 5 days (approx. 30 hrs).
+                </span>
+            </div>
+
             <div class="split">
-                <div class="frame"><img src="4.jpg" Black and white close-up of a photographer holding a Canon camera"
+                <div class="frame"><img src="4.jpg" alt="Black and white close-up of a photographer holding a Canon camera"
                         loading="lazy"></div>
                 <div class="intro-l">
-                    <p><strong>One-to-one coaching for beginners and amateurs.</strong></p>
-                    <p>Personal coaching and guidance, both online and offline. The programme can be customised to your
-                        needs, and runs for a minimum of 2 days (approx. 15 hrs) or 5 days (approx. 30 hrs).</p>
+                    <div class="learn-block">
+                        <h3>What you will learn as a beginner…</h3>
+                        <ul class="learn-list">
+                            <li>Understanding your camera and its various function, dials and buttons.</li>
+                            <li>Understanding basics of photography like exposure triangle (Aperture, Shutter speed and ISO), White balance and metering modes.</li>
+                            <li>Learn exposure modes, Focal length, Depth of field, Histogram and Autofocusing techniques.</li>
+                            <li>Learn to compose images, guidelines for composition and basic post processing.</li>
+                            <li>Learn to export images for web, social media and prints.</li>
+                        </ul>
+                    </div>
+
+                    <div class="learn-block">
+                        <h3>What you will learn as an amateur…</h3>
+                        <p class="learn-lead">Move to the next step from taking good photograph to creating meaningful photographs with your own vision, style and artistic vision.</p>
+                        <div class="learn-sub">Things you will learn…</div>
+                        <ul class="learn-list">
+                            <li>Understanding and working with light</li>
+                            <li>Advance composition</li>
+                            <li>Developing a photographic vision</li>
+                            <li>Creative techniques</li>
+                            <li>Post processing and color management</li>
+                            <li>Storytelling through images</li>
+                            <li>Specialization and fieldcraft</li>
+                            <li>Printing and presenting photographs</li>
+                            <li>Critical analysis</li>
+                            <li>Developing your personal style.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
