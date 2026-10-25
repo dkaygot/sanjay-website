@@ -57,6 +57,7 @@
             z-index: 0;
             overflow: hidden;
             background: var(--ink);
+            cursor: pointer;
         }
         
         .photo-layer {
@@ -94,31 +95,37 @@
         }
         
         .wordmark .tap-hint {
-            display: none;
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #f1d599;
+            text-shadow: 0 0 14px rgba(241, 213, 153, 0.45);
+            margin-bottom: 10px;
+            animation: tapBlink 1.5s ease-in-out infinite;
+            user-select: none;
+            pointer-events: none;
         }
         
         @keyframes tapBlink {
             0%, 100% {
-                opacity: 0.25;
+                opacity: 0.45;
                 transform: translateY(0);
+                text-shadow: 0 0 10px rgba(241, 213, 153, 0.3);
             }
             50% {
                 opacity: 1;
-                transform: translateY(-1px);
+                transform: translateY(-2px);
+                text-shadow: 0 0 20px rgba(241, 213, 153, 0.85);
             }
         }
         
-        @media (max-width: 768px), (hover: none), (pointer: coarse) {
+        @media (max-width: 768px) {
             .wordmark .tap-hint {
-                display: block;
                 font-size: 12px;
-                font-weight: 600;
-                letter-spacing: 0.16em;
-                color: #c9a96a;
+                letter-spacing: 0.18em;
                 margin-bottom: 6px;
-                animation: tapBlink 1.4s ease-in-out infinite;
-                user-select: none;
-                pointer-events: none;
             }
         }
         
