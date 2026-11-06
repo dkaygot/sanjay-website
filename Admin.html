@@ -700,6 +700,77 @@
             -webkit-box-orient: vertical;
         }
 
+        .post-thumbs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 0 0 18px;
+        }
+
+        .post-thumbs img {
+            width: 84px;
+            height: 63px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: #000;
+        }
+
+        .post-thumbs .more {
+            display: grid;
+            place-items: center;
+            width: 84px;
+            height: 63px;
+            border-radius: 4px;
+            border: 1px dashed var(--border);
+            color: var(--muted);
+            font-size: .85rem;
+        }
+
+        .post-files {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 0 0 18px;
+        }
+
+        .post-files a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 100%;
+            padding: 5px 10px 5px 5px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-size: .84rem;
+        }
+
+        .post-files a:hover {
+            border-color: var(--accent);
+            text-decoration: none;
+        }
+
+        .post-files .ext {
+            flex: none;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: var(--accent);
+            color: #0e0e0f;
+            font-size: .68rem;
+            font-weight: 600;
+        }
+
+        .post-files .ext.is-doc {
+            background: #7fa6d9;
+        }
+
+        .post-files .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         /* ---------- Settings Section ---------- */
 
         .settings-grid {
@@ -857,9 +928,19 @@
             color: var(--heading);
         }
 
+        /* the form sits between the card and its body: let it pass the height limit on */
+        .modal-card > form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
         .modal-body {
             padding: 24px;
             overflow-y: auto;
+            flex: 1;
+            min-height: 0;
         }
 
         .modal-footer {
@@ -1226,6 +1307,16 @@
                         <textarea id="postBody" style="min-height:220px;" placeholder="Write your photography field notes, technical details, or observations…" required></textarea>
                         <div class="help" id="postCharCount">0 characters</div>
                     </div>
+
+                    <div class="field">
+                        <label>Photos</label>
+                        <div id="postPhotos"></div>
+                    </div>
+
+                    <div class="field">
+                        <label>Documents</label>
+                        <div id="postFiles"></div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -1285,6 +1376,7 @@
 
     <!-- Storage Layer Script -->
     <script src="js/site-store.js"></script>
+    <script src="js/photo-picker.js"></script>
 
     <!-- Main Admin Controller -->
     <script>
@@ -1720,6 +1812,12 @@
             });
 
             /* ---------- BLOG POSTS TAB ---------- */
+            function sep() {
+                var s = document.createElement('span');
+                s.textContent = '•';
+                return s;
+            }
+
             function renderPosts() {
                 var list = $('postsList');
                 list.innerHTML = '';
@@ -1766,13 +1864,80 @@
 
                     var meta = document.createElement('div');
                     meta.className = 'post-meta';
-                    meta.innerHTML = '<span>By <strong>' + p.author + '</strong></span><span>•</span><span>' + fmtDate(p.date) + '</span>' + 
-                        (p.category ? '<span>•</span><span class="topic-tag">' + p.category + '</span>' : '');
+                    // built with textContent: author and category can come from guest submissions
+                    var by = document.createElement('span');
+                    var strong = document.createElement('strong');
+                    strong.textContent = p.author || '';
+                    by.append('By ', strong);
+                    var when = document.createElement('span');
+                    when.textContent = fmtDate(p.date);
+                    meta.append(by, sep(), when);
+                    if (p.category) {
+                        var tag = document.createElement('span');
+                        tag.className = 'topic-tag';
+                        tag.textContent = p.category;
+                        meta.append(sep(), tag);
+                    }
+                    var imgs = p.images || [];
+                    if (imgs.length) {
+                        var count = document.createElement('span');
+                        count.textContent = imgs.length + (imgs.length === 1 ? ' photo' : ' photos');
+                        meta.append(sep(), count);
+                    }
+                    var docs = p.files || [];
+                    if (docs.length) {
+                        var dcount = document.createElement('span');
+                        dcount.textContent = docs.length + (docs.length === 1 ? ' document' : ' documents');
+                        meta.append(sep(), dcount);
+                    }
                     card.appendChild(meta);
 
                     var body = document.createElement('p');
                     body.textContent = p.body;
                     card.appendChild(body);
+
+                    if (imgs.length) {
+                        var thumbs = document.createElement('div');
+                        thumbs.className = 'post-thumbs';
+                        imgs.slice(0, 6).forEach(function(im) {
+                            var t = document.createElement('img');
+                            t.src = store.imageUrl(im);
+                            t.alt = im.caption || '';
+                            t.loading = 'lazy';
+                            thumbs.appendChild(t);
+                        });
+                        if (imgs.length > 6) {
+                            var more = document.createElement('span');
+                            more.className = 'more';
+                            more.textContent = '+' + (imgs.length - 6);
+                            thumbs.appendChild(more);
+                        }
+                        card.appendChild(thumbs);
+                    }
+
+                    if (docs.length) {
+                        var fileRow = document.createElement('div');
+                        fileRow.className = 'post-files';
+                        docs.forEach(function(f) {
+                            var kind = store.docKind(f.name) || 'file';
+                            var a = document.createElement('a');
+                            a.target = '_blank';
+                            a.rel = 'noopener';
+                            // review a guest's file by downloading it; a local-only file is a data URL
+                            a.href = store.fileUrl(f, null, kind !== 'pdf');
+                            if (f.src || kind !== 'pdf') a.setAttribute('download', f.name);
+                            a.title = f.name + ' (' + window.FilePicker.formatSize(f.size) + ')';
+                            var ext = document.createElement('span');
+                            ext.className = 'ext' + (kind === 'pdf' ? '' : ' is-doc');
+                            ext.textContent = kind.toUpperCase();
+                            var nm = document.createElement('span');
+                            nm.className = 'name';
+                            nm.textContent = f.name;
+                            a.append(ext, nm);
+                            fileRow.appendChild(a);
+                        });
+                        card.appendChild(fileRow);
+                    }
 
                     var actions = document.createElement('div');
                     actions.className = 'msg-actions';
@@ -1916,6 +2081,15 @@
             });
 
             /* ---------- POST MODAL (CREATE / EDIT) ---------- */
+            var photoPicker = window.PhotoPicker.create($('postPhotos'), { max: 12 });
+            var filePicker = window.FilePicker.create($('postFiles'), { max: 6 });
+
+            function closePostModal() {
+                $('postModal').hidden = true;
+                photoPicker.reset();
+                filePicker.reset();
+            }
+
             function openPostModal(post) {
                 var isEdit = !!post;
                 $('postModalTitle').textContent = isEdit ? 'Edit Article' : 'Write New Article';
@@ -1926,6 +2100,8 @@
                 $('postDate').value = isEdit ? post.date : new Date().toISOString().slice(0, 10);
                 $('postStatus').value = isEdit ? post.status : 'approved';
                 $('postBody').value = isEdit ? post.body : '';
+                photoPicker.setImages(isEdit ? (post.images || []) : []);
+                filePicker.setFiles(isEdit ? (post.files || []) : []);
                 $('postModalSubmit').textContent = isEdit ? 'Save Changes' : 'Publish Article';
                 updateCharCount();
                 $('postModal').hidden = false;
@@ -1936,8 +2112,8 @@
                 openPostModal(null);
             });
 
-            $('postModalClose').addEventListener('click', function() { $('postModal').hidden = true; });
-            $('postModalCancel').addEventListener('click', function() { $('postModal').hidden = true; });
+            $('postModalClose').addEventListener('click', closePostModal);
+            $('postModalCancel').addEventListener('click', closePostModal);
 
             $('postBody').addEventListener('input', updateCharCount);
 
@@ -1949,7 +2125,10 @@
             $('postModalForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 var subBtn = $('postModalSubmit');
+                var subLabel = subBtn.textContent;
                 subBtn.disabled = true;
+                photoPicker.setBusy(true);
+                filePicker.setBusy(true);
                 var id = $('editPostId').value;
                 var payload = {
                     title: $('postTitle').value.trim(),
@@ -1960,15 +2139,28 @@
                     body: $('postBody').value.trim()
                 };
 
-                var op = id ? store.updatePost(id, payload) : store.addPost(payload);
-                Promise.resolve(op).then(function() {
-                    $('postModal').hidden = true;
+                photoPicker.uploadAll(function(n, total) {
+                    subBtn.textContent = 'Uploading photo ' + n + ' of ' + total + '…';
+                }).then(function(images) {
+                    payload.images = images;
+                    return filePicker.uploadAll(function(n, total) {
+                        subBtn.textContent = 'Uploading document ' + n + ' of ' + total + '…';
+                    });
+                }).then(function(files) {
+                    subBtn.textContent = 'Saving…';
+                    payload.files = files;
+                    return id ? store.updatePost(id, payload) : store.addPost(payload);
+                }).then(function() {
+                    closePostModal();
                     loadData();
                     toast(id ? 'Article updated and synced.' : 'New article created and synced live.');
                 }).catch(function(err) {
                     toast('Error: ' + err.message, true);
                 }).then(function() {
                     subBtn.disabled = false;
+                    subBtn.textContent = subLabel;
+                    photoPicker.setBusy(false);
+                    filePicker.setBusy(false);
                 });
             });
 

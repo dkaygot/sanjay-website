@@ -357,6 +357,147 @@
             return contacts;
         },
 
+        /* ---------- BLOG PHOTOS ---------- */
+
+        // Where to load a post photo from: photos kept only in this browser
+        // carry their own data URL, uploaded ones are served by the API.
+        imageUrl: function(img, apiUrl) {
+            if (!img) return '';
+            if (img.src) return img.src;
+            return (apiUrl || '/api/api') + '?action=image&id=' + encodeURIComponent(img.id);
+        },
+
+        // Shrink a photo to a JPEG data URL of at most opts.maxBytes, with its
+        // long edge at most opts.maxEdge pixels. Resolves { dataUrl, bytes, width, height }.
+        compressImage: function(file, opts) {
+            opts = opts || {};
+            var maxEdge = opts.maxEdge || 2000;
+            var maxBytes = opts.maxBytes || 560 * 1024;
+            return new Promise(function(resolve, reject) {
+                var name = (file && file.name) ? '"' + file.name + '"' : 'That file';
+                if (!file || !/^image\//.test(file.type || '')) {
+                    return reject(new Error(name + ' is not a photo. Use a JPEG, PNG or WebP image.'));
+                }
+                if (file.size > 40 * 1024 * 1024) {
+                    return reject(new Error(name + ' is larger than 40 MB.'));
+                }
+                var url = URL.createObjectURL(file);
+                var img = new Image();
+                img.onload = function() {
+                    URL.revokeObjectURL(url);
+                    var w0 = img.naturalWidth;
+                    var h0 = img.naturalHeight;
+                    if (!w0 || !h0) return reject(new Error(name + ' could not be read.'));
+                    var edge = Math.min(maxEdge, Math.max(w0, h0));
+                    var quality = 0.86;
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    // step quality down first, then size, until the file fits
+                    for (;;) {
+                        var scale = edge / Math.max(w0, h0);
+                        canvas.width = Math.max(1, Math.round(w0 * scale));
+                        canvas.height = Math.max(1, Math.round(h0 * scale));
+                        ctx.fillStyle = '#ffffff'; // transparent PNG areas become white, not black
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        var dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        var bytes = Math.floor((dataUrl.length - dataUrl.indexOf(',') - 1) * 3 / 4);
+                        if (bytes <= maxBytes || edge <= 480) {
+                            return resolve({ dataUrl: dataUrl, bytes: bytes, width: canvas.width, height: canvas.height });
+                        }
+                        if (quality > 0.68) quality -= 0.08;
+                        else edge = Math.round(edge * 0.82);
+                    }
+                };
+                img.onerror = function() {
+                    URL.revokeObjectURL(url);
+                    reject(new Error(name + ' could not be read. Use a JPEG, PNG or WebP photo.'));
+                };
+                img.src = url;
+            });
+        },
+
+        // Shrink and upload one photo. Resolves { id, caption } for a photo
+        // stored on the server, or { id, caption, src } for one kept only in
+        // this browser when no server is reachable (local / offline mode).
+        uploadImage: function(file, apiUrl) {
+            var self = this;
+            var endpoint = apiUrl || '/api/api';
+            return this.compressImage(file).then(function(c) {
+                return fetch(endpoint + '?action=upload_image', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: self.getAuthHeaders(),
+                    body: JSON.stringify({ data: c.dataUrl })
+                }).then(function(r) {
+                    return r.json().catch(function() { return null; });
+                }, function() {
+                    return null;
+                }).then(function(res) {
+                    if (res && res.ok && res.image && res.image.id) return { id: res.image.id, caption: '' };
+                    if (res && res.error) throw new Error(res.error);
+                    // no API here: keep a smaller copy in this browser instead
+                    return self.compressImage(file, { maxEdge: 1400, maxBytes: 220 * 1024 }).then(function(small) {
+                        return { id: 'local-' + generateId(), caption: '', src: small.dataUrl };
+                    });
+                });
+            });
+        },
+
+        /* ---------- BLOG DOCUMENTS (PDF / DOC / DOCX) ---------- */
+
+        MAX_FILE_BYTES: 3 * 1024 * 1024,
+
+        // 'pdf' | 'doc' | 'docx' from a file name, or ''
+        docKind: function(name) {
+            var m = /\.(pdf|docx?)$/i.exec(name || '');
+            return m ? m[1].toLowerCase() : '';
+        },
+
+        // Where to load a document from; `download` asks for a download even for a PDF.
+        fileUrl: function(f, apiUrl, download) {
+            if (!f) return '';
+            if (f.src) return f.src;
+            return (apiUrl || '/api/api') + '?action=file&id=' + encodeURIComponent(f.id) + (download ? '&download=1' : '');
+        },
+
+        // Upload one document. Resolves { id, name, type, size } for a file
+        // stored on the server, or the same plus `src` (a data URL) for one
+        // kept only in this browser when no server is reachable.
+        uploadFile: function(file, apiUrl) {
+            var self = this;
+            var endpoint = apiUrl || '/api/api';
+            var name = (file && file.name) || 'document';
+            if (!this.docKind(name)) return Promise.reject(new Error('"' + name + '" is not a PDF, DOC or DOCX file.'));
+            if (file.size > this.MAX_FILE_BYTES) return Promise.reject(new Error('"' + name + '" is larger than 3 MB.'));
+            return new Promise(function(resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function() { resolve(reader.result); };
+                reader.onerror = function() { reject(new Error('"' + name + '" could not be read.')); };
+                reader.readAsDataURL(file);
+            }).then(function(dataUrl) {
+                return fetch(endpoint + '?action=upload_file', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: self.getAuthHeaders(),
+                    body: JSON.stringify({ name: name, data: dataUrl })
+                }).then(function(r) {
+                    return r.json().catch(function() { return null; });
+                }, function() {
+                    return null;
+                }).then(function(res) {
+                    if (res && res.ok && res.file && res.file.id) return res.file;
+                    if (res && res.error) throw new Error(res.error);
+                    // no API here: keep it in this browser, which only has room for small files
+                    if (file.size > 1024 * 1024) {
+                        throw new Error('"' + name + '" is over 1 MB, which can only be attached when the site is online.');
+                    }
+                    return { id: 'local-' + generateId(), name: name, type: file.type || '', size: file.size, src: dataUrl };
+                });
+            });
+        },
+
         /* ---------- BLOG POSTS ---------- */
 
         getPosts: function(filterStatus) {
@@ -372,7 +513,8 @@
             return sorted;
         },
 
-        addPost: function(post) {
+        // opts.localOnly: save in this browser without sending it to the server
+        addPost: function(post, opts) {
             var self = this;
             var posts = safeParse(storage.getItem(STORAGE_KEYS.POSTS), []);
             var now = new Date().toISOString();
@@ -383,14 +525,18 @@
                 category: (post.category || 'Field Notes').trim(),
                 date: post.date || now.slice(0, 10),
                 body: (post.body || '').trim(),
+                images: Array.isArray(post.images) ? post.images : [],
+                files: Array.isArray(post.files) ? post.files : [],
                 status: post.status || 'pending', // 'approved', 'pending', or 'draft'
                 createdAt: post.createdAt || now
             };
             posts.unshift(record);
             storage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
+            if (opts && opts.localOnly) return Promise.resolve(record);
 
             // Sync to server
-            var action = (record.status === 'approved' || record.status === 'draft') ? 'create_post' : 'submit_post';
+            // the admin saves through create_post whatever the status (guest limits don't apply)
+            var action = (self.isLoggedIn() || record.status === 'approved' || record.status === 'draft') ? 'create_post' : 'submit_post';
             return fetch('/api/api?action=' + action, {
                 method: 'POST',
                 credentials: 'include',
@@ -426,6 +572,8 @@
                     if (data.category != null) p.category = data.category.trim();
                     if (data.date != null) p.date = data.date;
                     if (data.body != null) p.body = data.body.trim();
+                    if (Array.isArray(data.images)) p.images = data.images;
+                    if (Array.isArray(data.files)) p.files = data.files;
                     if (data.status != null) p.status = data.status;
                     target = p;
                 }
@@ -472,6 +620,8 @@
                 payload.body = target.body;
                 payload.category = target.category;
                 payload.date = target.date;
+                payload.images = target.images || [];
+                payload.files = target.files || [];
             }
 
             return fetch('/api/api?action=set_post_status', {

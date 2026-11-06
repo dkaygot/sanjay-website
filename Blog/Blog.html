@@ -115,32 +115,362 @@
         }
         /* Posts */
         
+        .wrap.narrow {
+            max-width: 840px;
+        }
+
         .posts {
             display: grid;
-            gap: 20px;
+            gap: 28px;
         }
-        
+
         .post {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 28px;
+            border-radius: 10px;
+            padding: 44px 48px 40px;
+            overflow: hidden;
         }
-        
-        .post h3 {
-            font-size: 1.7rem;
-            margin-bottom: 6px;
+        /* Post photos */
+
+        .photo-btn {
+            display: block;
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: #000;
+            cursor: zoom-in;
+            overflow: hidden;
         }
-        
-        .meta {
+
+        .photo-btn img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .5s ease, opacity .3s;
+        }
+
+        .photo-btn:hover img {
+            transform: scale(1.025);
+        }
+
+        .post-cover {
+            margin: -44px -48px 34px;
+        }
+
+        .post-cover .photo-btn img {
+            height: auto;
+            max-height: 560px;
+        }
+
+        .post-cover figcaption,
+        .post-gallery figcaption {
             color: var(--muted);
-            font-size: .85rem;
+            font-size: .84rem;
+            font-style: italic;
+        }
+
+        .post-cover figcaption {
+            padding: 10px 48px 0;
+        }
+
+        .post-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+            margin-top: 34px;
+        }
+
+        .post-gallery[data-count="2"] {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .post-gallery[data-count="1"] {
+            grid-template-columns: 1fr;
+        }
+
+        .post-gallery figure {
+            margin: 0;
+            display: grid;
+            gap: 6px;
+            align-content: start;
+        }
+
+        .post-gallery .photo-btn {
+            aspect-ratio: 4 / 3;
+            border-radius: 6px;
+        }
+
+        .post-gallery[data-count="1"] .photo-btn {
+            aspect-ratio: auto;
+        }
+
+        .post-gallery[data-count="1"] .photo-btn img {
+            height: auto;
+            max-height: 560px;
+        }
+        /* Attached documents */
+
+        .post-files {
+            display: grid;
+            gap: 10px;
+            margin-top: 34px;
+        }
+
+        .post-files-title {
+            color: var(--muted);
+            font-size: .72rem;
+            font-weight: 500;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .file-card {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            overflow: hidden;
+            transition: border-color .2s;
+        }
+
+        .file-card:hover {
+            border-color: var(--accent);
+        }
+
+        .file-open {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 14px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .file-ext {
+            flex: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            background: var(--accent);
+            color: #0e0e0f;
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+        }
+
+        .file-ext.is-doc {
+            background: #7fa6d9;
+        }
+
+        .file-meta {
+            min-width: 0;
+            display: grid;
+            gap: 2px;
+        }
+
+        .file-name {
+            color: var(--heading);
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-sub {
+            color: var(--muted);
+            font-size: .8rem;
+        }
+
+        .file-arrow {
+            margin-left: auto;
+            padding-left: 8px;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .file-dl {
+            flex: none;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-left: 1px solid var(--border);
+            color: var(--muted);
+            font-size: .82rem;
+            text-decoration: none;
+            transition: color .2s, background .2s;
+        }
+
+        .file-dl:hover {
+            color: var(--heading);
+            background: rgba(255, 255, 255, .03);
+        }
+        /* Lightbox */
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 2147483640;
+            display: grid;
+            grid-template-columns: 64px 1fr 64px;
+            align-items: center;
+            background: rgba(6, 6, 7, .96);
+        }
+
+        .lightbox[hidden] {
+            display: none;
+        }
+
+        .lightbox figure {
+            grid-column: 2;
+            margin: 0;
+            display: grid;
+            justify-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .lightbox img {
+            display: block;
+            max-width: 100%;
+            max-height: calc(100vh - 120px);
+            object-fit: contain;
+        }
+
+        .lightbox figcaption {
+            color: var(--body);
+            font-size: .92rem;
+            text-align: center;
+            max-width: 70ch;
+        }
+
+        .lb-count {
+            color: var(--muted);
+            font-size: .8rem;
+            letter-spacing: .08em;
+        }
+
+        .lb-btn {
+            border: 0;
+            background: transparent;
+            color: var(--heading);
+            font-size: 2.6rem;
+            line-height: 1;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            cursor: pointer;
+            justify-self: center;
+            transition: background .2s;
+        }
+
+        .lb-btn:hover {
+            background: rgba(255, 255, 255, .08);
+        }
+
+        .lb-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            font-size: 2rem;
+        }
+
+        .lb-prev {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .lb-next {
+            grid-column: 3;
+            grid-row: 1;
+        }
+
+        .lightbox.single .lb-prev,
+        .lightbox.single .lb-next {
+            visibility: hidden;
+        }
+
+        .photos-field {
+            display: grid;
+            gap: 6px;
+            font-size: .9rem;
+            color: var(--muted);
+        }
+
+        .post-cat {
+            display: inline-block;
+            color: var(--accent);
+            font-size: .72rem;
+            font-weight: 500;
+            letter-spacing: .16em;
+            text-transform: uppercase;
             margin-bottom: 14px;
         }
-        
-        .post p {
-            margin: 0;
+
+        .post h3 {
+            font-size: clamp(2rem, 4.4vw, 2.9rem);
+            font-weight: 600;
+            line-height: 1.1;
+            letter-spacing: -.005em;
+            text-wrap: balance;
+            margin-bottom: 16px;
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 10px;
+            color: var(--muted);
+            font-size: .88rem;
+            padding-bottom: 22px;
+            margin-bottom: 26px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .meta .author {
+            color: var(--body);
+            font-weight: 500;
+        }
+
+        .meta .dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--muted);
+            opacity: .7;
+        }
+
+        .post-body {
+            font-size: 1.08rem;
+            line-height: 1.8;
+            color: var(--body);
+            max-width: 68ch;
+        }
+
+        .post-body p {
+            margin: 0 0 1.15em;
             white-space: pre-line;
+        }
+
+        .post-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .post-body p:first-child::first-letter {
+            float: left;
+            font-family: "Cormorant Garamond", Georgia, serif;
+            font-size: 3.6em;
+            line-height: .85;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 6px 10px 0 0;
         }
         
         .empty {
@@ -252,6 +582,64 @@
             section {
                 padding: 52px 0;
             }
+            .post {
+                padding: 28px 22px 26px;
+            }
+            .post-cover {
+                margin: -28px -22px 26px;
+            }
+            .post-cover figcaption {
+                padding: 8px 22px 0;
+            }
+            .post-gallery,
+            .post-gallery[data-count="2"] {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .post-gallery[data-count="1"] {
+                grid-template-columns: 1fr;
+            }
+            .file-open {
+                gap: 12px;
+                padding: 10px 12px;
+            }
+            .file-arrow {
+                display: none;
+            }
+            .file-dl {
+                padding: 0 12px;
+            }
+            .lightbox {
+                grid-template-columns: 1fr;
+                padding: 0 8px;
+            }
+            .lightbox figure {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .lb-prev,
+            .lb-next {
+                position: relative;
+                z-index: 1;
+                grid-row: 1;
+                grid-column: 1;
+                align-self: end;
+                margin-bottom: 18px;
+                background: rgba(0, 0, 0, .5);
+            }
+            .lb-prev {
+                justify-self: start;
+            }
+            .lb-next {
+                justify-self: end;
+            }
+            .post-body {
+                font-size: 1.02rem;
+                line-height: 1.75;
+            }
+            .post-body p:first-child::first-letter {
+                font-size: 3.1em;
+            }
         }
         
         @media (prefers-reduced-motion: reduce) {
@@ -273,7 +661,7 @@
     </div>
 
     <section id="posts">
-        <div class="wrap">
+        <div class="wrap narrow">
             <div class="section-head">
                 <h2>Latest posts</h2>
                 <p id="count"></p>
@@ -283,7 +671,7 @@
     </section>
 
     <section class="alt" id="write">
-        <div class="wrap">
+        <div class="wrap narrow">
             <div class="section-head">
                 <h2>Write a post</h2>
                 <p>Send in your post and it appears in the list once it has been reviewed.</p>
@@ -304,13 +692,33 @@
                 <label>Post
         <textarea id="body" name="body" required></textarea>
       </label>
+                <div class="photos-field">
+                    <span>Photos (optional)</span>
+                    <div id="photoPicker"></div>
+                </div>
+                <div class="photos-field">
+                    <span>Documents (optional)</span>
+                    <div id="filePicker"></div>
+                </div>
                 <div class="status" id="status" role="status"></div>
                 <button class="btn" type="submit" id="submitBtn">Send for review</button>
             </form>
         </div>
     </section>
 
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+        <button class="lb-btn lb-close" type="button" id="lbClose" aria-label="Close">&times;</button>
+        <button class="lb-btn lb-prev" type="button" id="lbPrev" aria-label="Previous photo">&lsaquo;</button>
+        <figure>
+            <img id="lbImg" alt="">
+            <figcaption id="lbCap"></figcaption>
+            <div class="lb-count" id="lbCount"></div>
+        </figure>
+        <button class="lb-btn lb-next" type="button" id="lbNext" aria-label="Next photo">&rsaquo;</button>
+    </div>
+
     <script src="../js/site-store.js"></script>
+    <script src="../js/photo-picker.js"></script>
     <script>
         (function() {
             var API = "/api/api";
@@ -321,6 +729,180 @@
             var writeSection = document.getElementById("write");
             var status = document.getElementById("status");
             var submitBtn = document.getElementById("submitBtn");
+            var picker = window.PhotoPicker ? window.PhotoPicker.create(document.getElementById("photoPicker"), {
+                max: 4
+            }) : null;
+
+            var docPicker = window.FilePicker ? window.FilePicker.create(document.getElementById("filePicker"), {
+                max: 2
+            }) : null;
+
+            /* ---------- Attached documents ---------- */
+            function docKind(name) {
+                var m = /\.(pdf|docx?)$/i.exec(name || "");
+                return m ? m[1].toLowerCase() : "";
+            }
+
+            function fileUrl(f, download) {
+                if (window.SiteStore) return window.SiteStore.fileUrl(f, API, download);
+                return f.src || API + "?action=file&id=" + encodeURIComponent(f.id) + (download ? "&download=1" : "");
+            }
+
+            // Microsoft's free viewer can only fetch files from a public site, not from localhost
+            var publicSite = location.protocol === "https:" &&
+                !/^(localhost|127\.|0\.0\.0\.0|\[::1\]|10\.|192\.168\.)/.test(location.hostname);
+
+            // a PDF opens in the browser's own viewer; a Word file in Microsoft's online viewer
+            function openHref(f) {
+                var url = fileUrl(f);
+                if (docKind(f.name) === "pdf" || !publicSite) return url;
+                return "https://view.officeapps.live.com/op/view.aspx?src=" + encodeURIComponent(new URL(url, location.href).href);
+            }
+
+            // a document kept only in this browser (local mode) is a data URL, which tabs refuse to open directly
+            function openLocal(f) {
+                var cut = f.src.indexOf(",");
+                var bin = atob(f.src.slice(cut + 1));
+                var bytes = new Uint8Array(bin.length);
+                for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                var type = f.src.slice(5, f.src.indexOf(";")) || "application/octet-stream";
+                window.open(URL.createObjectURL(new Blob([bytes], {
+                    type: type
+                })), "_blank", "noopener");
+            }
+
+            function fileCard(f) {
+                var kind = docKind(f.name) || "file";
+                var card = document.createElement("div");
+                card.className = "file-card";
+
+                var open = document.createElement("a");
+                open.className = "file-open";
+                open.href = f.src ? "#" : openHref(f);
+                open.target = "_blank";
+                open.rel = "noopener";
+                if (f.src) open.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    openLocal(f);
+                });
+
+                var ext = document.createElement("span");
+                ext.className = "file-ext" + (kind === "pdf" ? "" : " is-doc");
+                ext.textContent = kind.toUpperCase();
+                var meta = document.createElement("span");
+                meta.className = "file-meta";
+                var name = document.createElement("span");
+                name.className = "file-name";
+                name.textContent = f.name;
+                name.title = f.name;
+                var sub = document.createElement("span");
+                sub.className = "file-sub";
+                var size = window.FilePicker ? window.FilePicker.formatSize(f.size) : "";
+                sub.textContent = (size ? size + " · " : "") + "Opens in a new tab";
+                meta.append(name, sub);
+                var arrow = document.createElement("span");
+                arrow.className = "file-arrow";
+                arrow.setAttribute("aria-hidden", "true");
+                arrow.textContent = "↗";
+                open.append(ext, meta, arrow);
+
+                var dl = document.createElement("a");
+                dl.className = "file-dl";
+                dl.href = fileUrl(f, true);
+                dl.setAttribute("download", f.name);
+                dl.setAttribute("aria-label", "Download " + f.name);
+                dl.textContent = "Download";
+
+                card.append(open, dl);
+                return card;
+            }
+
+            function imageUrl(img) {
+                if (window.SiteStore) return window.SiteStore.imageUrl(img, API);
+                return img.src || API + "?action=image&id=" + encodeURIComponent(img.id);
+            }
+
+            /* ---------- Lightbox ---------- */
+            var lb = document.getElementById("lightbox");
+            var lbImg = document.getElementById("lbImg");
+            var lbCap = document.getElementById("lbCap");
+            var lbCount = document.getElementById("lbCount");
+            var lbList = [];
+            var lbIndex = 0;
+            var lbReturnFocus = null;
+
+            function lbShow(i) {
+                lbIndex = (i + lbList.length) % lbList.length;
+                var item = lbList[lbIndex];
+                lbImg.src = item.src;
+                lbImg.alt = item.alt;
+                lbCap.textContent = item.caption;
+                lbCap.hidden = !item.caption;
+                lbCount.textContent = lbList.length > 1 ? (lbIndex + 1) + " / " + lbList.length : "";
+            }
+
+            function openLightbox(list, i) {
+                lbList = list;
+                lbReturnFocus = document.activeElement;
+                lb.classList.toggle("single", list.length < 2);
+                lbShow(i);
+                lb.hidden = false;
+                document.body.style.overflow = "hidden";
+                document.getElementById("lbClose").focus();
+            }
+
+            function closeLightbox() {
+                lb.hidden = true;
+                lbImg.removeAttribute("src");
+                document.body.style.overflow = "";
+                if (lbReturnFocus && lbReturnFocus.focus) lbReturnFocus.focus();
+            }
+
+            document.getElementById("lbClose").addEventListener("click", closeLightbox);
+            document.getElementById("lbPrev").addEventListener("click", function() {
+                lbShow(lbIndex - 1);
+            });
+            document.getElementById("lbNext").addEventListener("click", function() {
+                lbShow(lbIndex + 1);
+            });
+            lb.addEventListener("click", function(e) {
+                if (e.target === lb) closeLightbox();
+            });
+            document.addEventListener("keydown", function(e) {
+                if (lb.hidden) return;
+                if (e.key === "Escape") closeLightbox();
+                else if (e.key === "ArrowLeft" && lbList.length > 1) lbShow(lbIndex - 1);
+                else if (e.key === "ArrowRight" && lbList.length > 1) lbShow(lbIndex + 1);
+            });
+
+            // a clickable photo that opens the lightbox at position `i` of `list`
+            function photoButton(list, i) {
+                var btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "photo-btn";
+                btn.setAttribute("aria-label", "View photo" + (list[i].caption ? ": " + list[i].caption : " " + (i + 1)));
+                var img = document.createElement("img");
+                img.src = list[i].src;
+                img.alt = list[i].alt;
+                img.loading = "lazy";
+                img.decoding = "async";
+                btn.appendChild(img);
+                btn.addEventListener("click", function() {
+                    openLightbox(list, i);
+                });
+                return btn;
+            }
+
+            function figure(list, i) {
+                var f = document.createElement("figure");
+                f.appendChild(photoButton(list, i));
+                if (list[i].caption) {
+                    var c = document.createElement("figcaption");
+                    c.textContent = list[i].caption;
+                    f.appendChild(c);
+                }
+                return f;
+            }
 
             // Apply admin settings
             if (window.SiteStore) {
@@ -357,16 +939,92 @@
                     var art = document.createElement("article");
                     art.className = "post";
 
+                    var photos = (p.images || []).map(function(img, i) {
+                        return {
+                            src: imageUrl(img),
+                            caption: img.caption || "",
+                            alt: img.caption || p.title + " (photo " + (i + 1) + ")"
+                        };
+                    });
+                    if (photos.length) {
+                        var cover = figure(photos, 0);
+                        cover.className = "post-cover";
+                        art.appendChild(cover);
+                    }
+
+                    if (p.category) {
+                        var c = document.createElement("span");
+                        c.className = "post-cat";
+                        c.textContent = p.category;
+                        art.appendChild(c);
+                    }
+
                     var h = document.createElement("h3");
                     h.textContent = p.title;
+
+                    var text = String(p.body || "");
+                    var words = text.split(/\s+/).filter(Boolean).length;
+                    var mins = Math.max(1, Math.round(words / 200));
+
                     var m = document.createElement("div");
                     m.className = "meta";
-                    var catTag = p.category ? " • " + p.category : "";
-                    m.textContent = "By " + p.author + " on " + fmt(p.date) + catTag;
-                    var b = document.createElement("p");
-                    b.textContent = p.body;
+                    var metaParts = [];
+                    if (p.author) {
+                        var a = document.createElement("span");
+                        a.className = "author";
+                        a.textContent = p.author;
+                        metaParts.push(a);
+                    }
+                    if (p.date) {
+                        var t = document.createElement("time");
+                        t.dateTime = p.date;
+                        t.textContent = fmt(p.date);
+                        metaParts.push(t);
+                    }
+                    var r = document.createElement("span");
+                    r.textContent = mins + " min read";
+                    metaParts.push(r);
+                    metaParts.forEach(function(el, i) {
+                        if (i) {
+                            var d = document.createElement("span");
+                            d.className = "dot";
+                            d.setAttribute("aria-hidden", "true");
+                            m.appendChild(d);
+                        }
+                        m.appendChild(el);
+                    });
+
+                    var b = document.createElement("div");
+                    b.className = "post-body";
+                    text.trim().split(/\n\s*\n/).forEach(function(para) {
+                        var pe = document.createElement("p");
+                        pe.textContent = para.trim();
+                        b.appendChild(pe);
+                    });
 
                     art.append(h, m, b);
+
+                    if (photos.length > 1) {
+                        var gallery = document.createElement("div");
+                        gallery.className = "post-gallery";
+                        gallery.dataset.count = String(photos.length - 1);
+                        for (var gi = 1; gi < photos.length; gi++) gallery.appendChild(figure(photos, gi));
+                        art.appendChild(gallery);
+                    }
+
+                    if (p.files && p.files.length) {
+                        var files = document.createElement("div");
+                        files.className = "post-files";
+                        var ft = document.createElement("div");
+                        ft.className = "post-files-title";
+                        ft.textContent = p.files.length === 1 ? "Attachment" : "Attachments";
+                        files.appendChild(ft);
+                        p.files.forEach(function(f) {
+                            files.appendChild(fileCard(f));
+                        });
+                        art.appendChild(files);
+                    }
+
                     list.appendChild(art);
                 });
             }
@@ -416,43 +1074,80 @@
                     return;
                 }
                 submitBtn.disabled = true;
+                if (picker) picker.setBusy(true);
+                if (docPicker) docPicker.setBusy(true);
                 setStatus("Sending…");
 
-                // Save via SiteStore (saves locally and attempts remote server sync)
-                if (window.SiteStore) {
-                    window.SiteStore.addPost({
-                        title: title,
-                        author: author,
-                        body: body,
-                        category: "Guest Submission",
-                        status: "pending"
-                    });
-                }
+                var images = [];
+                var files = [];
+                var photos = picker && picker.count() ? picker.uploadAll(function(n, total) {
+                    setStatus("Uploading photo " + n + " of " + total + "…");
+                }) : Promise.resolve([]);
 
-                fetch(API + "?action=submit_post", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        title: title,
-                        author: author,
-                        body: body,
-                        website: form.website.value
-                    })
-                }).then(function(r) {
-                    return r.json().catch(function() {
-                        return {};
+                photos.then(function(list) {
+                    images = list;
+                    return docPicker && docPicker.count() ? docPicker.uploadAll(function(n, total) {
+                        setStatus("Uploading document " + n + " of " + total + "…");
+                    }) : [];
+                }).then(function(list) {
+                    files = list;
+                    setStatus("Sending…");
+                    return fetch(API + "?action=submit_post", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            title: title,
+                            author: author,
+                            body: body,
+                            images: images.map(function(im) {
+                                return {
+                                    id: im.id,
+                                    caption: im.caption
+                                };
+                            }),
+                            files: files.map(function(f) {
+                                return {
+                                    id: f.id
+                                };
+                            }),
+                            website: form.website.value
+                        })
+                    }).then(function(r) {
+                        return r.json().catch(function() {
+                            return null;
+                        });
+                    }, function() {
+                        return null; // no server reachable
                     });
                 }).then(function(res) {
+                    if (res && res.ok) return;
+                    if (res && res.error) throw new Error(res.error);
+                    // no API here (local preview / offline): keep the post in this browser for the admin page
+                    if (!window.SiteStore) throw new Error("Your post couldn't be sent right now. Please try again later.");
+                    return window.SiteStore.addPost({
+                        title: title,
+                        author: author,
+                        body: body,
+                        images: images,
+                        files: files,
+                        category: "Guest Submission",
+                        status: "pending"
+                    }, {
+                        localOnly: true
+                    });
+                }).then(function() {
                     form.reset();
+                    if (picker) picker.reset();
+                    if (docPicker) docPicker.reset();
                     setStatus("Thank you! Your post has been sent and will appear here once it's approved by admin.");
-                }).catch(function() {
-                    // Even if server is offline, SiteStore already saved locally!
-                    form.reset();
-                    setStatus("Thank you! Your post has been submitted for admin review and will appear once approved.");
+                }).catch(function(err) {
+                    setStatus(err.message || "Your post couldn't be sent. Please try again.", true);
                 }).then(function() {
                     submitBtn.disabled = false;
+                    if (picker) picker.setBusy(false);
+                    if (docPicker) docPicker.setBusy(false);
                 });
             });
 
