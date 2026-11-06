@@ -1514,7 +1514,17 @@
                             toast('Live database synced (' + state.posts.length + ' articles).');
                         }
                     }).catch(function(err) {
+                        if (err.status === 401) {
+                            // the browser still thought it was logged in, but the server login has
+                            // expired (they last 7 days): what's on screen is an old copy, so log in again
+                            store.logout();
+                            showLogin('Your admin session has expired. Log in again to see the latest posts and messages.');
+                            return;
+                        }
                         console.warn('Could not fetch server admin data:', err);
+                        if (isOnlineApi || (err.status && err.status !== 404)) {
+                            toast('Could not load live data (' + err.message + '). Showing the copy saved in this browser.', true);
+                        }
                     });
                 }
             }

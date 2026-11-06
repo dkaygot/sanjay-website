@@ -113,6 +113,16 @@
         }
     }
 
+    // An API reply as JSON. null means there is no API here at all (a 404 from a plain
+    // file server, i.e. local preview), so local mode applies. Any other reply that
+    // isn't JSON (a Vercel timeout or size-limit page) is a real error, not "offline".
+    function readApi(r) {
+        return r.json().catch(function() {
+            if (r.status === 404) return null;
+            return { ok: false, error: 'The server had a problem (error ' + r.status + '). Please try again.' };
+        });
+    }
+
     function generateId() {
         return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 7);
     }
@@ -148,6 +158,8 @@
     };
 
     var SiteStore = {
+        readApi: readApi,
+
         // Initialize default storage if empty
         init: function() {
             if (!storage.getItem(STORAGE_KEYS.SETTINGS)) {
@@ -199,7 +211,9 @@
             }).then(function(r) {
                 return r.json().catch(function() { return {}; }).then(function(data) {
                     if (!r.ok || !data.ok) {
-                        throw new Error(data.error || 'Server returned status ' + r.status);
+                        var err = new Error(data.error || 'Server returned status ' + r.status);
+                        err.status = r.status; // 401: the server login has expired
+                        throw err;
                     }
                     if (Array.isArray(data.contacts)) {
                         storage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(data.contacts));
@@ -431,7 +445,7 @@
                     headers: self.getAuthHeaders(),
                     body: JSON.stringify({ data: c.dataUrl })
                 }).then(function(r) {
-                    return r.json().catch(function() { return null; });
+                    return readApi(r);
                 }, function() {
                     return null;
                 }).then(function(res) {
@@ -483,7 +497,7 @@
                     headers: self.getAuthHeaders(),
                     body: JSON.stringify({ name: name, data: dataUrl })
                 }).then(function(r) {
-                    return r.json().catch(function() { return null; });
+                    return readApi(r);
                 }, function() {
                     return null;
                 }).then(function(res) {
@@ -682,25 +696,28 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: password })
             }).then(function(r) {
-                return r.json().catch(function() { return {}; }).then(function(data) {
-                    if (data.ok) {
-                        if (data.token) {
-                            storage.setItem(STORAGE_KEYS.TOKEN, data.token);
-                        }
-                        storage.setItem(STORAGE_KEYS.AUTH, 'server:' + Date.now());
-                        return { ok: true, mode: 'server', token: data.token };
+                return readApi(r);
+            }, function() {
+                return null; // no server reachable
+            }).then(function(data) {
+                if (data && data.ok) {
+                    if (data.token) {
+                        storage.setItem(STORAGE_KEYS.TOKEN, data.token);
                     }
-                    throw new Error(data.error || 'Invalid password.');
-                });
-            }).catch(function(err) {
-                // If server is unreachable or failed due to network, check local password
+                    storage.setItem(STORAGE_KEYS.AUTH, 'server:' + Date.now());
+                    return { ok: true, mode: 'server', token: data.token };
+                }
+                // The server answered (wrong password, rate limit, setup problem): never fall
+                // back to local mode, or the dashboard would show stale browser data as if live.
+                if (data && data.error) throw new Error(data.error);
+                // No server at all (local preview / offline): use the local password
                 var settings = self.getSettings();
                 var expected = settings.adminPassword || 'admin';
-                if (password === expected || (!expected && password === 'admin')) {
+                if (password === expected) {
                     storage.setItem(STORAGE_KEYS.AUTH, 'local:' + Date.now());
                     return { ok: true, mode: 'local' };
                 }
-                throw new Error(err.message === 'Invalid password.' ? err.message : 'Incorrect password. (Local default: admin)');
+                throw new Error('Incorrect password. (Local default: admin)');
             });
         },
 

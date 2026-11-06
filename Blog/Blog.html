@@ -159,9 +159,33 @@
             margin: -44px -48px 34px;
         }
 
+        /* a fixed-height banner; the full, uncropped photo opens in the lightbox */
+        .post-cover .photo-btn {
+            position: relative;
+            height: clamp(190px, 36vw, 340px);
+        }
+
         .post-cover .photo-btn img {
-            height: auto;
-            max-height: 560px;
+            object-position: center 30%;
+        }
+
+        .photo-hint {
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, .6);
+            color: #fff;
+            font-size: .75rem;
+            letter-spacing: .02em;
+            pointer-events: none;
+            opacity: .85;
+            transition: opacity .2s;
+        }
+
+        .photo-btn:hover .photo-hint {
+            opacity: 1;
         }
 
         .post-cover figcaption,
@@ -175,19 +199,12 @@
             padding: 10px 48px 0;
         }
 
+        /* the other photos as a row of small thumbnails */
         .post-gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 14px;
-            margin-top: 34px;
-        }
-
-        .post-gallery[data-count="2"] {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .post-gallery[data-count="1"] {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            margin-top: 30px;
         }
 
         .post-gallery figure {
@@ -202,13 +219,9 @@
             border-radius: 6px;
         }
 
-        .post-gallery[data-count="1"] .photo-btn {
-            aspect-ratio: auto;
-        }
-
-        .post-gallery[data-count="1"] .photo-btn img {
-            height: auto;
-            max-height: 560px;
+        .post-gallery figcaption {
+            font-size: .76rem;
+            line-height: 1.35;
         }
         /* Attached documents */
 
@@ -591,13 +604,13 @@
             .post-cover figcaption {
                 padding: 8px 22px 0;
             }
-            .post-gallery,
-            .post-gallery[data-count="2"] {
-                grid-template-columns: 1fr 1fr;
+            .post-gallery {
+                grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
             }
-            .post-gallery[data-count="1"] {
-                grid-template-columns: 1fr;
+            .photo-hint {
+                right: 10px;
+                bottom: 10px;
             }
             .file-open {
                 gap: 12px;
@@ -949,6 +962,11 @@
                     if (photos.length) {
                         var cover = figure(photos, 0);
                         cover.className = "post-cover";
+                        var hint = document.createElement("span");
+                        hint.className = "photo-hint";
+                        hint.setAttribute("aria-hidden", "true");
+                        hint.textContent = "⤢ View full photo" + (photos.length > 1 ? " · " + photos.length + " photos" : "");
+                        cover.querySelector(".photo-btn").appendChild(hint);
                         art.appendChild(cover);
                     }
 
@@ -1007,7 +1025,6 @@
                     if (photos.length > 1) {
                         var gallery = document.createElement("div");
                         gallery.className = "post-gallery";
-                        gallery.dataset.count = String(photos.length - 1);
                         for (var gi = 1; gi < photos.length; gi++) gallery.appendChild(figure(photos, gi));
                         art.appendChild(gallery);
                     }
@@ -1115,8 +1132,12 @@
                             website: form.website.value
                         })
                     }).then(function(r) {
+                        if (window.SiteStore) return window.SiteStore.readApi(r);
                         return r.json().catch(function() {
-                            return null;
+                            return r.status === 404 ? null : {
+                                ok: false,
+                                error: "The server had a problem (error " + r.status + "). Please try again."
+                            };
                         });
                     }, function() {
                         return null; // no server reachable
