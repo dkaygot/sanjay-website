@@ -791,15 +791,17 @@
         exportPostsCSV: function() {
             var posts = this.getPosts('all');
             var headers = ['ID', 'Title', 'Author', 'Category', 'Date', 'Status', 'Body'];
+            // the spreadsheet gets the visible text, without the bold / italic / underline tags
+            var plain = function(t) { return window.RichText ? window.RichText.toPlain(t) : String(t || ''); };
             var rows = posts.map(function(p) {
                 return [
                     p.id,
-                    '"' + (p.title || '').replace(/"/g, '""') + '"',
+                    '"' + plain(p.title).replace(/"/g, '""') + '"',
                     '"' + (p.author || '').replace(/"/g, '""') + '"',
                     '"' + (p.category || '').replace(/"/g, '""') + '"',
                     p.date,
                     p.status,
-                    '"' + (p.body || '').replace(/"/g, '""').replace(/\n/g, ' ') + '"'
+                    '"' + plain(p.body).replace(/"/g, '""').replace(/\n/g, ' ') + '"'
                 ].join(',');
             });
             return [headers.join(',')].concat(rows).join('\r\n');

@@ -8,7 +8,7 @@
     <title>Admin Portal — Sanjay Patil Photography</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0e0e0f;
@@ -700,6 +700,24 @@
             -webkit-box-orient: vertical;
         }
 
+        .field .rt {
+            color: var(--heading);
+            border-radius: 4px;
+        }
+
+        .post-card h3 strong {
+            font-weight: 700;
+        }
+
+        .post-card p strong {
+            font-weight: 600;
+            color: var(--heading);
+        }
+
+        .post-card u {
+            text-underline-offset: .16em;
+        }
+
         .post-thumbs {
             display: flex;
             gap: 8px;
@@ -1265,7 +1283,7 @@
                     <input type="hidden" id="editPostId">
                     <div class="field">
                         <label for="postTitle">Article Title</label>
-                        <input id="postTitle" type="text" maxlength="90" placeholder="e.g. The Morning Mist at Lonar Crater" required>
+                        <div id="postTitle"></div>
                     </div>
 
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -1304,7 +1322,7 @@
 
                     <div class="field">
                         <label for="postBody">Article Content</label>
-                        <textarea id="postBody" style="min-height:220px;" placeholder="Write your photography field notes, technical details, or observations…" required></textarea>
+                        <div id="postBody"></div>
                         <div class="help" id="postCharCount">0 characters</div>
                     </div>
 
@@ -1377,6 +1395,7 @@
     <!-- Storage Layer Script -->
     <script src="js/site-store.js"></script>
     <script src="js/photo-picker.js"></script>
+    <script src="js/rich-text.js"></script>
 
     <!-- Main Admin Controller -->
     <script>
@@ -1836,7 +1855,7 @@
                     if (state.postFilter !== 'all' && p.status !== state.postFilter) return false;
                     if (state.postSearch) {
                         var q = state.postSearch.toLowerCase();
-                        var text = (p.title + ' ' + p.author + ' ' + (p.category || '') + ' ' + p.body).toLowerCase();
+                        var text = (RichText.toPlain(p.title) + ' ' + p.author + ' ' + (p.category || '') + ' ' + RichText.toPlain(p.body)).toLowerCase();
                         if (text.indexOf(q) === -1) return false;
                     }
                     return true;
@@ -1863,7 +1882,7 @@
                     header.className = 'post-card-header';
 
                     var h3 = document.createElement('h3');
-                    h3.textContent = p.title;
+                    RichText.render(p.title, h3); // bold / italic / underline only, never raw HTML
 
                     var badge = document.createElement('span');
                     badge.className = 'status-badge ' + p.status;
@@ -1903,7 +1922,7 @@
                     card.appendChild(meta);
 
                     var body = document.createElement('p');
-                    body.textContent = p.body;
+                    RichText.render(p.body, body);
                     card.appendChild(body);
 
                     if (imgs.length) {
@@ -2025,7 +2044,7 @@
                     deleteBtn.className = 'btn danger sm';
                     deleteBtn.textContent = 'Delete';
                     deleteBtn.addEventListener('click', function() {
-                        if (!confirm('Are you sure you want to delete "' + p.title + '"? This cannot be undone.')) return;
+                        if (!confirm('Are you sure you want to delete "' + RichText.toPlain(p.title) + '"? This cannot be undone.')) return;
                         deleteBtn.disabled = true;
                         store.deletePost(p.id).then(function() {
                             loadData();
@@ -2093,6 +2112,18 @@
             /* ---------- POST MODAL (CREATE / EDIT) ---------- */
             var photoPicker = window.PhotoPicker.create($('postPhotos'), { max: 12 });
             var filePicker = window.FilePicker.create($('postFiles'), { max: 6 });
+            var titleEditor = RichText.editor($('postTitle'), {
+                label: 'Article title',
+                placeholder: 'e.g. The Morning Mist at Lonar Crater',
+                maxPlain: 90
+            });
+            var bodyEditor = RichText.editor($('postBody'), {
+                label: 'Article content',
+                placeholder: 'Write your photography field notes, technical details, or observations…',
+                multiline: true,
+                minHeight: 220,
+                onInput: function() { updateCharCount(); }
+            });
 
             function closePostModal() {
                 $('postModal').hidden = true;
@@ -2104,18 +2135,18 @@
                 var isEdit = !!post;
                 $('postModalTitle').textContent = isEdit ? 'Edit Article' : 'Write New Article';
                 $('editPostId').value = isEdit ? post.id : '';
-                $('postTitle').value = isEdit ? post.title : '';
+                titleEditor.setValue(isEdit ? post.title : '');
                 $('postAuthor').value = isEdit ? post.author : (state.settings.defaultAuthor || 'Sanjay Patil');
                 $('postCategory').value = isEdit ? (post.category || '') : 'Field Notes';
                 $('postDate').value = isEdit ? post.date : new Date().toISOString().slice(0, 10);
                 $('postStatus').value = isEdit ? post.status : 'approved';
-                $('postBody').value = isEdit ? post.body : '';
+                bodyEditor.setValue(isEdit ? post.body : '');
                 photoPicker.setImages(isEdit ? (post.images || []) : []);
                 filePicker.setFiles(isEdit ? (post.files || []) : []);
                 $('postModalSubmit').textContent = isEdit ? 'Save Changes' : 'Publish Article';
                 updateCharCount();
                 $('postModal').hidden = false;
-                $('postTitle').focus();
+                titleEditor.focus();
             }
 
             $('newPostBtn').addEventListener('click', function() {
@@ -2125,15 +2156,25 @@
             $('postModalClose').addEventListener('click', closePostModal);
             $('postModalCancel').addEventListener('click', closePostModal);
 
-            $('postBody').addEventListener('input', updateCharCount);
 
             function updateCharCount() {
-                var count = $('postBody').value.length;
+                var count = bodyEditor.getPlain().length;
                 $('postCharCount').textContent = count + ' characters';
             }
 
             $('postModalForm').addEventListener('submit', function(e) {
                 e.preventDefault();
+                // the formatting editors aren't form inputs, so `required` can't check them
+                if (!titleEditor.getPlain() || !bodyEditor.getPlain()) {
+                    toast('Add a title and the article content.', true);
+                    (titleEditor.getPlain() ? bodyEditor : titleEditor).focus();
+                    return;
+                }
+                if (titleEditor.isTooLong()) {
+                    toast('The title is too long (up to 90 characters).', true);
+                    titleEditor.focus();
+                    return;
+                }
                 var subBtn = $('postModalSubmit');
                 var subLabel = subBtn.textContent;
                 subBtn.disabled = true;
@@ -2141,12 +2182,12 @@
                 filePicker.setBusy(true);
                 var id = $('editPostId').value;
                 var payload = {
-                    title: $('postTitle').value.trim(),
+                    title: titleEditor.getValue(),
                     author: $('postAuthor').value.trim(),
                     category: $('postCategory').value.trim() || 'Field Notes',
                     date: $('postDate').value,
                     status: $('postStatus').value,
-                    body: $('postBody').value.trim()
+                    body: bodyEditor.getValue()
                 };
 
                 photoPicker.uploadAll(function(n, total) {

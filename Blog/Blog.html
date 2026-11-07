@@ -7,7 +7,7 @@
     <title>Field Notes — A simple blog</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
          :root {
             --bg: #0e0e0f;
@@ -428,11 +428,46 @@
 
         .post h3 {
             font-size: clamp(2rem, 4.4vw, 2.9rem);
-            font-weight: 600;
+            font-weight: 500;
             line-height: 1.1;
             letter-spacing: -.005em;
             text-wrap: balance;
             margin-bottom: 16px;
+        }
+        /* bold / italic / underline written with the editor */
+
+        .post h3 strong {
+            font-weight: 700;
+        }
+
+        .post-body strong {
+            font-weight: 700;
+            color: var(--heading);
+        }
+
+        .post h3 u,
+        .post-body u {
+            text-decoration-thickness: 1px;
+            text-underline-offset: .18em;
+        }
+
+        .post h3 u {
+            text-decoration-thickness: 2px;
+            text-decoration-color: var(--accent);
+        }
+
+        .field-rt {
+            display: grid;
+            gap: 6px;
+        }
+
+        .field-rt .rt {
+            color: var(--body);
+            font-size: 1rem;
+        }
+
+        .field-rt .rt-multi {
+            min-height: 170px;
         }
 
         .meta {
@@ -694,17 +729,19 @@
                 <div class="hp" aria-hidden="true">
                     <label>Website <input name="website" type="text" tabindex="-1" autocomplete="off"></label>
                 </div>
+                <div class="field-rt">
+                    <label for="titleEditor">Title</label>
+                    <div id="titleEditor"></div>
+                </div>
                 <div class="row">
-                    <label>Title
-          <input id="title" name="title" type="text" maxlength="90" required>
-        </label>
                     <label>Your name
           <input id="author" name="author" type="text" maxlength="50" required>
         </label>
                 </div>
-                <label>Post
-        <textarea id="body" name="body" required></textarea>
-      </label>
+                <div class="field-rt">
+                    <label for="bodyEditor">Post</label>
+                    <div id="bodyEditor"></div>
+                </div>
                 <div class="photos-field">
                     <span>Photos (optional)</span>
                     <div id="photoPicker"></div>
@@ -731,6 +768,7 @@
     </div>
 
     <script src="../js/site-store.js"></script>
+    <script src="../js/rich-text.js"></script>
     <script src="../js/photo-picker.js"></script>
     <script>
         (function() {
@@ -749,6 +787,14 @@
             var docPicker = window.FilePicker ? window.FilePicker.create(document.getElementById("filePicker"), {
                 max: 2
             }) : null;
+            var titleEditor = RichText.editor(document.getElementById("titleEditor"), {
+                label: "Title",
+                maxPlain: 90
+            });
+            var bodyEditor = RichText.editor(document.getElementById("bodyEditor"), {
+                label: "Post",
+                multiline: true
+            });
 
             /* ---------- Attached documents ---------- */
             function docKind(name) {
@@ -952,11 +998,12 @@
                     var art = document.createElement("article");
                     art.className = "post";
 
+                    var plainTitle = RichText.toPlain(p.title);
                     var photos = (p.images || []).map(function(img, i) {
                         return {
                             src: imageUrl(img),
                             caption: img.caption || "",
-                            alt: img.caption || p.title + " (photo " + (i + 1) + ")"
+                            alt: img.caption || plainTitle + " (photo " + (i + 1) + ")"
                         };
                     });
                     if (photos.length) {
@@ -977,10 +1024,11 @@
                         art.appendChild(c);
                     }
 
+                    // title and body may hold bold / italic / underline; RichText rebuilds only those
                     var h = document.createElement("h3");
-                    h.textContent = p.title;
+                    RichText.render(p.title, h);
 
-                    var text = String(p.body || "");
+                    var text = RichText.toPlain(p.body);
                     var words = text.split(/\s+/).filter(Boolean).length;
                     var mins = Math.max(1, Math.round(words / 200));
 
@@ -1014,10 +1062,8 @@
 
                     var b = document.createElement("div");
                     b.className = "post-body";
-                    text.trim().split(/\n\s*\n/).forEach(function(para) {
-                        var pe = document.createElement("p");
-                        pe.textContent = para.trim();
-                        b.appendChild(pe);
+                    RichText.render(p.body, b, {
+                        paragraphs: true
                     });
 
                     art.append(h, m, b);
@@ -1083,14 +1129,20 @@
 
             form.addEventListener("submit", function(ev) {
                 ev.preventDefault();
-                var title = form.title.value.trim();
+                var title = titleEditor.getValue();
                 var author = form.author.value.trim();
-                var body = form.body.value.trim();
-                if (!title || !author || !body) {
+                var body = bodyEditor.getValue();
+                if (!titleEditor.getPlain() || !author || !bodyEditor.getPlain()) {
                     setStatus("Add a title, your name, and the post text.", true);
                     return;
                 }
+                if (titleEditor.isTooLong()) {
+                    setStatus("The title is too long (up to 90 characters).", true);
+                    return;
+                }
                 submitBtn.disabled = true;
+                titleEditor.setDisabled(true);
+                bodyEditor.setDisabled(true);
                 if (picker) picker.setBusy(true);
                 if (docPicker) docPicker.setBusy(true);
                 setStatus("Sending…");
@@ -1160,6 +1212,8 @@
                     });
                 }).then(function() {
                     form.reset();
+                    titleEditor.clear();
+                    bodyEditor.clear();
                     if (picker) picker.reset();
                     if (docPicker) docPicker.reset();
                     setStatus("Thank you! Your post has been sent and will appear here once it's approved by admin.");
@@ -1167,6 +1221,8 @@
                     setStatus(err.message || "Your post couldn't be sent. Please try again.", true);
                 }).then(function() {
                     submitBtn.disabled = false;
+                    titleEditor.setDisabled(false);
+                    bodyEditor.setDisabled(false);
                     if (picker) picker.setBusy(false);
                     if (docPicker) docPicker.setBusy(false);
                 });

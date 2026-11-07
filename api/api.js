@@ -337,6 +337,21 @@ function text(b, key, max, label, optional) {
     return v;
 }
 
+// A post title or body may carry <b>, <i>, <u> and &amp; &lt; &gt; from the
+// formatting editor (js/rich-text.js); the pages only ever rebuild those, never
+// insert the text as HTML. Limits count the visible text, not the tags.
+function plainText(s) {
+    return s.replace(/<\/?[biu]>/g, '').replace(/&(?:amp|lt|gt);/g, '&');
+}
+
+function richText(b, key, max, label, optional) {
+    const v = text(b, key, max * 4, label, optional);
+    const visible = plainText(v).trim();
+    if (!visible && !optional) throw new HttpError(400, 'Add ' + label + '.');
+    if (visible.length > max) throw new HttpError(400, label.charAt(0).toUpperCase() + label.slice(1) + ' is too long (up to ' + max + ' characters).');
+    return v;
+}
+
 function sha256(s) {
     return crypto.createHash('sha256').update(String(s)).digest();
 }
@@ -409,9 +424,9 @@ const actions = {
         const now = new Date().toISOString();
         const post = {
             id: crypto.randomUUID(),
-            title: text(b, 'title', 90, 'a title'),
+            title: richText(b, 'title', 90, 'a title'),
             author: text(b, 'author', 50, 'your name'),
-            body: text(b, 'body', 20000, 'the post text'),
+            body: richText(b, 'body', 20000, 'the post text'),
             category: text(b, 'category', 50, 'a category', true) || 'Guest Post',
             images: cleanImages(b.images, MAX_GUEST_IMAGES),
             files: cleanFileIds(b.files, MAX_GUEST_FILES),
@@ -523,9 +538,9 @@ const actions = {
         const now = new Date().toISOString();
         const post = {
             id: (typeof b.id === 'string' && b.id.trim()) ? b.id.trim() : crypto.randomUUID(),
-            title: text(b, 'title', 90, 'a title'),
+            title: richText(b, 'title', 90, 'a title'),
             author: text(b, 'author', 50, "the author's name"),
-            body: text(b, 'body', 20000, 'the post text'),
+            body: richText(b, 'body', 20000, 'the post text'),
             category: text(b, 'category', 50, 'a category', true) || 'Field Notes',
             images: await keepImages(cleanImages(b.images, MAX_ADMIN_IMAGES)),
             files: await keepFiles(cleanFileIds(b.files, MAX_ADMIN_FILES)),
@@ -551,9 +566,9 @@ const actions = {
                 const now = new Date().toISOString();
                 post = {
                     id: String(b.id || crypto.randomUUID()),
-                    title: text(b, 'title', 90, 'a title'),
+                    title: richText(b, 'title', 90, 'a title'),
                     author: text(b, 'author', 50, "the author's name", true) || 'Sanjay Patil',
-                    body: text(b, 'body', 20000, 'the post text'),
+                    body: richText(b, 'body', 20000, 'the post text'),
                     category: text(b, 'category', 50, 'a category', true) || 'Field Notes',
                     images: await keepImages(cleanImages(b.images, MAX_ADMIN_IMAGES)),
                     files: await keepFiles(cleanFileIds(b.files, MAX_ADMIN_FILES)),
@@ -579,9 +594,9 @@ const actions = {
             post = await getOne(POSTS, b.id);
             oldImages = post.images || [];
             oldFiles = post.files || [];
-            post.title = text(b, 'title', 90, 'a title');
+            post.title = richText(b, 'title', 90, 'a title');
             post.author = text(b, 'author', 50, "the author's name");
-            post.body = text(b, 'body', 20000, 'the post text');
+            post.body = richText(b, 'body', 20000, 'the post text');
             if (b.category != null) post.category = text(b, 'category', 50, 'a category', true);
             if (b.date) post.date = b.date;
             if (b.status) post.status = b.status;
@@ -589,9 +604,9 @@ const actions = {
             const now = new Date().toISOString();
             post = {
                 id: String(b.id || crypto.randomUUID()),
-                title: text(b, 'title', 90, 'a title'),
+                title: richText(b, 'title', 90, 'a title'),
                 author: text(b, 'author', 50, "the author's name", true) || 'Sanjay Patil',
-                body: text(b, 'body', 20000, 'the post text'),
+                body: richText(b, 'body', 20000, 'the post text'),
                 category: text(b, 'category', 50, 'a category', true) || 'Field Notes',
                 images: [],
                 files: [],
